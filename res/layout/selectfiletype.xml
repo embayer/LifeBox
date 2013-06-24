@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="11dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="11dp" >
+
+    <Button
+            android:id="@+id/media_picture"
+            android:drawableTop="@drawable/button_picture_256"
+            android:paddingTop="25dp"
+            android:layout_width="362dp"
+            android:layout_height="176dp" />
+    <Button
+            android:id="@+id/media_video"
+            android:drawableTop="@drawable/button_video_256"
+            android:paddingTop="25dp"
+            android:layout_below="@id/media_picture"
+            android:layout_width="362dp"
+            android:layout_height="176dp"
+            android:layout_marginTop="11dp"/>
+    <Button
+            android:id="@+id/media_file"
+            android:drawableTop="@drawable/button_anyfile_256"
+            android:paddingTop="25dp"
+            android:layout_below="@id/media_video"
+            android:layout_width="362dp"
+            android:layout_height="176dp"
+            android:layout_marginTop="11dp"/>
+</RelativeLayout>

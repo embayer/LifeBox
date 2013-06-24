@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LifeBox</string>
+    <string name="title_selecttype">Select Type</string>
+    <string name="tab_reporting">Reporting</string>
+    <string name="tab_input">Input</string>
+    <string name="tab_timeline">Timeline</string>
+    <string name="album_name">LifeBoxImages</string>
+    <string name="cannot">Cannot</string>
+</resources>

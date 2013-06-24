@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="11dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="11dp" >
+    <Button
+            android:id="@+id/picture"
+            android:drawableTop="@drawable/button_camera"
+            android:paddingTop="25dp"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="11dp"/>
+    <Button
+            android:id="@+id/video"
+            android:drawableTop="@drawable/button_videocamera"
+            android:paddingTop="25dp"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_toRightOf="@id/picture"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+    <Button
+            android:id="@+id/voice"
+            android:drawableTop="@drawable/button_microphone"
+            android:paddingTop="25dp"
+            android:layout_below="@id/picture"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+    <Button
+            android:id="@+id/text"
+            android:drawableTop="@drawable/button_text"
+            android:paddingTop="25dp"
+            android:layout_toRightOf="@id/voice"
+            android:layout_below="@id/picture"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+    <Button
+            android:id="@+id/location"
+            android:drawableTop="@drawable/button_marker"
+            android:paddingTop="25dp"
+            android:layout_toRightOf="@id/text"
+            android:layout_below="@id/picture"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+    <Button
+            android:id="@+id/book"
+            android:drawableTop="@drawable/button_book"
+            android:paddingTop="25dp"
+            android:layout_below="@id/voice"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+    <Button
+            android:id="@+id/movie"
+            android:drawableTop="@drawable/button_movie"
+            android:paddingTop="25dp"
+            android:layout_toRightOf="@id/book"
+            android:layout_below="@id/text"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+    <Button
+            android:id="@+id/tvshow"
+            android:drawableTop="@drawable/button_tv"
+            android:paddingTop="25dp"
+            android:layout_toRightOf="@id/movie"
+            android:layout_below="@id/location"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+    <Button
+            android:id="@+id/music"
+            android:drawableTop="@drawable/button_music"
+            android:paddingTop="25dp"
+            android:layout_below="@id/book"
+            android:layout_width="114dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+    <Button
+            android:drawableTop="@drawable/button_file"
+            android:paddingTop="25dp"
+            android:layout_toRightOf="@id/music"
+            android:layout_below="@id/movie"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:onClick="startSelectFileType"/>
+
+    <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="visible"
+            android:id="@+id/imageview" />
+
+    <VideoView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="invisible"
+            android:id="@+id/videoview" />
+
+</RelativeLayout>
