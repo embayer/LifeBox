@@ -156,11 +156,24 @@ public class SelectTypeFragment extends Fragment
 			case ACTION_TAKE_PHOTO:
 				if(resultCode == Activity.RESULT_OK)
 				{
-					Intent intent = new Intent(getActivity(), UploadService.class);
-					intent.putExtra("imgUri", mCurrentPhotoPath);
-					getActivity().startService(intent);
+					Intent intent = new Intent(getActivity(), MetaForm.class);
+					intent.putExtra("fileUri", mCurrentPhotoPath);
+					Log.e("fileUri", mCurrentPhotoPath);
+					intent.putExtra("mimeType", MIME_TYPE_IMAGE);
+					getActivity().startActivity(intent);
+
+
 				}
 				//TODO Fehlerbehandlung
+				break;
+			case ACTION_TAKE_VIDEO:
+				if(resultCode == Activity.RESULT_OK)
+				{
+					Intent intent = new Intent(getActivity(), UploadService.class);
+					intent.putExtra("fileUri", mCurrentVideoPath);
+					intent.putExtra("mimeType", MIME_TYPE_VIDEO);
+					getActivity().startService(intent);
+				}
 				break;
 			default:
 				//TODO default case

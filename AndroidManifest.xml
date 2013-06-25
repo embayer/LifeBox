@@ -43,15 +43,15 @@
         <activity
                 android:name=".NoConnectionActivity"
                 android:noHistory="true" />
-        <activity android:name=".UploadActivity"/>
-        <activity android:name=".GetMeta"/>
-        <activity android:name=".TakePictureActivity"/>
+
         <activity android:name=".MetaForm"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="SelectTypeActivity" />
 
-        <service android:name=".UploadService"/>
+        <service android:name=".UploadService"
+                 android:exported="false" />
+
     </application>
 </manifest>

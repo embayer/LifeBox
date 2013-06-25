@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -28,8 +30,6 @@ public class UploadService extends IntentService
 	//TODO change the upload directory to AppData
 	/**Google Drive Scope for the AppData folder */
 	public static String APP_DATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
-	/** Path to the local file that should be uploaded */
-	private static Uri fileUri;
 	/** Drive service object */
 	private static Drive service;
 	/** Google account authentification object */
@@ -57,7 +57,11 @@ public class UploadService extends IntentService
 	{
 		showToast("Begin upload");
 
-		fileUri = Uri.parse(intent.getStringExtra("imgUri"));
+		// get the extras
+		// MIME-Type of file
+		String mimeType = intent.getStringExtra("mimeType");
+		// Path to the local file that should be uploaded
+		Uri fileUri = Uri.parse(intent.getStringExtra("fileUri"));
 
 		// retrieve the users accountname from the sharedpreferences
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
@@ -76,23 +80,40 @@ public class UploadService extends IntentService
 				// assemble the file
 				// File's binary content
 				java.io.File fileContent = new java.io.File(fileUri.getPath());
-				FileContent mediaContent = new FileContent("image/jpeg", fileContent);
+				FileContent mediaContent = null;
 
-				// File's metadata.
-				File body = new File();
+				// File's metadata
+				File body = null;
+
+				if(mimeType == "image")
+				{
+					mediaContent = new FileContent("image/jpeg", fileContent);
+					body = new File();
+					body.setMimeType("image/jpeg");
+				}
+				else
+				{
+					mediaContent = new FileContent("video/mp4", fileContent);
+					body = new File();
+					body.setMimeType("video/mp4");
+				}
+
 				body.setTitle(fileContent.getName());
 				body.setDescription("LifeBoxFile");
-				body.setMimeType("image/jpeg");
 //				body.setParents(Arrays.asList(new ParentReference().setId("appdata")));
 
 				// upload
 				File file = service.files().insert(body, mediaContent).execute();
+				Log.e("uploadservice", file.toString());
 
 				// succeeded?
-				if (null !=file)
+				if (null != file)
 				{
 					// notify the user via a toast
 					showToast("Photo uploaded: " + file.getTitle());
+					// get and send the fileId via broadcast
+					String id = file.get("id").toString();
+					sendFileId(id);
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
@@ -111,7 +132,6 @@ public class UploadService extends IntentService
 //			startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 		}
 	}
-	// gitgitgit
 
 	/**
 	 * Getter for Google Drive service objects.
@@ -122,6 +142,22 @@ public class UploadService extends IntentService
 	{
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
 				.build();
+	}
+
+	/**
+	 * Sends the fileId retrieved from the drive service back to the activity
+	 * which started this service
+	 * @param fileId String the id handle to the uploaded file stored on drive
+	 */
+	private void sendFileId(String fileId)
+	{
+		Constants mConstants = new Constants();
+		Intent localIntent = new Intent(mConstants.BROADCAST_ACTION);
+		localIntent.putExtra("fileId", fileId);
+		localIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+		// broadcasts the Intent to receivers in this app
+		LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
 	}
 
 	/**
