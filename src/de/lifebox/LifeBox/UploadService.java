@@ -85,13 +85,13 @@ public class UploadService extends IntentService
 				// File's metadata
 				File body = null;
 
-				if(mimeType == "image")
+				if(mimeType.equals(Constants.MIME_TYPE_IMAGE))
 				{
 					mediaContent = new FileContent("image/jpeg", fileContent);
 					body = new File();
 					body.setMimeType("image/jpeg");
 				}
-				else
+				else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
 				{
 					mediaContent = new FileContent("video/mp4", fileContent);
 					body = new File();
@@ -111,9 +111,9 @@ public class UploadService extends IntentService
 				{
 					// notify the user via a toast
 					showToast("Photo uploaded: " + file.getTitle());
-					// get and send the fileId via broadcast
-					String id = file.get("id").toString();
-					sendFileId(id);
+					Log.e("json", file.toString());
+					Log.e("downloadUrl", file.get("downloadUrl").toString());
+					sendDriveMetaData(file.toString());
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
@@ -122,6 +122,7 @@ public class UploadService extends IntentService
 			}
 			catch(IOException e)
 			{
+				Log.e("ioerror", e.toString());
 				showToast("IO-Error. Please try again.");
 			}
 		}
@@ -147,13 +148,12 @@ public class UploadService extends IntentService
 	/**
 	 * Sends the fileId retrieved from the drive service back to the activity
 	 * which started this service
-	 * @param fileId String the id handle to the uploaded file stored on drive
+	 * @param file String the id handle to the uploaded file stored on drive
 	 */
-	private void sendFileId(String fileId)
+	private void sendDriveMetaData(String file)
 	{
-		Constants mConstants = new Constants();
-		Intent localIntent = new Intent(mConstants.BROADCAST_ACTION);
-		localIntent.putExtra("fileId", fileId);
+		Intent localIntent = new Intent(Constants.BROADCAST_ACTION);
+		localIntent.putExtra("driveMetaData", file);
 		localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
 		// broadcasts the Intent to receivers in this app

@@ -23,7 +23,7 @@ public class AlbumStorageDirFactory
 	public File getAlbumStorageDir(String mimeType)
 	{
 		File storageDir;
-		if(mimeType.equals("image"))
+		if(mimeType.equals(Constants.MIME_TYPE_IMAGE))
 		{
 			// path should be something like: emulated/0/storage/LifeBox/Images/
 			storageDir = new File
@@ -35,7 +35,7 @@ public class AlbumStorageDirFactory
 						+ PICTURES_DIR
 					);
 		}
-		else if(mimeType.equals("video"))
+		else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
 		{
 			storageDir = new File
 					(

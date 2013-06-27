@@ -44,7 +44,7 @@
                 android:name=".NoConnectionActivity"
                 android:noHistory="true" />
 
-        <activity android:name=".MetaForm"/>
+        <activity android:name=".MetaFormActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

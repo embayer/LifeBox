@@ -7,25 +7,17 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.services.drive.Drive;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -42,10 +34,6 @@ public class SelectTypeFragment extends Fragment
 	private static final int ACTION_TAKE_PHOTO_S = 2;
 	private static final int ACTION_TAKE_VIDEO = 3;
 
-	// codes for the different MIME-Types
-	private static final String MIME_TYPE_IMAGE = "image";
-	private static final String MIME_TYPE_VIDEO = "video";
-
 	// keys for image display
 	private static final String BITMAP_STORAGE_KEY = "viewbitmap";
 	private static final String IMAGEVIEW_VISIBILITY_STORAGE_KEY = "imageviewvisibility";
@@ -61,6 +49,12 @@ public class SelectTypeFragment extends Fragment
 	// paths to the last created media
 	private String mCurrentPhotoPath;
 	private String mCurrentVideoPath;
+
+	// path to the temporary image that will be deleted
+	private String mPhotoToDeletePath;
+
+	// timestamp (NOT unix timestamp) of the last created file
+	private String mCurrentTimeStamp;
 
 	// pre- and suffixes to assemble filenames
 	private static final String FILE_PREFIX = "LB_";
@@ -156,10 +150,27 @@ public class SelectTypeFragment extends Fragment
 			case ACTION_TAKE_PHOTO:
 				if(resultCode == Activity.RESULT_OK)
 				{
-					Intent intent = new Intent(getActivity(), MetaForm.class);
+					// remember the old files path in order to delete it later
+					mPhotoToDeletePath = mCurrentPhotoPath;
+
+					// reduce the image size
+					mCurrentPhotoPath = scale(mPhotoToDeletePath);
+
+					// delete the temporary file
+					File file = new File(mPhotoToDeletePath);
+					boolean deleted = file.delete();
+
+					if(deleted == false)
+					{
+						// do nothing
+					}
+
+					// start an intent to navigate to the MetaFormActivity
+					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
+					Log.e("path", mCurrentPhotoPath);
 					intent.putExtra("fileUri", mCurrentPhotoPath);
-					Log.e("fileUri", mCurrentPhotoPath);
-					intent.putExtra("mimeType", MIME_TYPE_IMAGE);
+					intent.putExtra("mimeType", Constants.MIME_TYPE_IMAGE);
+					intent.putExtra("timeStamp", mCurrentTimeStamp);
 					getActivity().startActivity(intent);
 
 
@@ -171,7 +182,8 @@ public class SelectTypeFragment extends Fragment
 				{
 					Intent intent = new Intent(getActivity(), UploadService.class);
 					intent.putExtra("fileUri", mCurrentVideoPath);
-					intent.putExtra("mimeType", MIME_TYPE_VIDEO);
+					intent.putExtra("mimeType", Constants.MIME_TYPE_VIDEO);
+					intent.putExtra("timeStamp", mCurrentTimeStamp);
 					getActivity().startService(intent);
 				}
 				break;
@@ -285,12 +297,13 @@ public class SelectTypeFragment extends Fragment
 	{
 		// create a timestamp
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		mCurrentTimeStamp = timeStamp;
 
 		// Create an image file name
 		String imageFileName = FILE_PREFIX + JPEG_FILE_PREFIX + timeStamp;
 
 		// request a storage dir
-		File albumF = getAlbumDir(MIME_TYPE_IMAGE);
+		File albumF = getAlbumDir(Constants.MIME_TYPE_IMAGE);
 		File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumF);
 
 		return imageF;
@@ -316,12 +329,13 @@ public class SelectTypeFragment extends Fragment
 	{
 		// create a timestamp
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		mCurrentTimeStamp = timeStamp;
 
 		// Create a video file name
 		String videoFileName = FILE_PREFIX + MP4_FILE_PREFIX + timeStamp;
 
 		// request a storage directory
-		File albumF = getAlbumDir(MIME_TYPE_VIDEO);
+		File albumF = getAlbumDir(Constants.MIME_TYPE_VIDEO);
 		File videoF = File.createTempFile(videoFileName, MP4_FILE_SUFFIX, albumF);
 		return videoF;
 	}
@@ -336,6 +350,82 @@ public class SelectTypeFragment extends Fragment
 		mCurrentPhotoPath = f.getAbsolutePath();
 
 		return f;
+	}
+
+	/**
+	 * Creates a new scaled down image of the image given in the parameter in order to reduce up- and downloadtime.
+	 *
+	 * @param path (String) to the picture that should be scaled.
+	 * @return newPath (String) to the newly created image.
+	 */
+	private String scale(String path)
+	{
+		// get the devices display size in pixels
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int deviceWidth = size.x;
+		int deviceHeight = size.y;
+
+		// get the size of the image
+		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+		bmOptions.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path, bmOptions);
+		int photoWidth = bmOptions.outWidth;
+		int photoHeight = bmOptions.outHeight;
+
+		// figure out which way needs to be reduced less
+		int scaleFactor = 1;
+		if((deviceWidth > 0) || (deviceHeight > 0))
+		{
+			scaleFactor = Math.min(photoWidth/deviceWidth, photoHeight/deviceHeight);
+		}
+
+		// set bitmap options to scale the image decode target
+		bmOptions.inJustDecodeBounds = false;
+		bmOptions.inSampleSize = scaleFactor;
+		bmOptions.inPurgeable = true;
+
+		// decode the JPEG file into a Bitmap
+		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+		// get the folder where the new file should be stored
+		File albumF = getAlbumDir(Constants.MIME_TYPE_IMAGE);
+
+		// set the new filename
+		String imageFileName = FILE_PREFIX + JPEG_FILE_PREFIX + mCurrentTimeStamp + JPEG_FILE_SUFFIX;
+
+		// create the new file
+		File file = new File(albumF, imageFileName);
+
+		// wright the file
+		OutputStream out = null;
+		try
+		{
+			out = new BufferedOutputStream(new FileOutputStream(file));
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+		}
+		catch(IOException e)
+		{
+			Toast.makeText(getActivity(), "An error occured while creating the image file. Please try again.", Toast.LENGTH_LONG);
+		}
+		finally
+		{
+			if(null != out)
+			{
+				try
+				{
+					// close the OutputStream
+					out.close();
+				}
+				catch (IOException e)
+				{
+					Toast.makeText(getActivity(), "An error occurred while creating the image file. Please try again.", Toast.LENGTH_LONG);
+				}
+			}
+		}
+
+		return file.getAbsolutePath();
 	}
 
 	/** Scale down the picture to devices screen resolution in order to save ram. */
@@ -405,6 +495,7 @@ public class SelectTypeFragment extends Fragment
 					e.printStackTrace();
 					f = null;
 					mCurrentPhotoPath = null;
+					mCurrentTimeStamp = null;
 				}
 				break;
 
@@ -435,6 +526,7 @@ public class SelectTypeFragment extends Fragment
 					e.printStackTrace();
 					f = null;
 					mCurrentVideoPath = null;
+					mCurrentTimeStamp = null;
 				}
 				break;
 
