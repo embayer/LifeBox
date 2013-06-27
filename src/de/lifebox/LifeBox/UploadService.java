@@ -110,7 +110,15 @@ public class UploadService extends IntentService
 				if (null != file)
 				{
 					// notify the user via a toast
-					showToast("Photo uploaded: " + file.getTitle());
+					if(mimeType.equals(Constants.MIME_TYPE_IMAGE))
+					{
+						showToast("Photo uploaded: " + file.getTitle());
+					}
+					else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
+					{
+						showToast("Video uploaded: " + file.getTitle());
+					}
+
 					Log.e("json", file.toString());
 					Log.e("downloadUrl", file.get("downloadUrl").toString());
 					sendDriveMetaData(file.toString());

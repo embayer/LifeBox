@@ -66,7 +66,17 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	protected void onStart()
 	{
 		super.onStart();
-		mPlusClient.connect();
+		if(isOnline())
+		{
+			mPlusClient.connect();
+		}
+		else
+		{
+			// navigate to the noconnection activity
+			Intent intent = new Intent(this, NoConnectionActivity.class);
+			startActivity(intent);
+		}
+
 	}
 
 	@Override

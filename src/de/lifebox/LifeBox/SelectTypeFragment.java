@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -62,6 +63,7 @@ public class SelectTypeFragment extends Fragment
 	private static final String JPEG_FILE_SUFFIX = ".jpg";
 	private static final String MP4_FILE_PREFIX = "VID_";
 	private static final String MP4_FILE_SUFFIX = ".mp4";
+	private static final String THUMBNAIL_SUFFIX = "THM";
 
 	// instance of AlbumstoragedirFactory helper class to generate valid folder files
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
@@ -165,12 +167,16 @@ public class SelectTypeFragment extends Fragment
 						// do nothing
 					}
 
+					// create a thumbnail of the image file
+					String imageThumbnail = createImageThumbnail(mCurrentPhotoPath);
+
 					// start an intent to navigate to the MetaFormActivity
 					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
 					Log.e("path", mCurrentPhotoPath);
 					intent.putExtra("fileUri", mCurrentPhotoPath);
 					intent.putExtra("mimeType", Constants.MIME_TYPE_IMAGE);
 					intent.putExtra("timeStamp", mCurrentTimeStamp);
+					intent.putExtra("thumbnail", imageThumbnail);
 					getActivity().startActivity(intent);
 
 
@@ -180,10 +186,15 @@ public class SelectTypeFragment extends Fragment
 			case ACTION_TAKE_VIDEO:
 				if(resultCode == Activity.RESULT_OK)
 				{
+					// create a thumbnail of the video file
+					String videoThumbnail = createVideoThumbnail(mCurrentVideoPath);
+
+					// start an intent to navigate to the MetaFormActivity
 					Intent intent = new Intent(getActivity(), UploadService.class);
 					intent.putExtra("fileUri", mCurrentVideoPath);
 					intent.putExtra("mimeType", Constants.MIME_TYPE_VIDEO);
 					intent.putExtra("timeStamp", mCurrentTimeStamp);
+					intent.putExtra("thumbnail", videoThumbnail);
 					getActivity().startService(intent);
 				}
 				break;
@@ -353,6 +364,44 @@ public class SelectTypeFragment extends Fragment
 	}
 
 	/**
+	 * Write a bitmap to a JPEG-image
+	 * @param sourceBitmap (Bitmap) the Bitmap used as source
+	 * @param targetFile (File) the output File
+	 * @return (String) path to the output File
+	 */
+	private String bitmapToJPEG(Bitmap sourceBitmap, File targetFile)
+	{
+		// wright the file
+		OutputStream out = null;
+		try
+		{
+			out = new BufferedOutputStream(new FileOutputStream(targetFile));
+			sourceBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+		}
+		catch(IOException e)
+		{
+			Toast.makeText(getActivity(), "An error occured while creating the image file. Please try again.", Toast.LENGTH_LONG);
+		}
+		finally
+		{
+			if(null != out)
+			{
+				try
+				{
+					// close the OutputStream
+					out.close();
+				}
+				catch (IOException e)
+				{
+					Toast.makeText(getActivity(), "An error occurred while creating the image file. Please try again.", Toast.LENGTH_LONG);
+				}
+			}
+		}
+
+		return targetFile.getAbsolutePath();
+	}
+
+	/**
 	 * Creates a new scaled down image of the image given in the parameter in order to reduce up- and downloadtime.
 	 *
 	 * @param path (String) to the picture that should be scaled.
@@ -399,33 +448,62 @@ public class SelectTypeFragment extends Fragment
 		File file = new File(albumF, imageFileName);
 
 		// wright the file
-		OutputStream out = null;
-		try
-		{
-			out = new BufferedOutputStream(new FileOutputStream(file));
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-		}
-		catch(IOException e)
-		{
-			Toast.makeText(getActivity(), "An error occured while creating the image file. Please try again.", Toast.LENGTH_LONG);
-		}
-		finally
-		{
-			if(null != out)
-			{
-				try
-				{
-					// close the OutputStream
-					out.close();
-				}
-				catch (IOException e)
-				{
-					Toast.makeText(getActivity(), "An error occurred while creating the image file. Please try again.", Toast.LENGTH_LONG);
-				}
-			}
-		}
+		String resultPath = bitmapToJPEG(bitmap, file);
 
-		return file.getAbsolutePath();
+		return resultPath;
+	}
+
+	/**
+	 * Create a thumbnail image from a given image.
+	 * @param path (String) to the image of which the thumbnail should be created
+	 * @return (String) path to the created thumbnail image
+	 */
+	private String createImageThumbnail(String path)
+	{
+		// get a bitmap for the specified file
+		Bitmap bitmap = BitmapFactory.decodeFile(path);
+
+		// get the folder where the new file should be stored
+		File albumF = getAlbumDir(Constants.MIME_TYPE_IMAGE_THUMB);
+
+		// set the new filename
+		String imageFileName = FILE_PREFIX + JPEG_FILE_PREFIX + mCurrentTimeStamp + THUMBNAIL_SUFFIX + JPEG_FILE_SUFFIX;
+
+		// create the new file
+		File file = new File(albumF, imageFileName);
+
+		// create the thumbnail
+		bitmap = ThumbnailUtils.extractThumbnail(bitmap, 96, 96);
+
+		String resultPath = bitmapToJPEG(bitmap, file);
+
+		return resultPath;
+	}
+
+	/**
+	 * Create a thumbnail image from a given image.
+	 * @param path (String) to the image of which the thumbnail should be created
+	 * @return (String) path to the created thumbnail image
+	 */
+	private String createVideoThumbnail(String path)
+	{
+		// get the folder where the new file should be stored
+		File albumF = getAlbumDir(Constants.MIME_TYPE_VIDEO_THUMB);
+
+		// set the new filename
+		String imageFileName = FILE_PREFIX + MP4_FILE_PREFIX + mCurrentTimeStamp + THUMBNAIL_SUFFIX + JPEG_FILE_SUFFIX;
+
+		// create the new file
+		File file = new File(albumF, imageFileName);
+
+		Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap;// = Bitmap.createBitmap(96, 96, conf);
+		bitmap = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MICRO_KIND);
+
+		// wright the file
+		String resultPath = bitmapToJPEG(bitmap, file);
+
+		return resultPath;
 	}
 
 	/** Scale down the picture to devices screen resolution in order to save ram. */

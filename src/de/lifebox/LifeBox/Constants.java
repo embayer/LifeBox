@@ -15,6 +15,10 @@ public final class Constants
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
 	public static final String MIME_TYPE_VIDEO = "video/mp4";
 
+	// codes for Thumbnails
+	public static final String MIME_TYPE_IMAGE_THUMB = "image/thumbnail";
+	public static final String MIME_TYPE_VIDEO_THUMB = "video/thumbnail";
+
 	/** Constructor is empty to prevent instantiating the Constants class. */
 	public Constants() {}
 }

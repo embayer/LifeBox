@@ -12,8 +12,9 @@ import java.io.File;
 public class AlbumStorageDirFactory
 {
 	private static final String LIFEBOX_DIR = "LifeBox";		// base folder
-	private static final String PICTURES_DIR = "Images";        // image folder
+	private static final String IMAGES_DIR = "Images";        // image folder
 	private static final String VIDEOS_DIR = "Videos";          // video folder
+	private static final String THUMBNAILS_DIR = "Thumbnails";
 
 	/**
 	 * Get the proper path for a specific MIME-Type and create a folder.
@@ -29,10 +30,10 @@ public class AlbumStorageDirFactory
 			storageDir = new File
 					(
 						Environment.getExternalStorageDirectory()
-						+File.separator
+						+ File.separator
 						+ LIFEBOX_DIR
-						+File.separator
-						+ PICTURES_DIR
+						+ File.separator
+						+ IMAGES_DIR
 					);
 		}
 		else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
@@ -40,10 +41,36 @@ public class AlbumStorageDirFactory
 			storageDir = new File
 					(
 						Environment.getExternalStorageDirectory()
+						+ File.separator
+						+ LIFEBOX_DIR
+						+ File.separator
+						+ VIDEOS_DIR
+					);
+		}
+		else if(mimeType.equals(Constants.MIME_TYPE_IMAGE_THUMB))
+		{
+			storageDir = new File
+					(
+						Environment.getExternalStorageDirectory()
 						+File.separator
 						+ LIFEBOX_DIR
-						+File.separator
-						+ VIDEOS_DIR
+						+ File.separator
+						+ IMAGES_DIR
+						+ File.separator
+						+ THUMBNAILS_DIR
+					);
+		}
+		else if(mimeType.equals(Constants.MIME_TYPE_VIDEO_THUMB))
+		{
+			storageDir = new File
+					(
+							Environment.getExternalStorageDirectory()
+							+ File.separator
+							+ LIFEBOX_DIR
+							+ File.separator
+							+ VIDEOS_DIR
+							+ File.separator
+							+ THUMBNAILS_DIR
 					);
 		}
 		else
