@@ -10,11 +10,10 @@
 
     <EditText
             android:id="@+id/in_title"
-            android:text="Title"
             android:layout_width="294dp"
             android:layout_height="60dp"
-
-            />
+            android:hint="Title"
+            android:capitalize="sentences" />
 
     <ImageView
             android:id="@+id/button_ok"
@@ -23,67 +22,62 @@
             android:layout_toRightOf="@id/in_title"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginLeft="10dp"
-            android:onClick="startDrive"/>
+            android:layout_marginLeft="10dp" />
+
+    <EditText
+            android:id="@+id/description"
+            android:padding="6dp"
+            android:layout_below="@id/in_title"
+            android:layout_width="364dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:background="#949494"
+            android:textColor="#000000"
+            android:hint="Description..."
+            android:capitalize="sentences" />
 
     <Button
             android:id="@+id/timepicker"
             android:text="23:51"
-            android:layout_below="@id/in_title"
+            android:layout_below="@id/description"
             android:layout_width="177dp"
             android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:onClick="showTimePickerDialog" />
+            android:layout_marginTop="10dp" />
 
     <Button
             android:id="@+id/datepicker"
             android:text="2013-12-24"
-            android:layout_below="@id/in_title"
+            android:layout_below="@id/description"
             android:layout_toRightOf="@id/timepicker"
             android:layout_width="177dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:onClick="showDatePickerDialog" />
-
-    <TextView
-            android:id="@+id/description"
-            android:text="Description..."
-            android:layout_below="@id/timepicker"
-            android:layout_width="364dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="10dp"
-            android:background="#c4c4c4"
-            android:textColor="#000000" />
+            android:layout_marginTop="10dp" />
 
     <Button
-            android:id="@+id/tags"
+            android:id="@+id/button_tags"
             android:text="tags"
-            android:layout_below="@id/description"
+            android:layout_below="@id/timepicker"
             android:layout_width="177dp"
             android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:onClick="showDatePickerDialog" />
+            android:layout_marginTop="10dp" />
 
     <Button
-            android:id="@+id/hashtags"
+            android:id="@+id/button_hashtags"
             android:text="hashtags"
-            android:layout_below="@id/description"
-            android:layout_toRightOf="@id/tags"
+            android:layout_below="@id/datepicker"
+            android:layout_toRightOf="@id/button_tags"
             android:layout_width="177dp"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:onClick="showDatePickerDialog" />
+            android:layout_marginTop="10dp" />
 
     <Button
             android:id="@+id/save"
             android:text="save"
-            android:layout_below="@id/tags"
+            android:layout_below="@id/button_tags"
             android:layout_width="364dp"
             android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:onClick="showDatePickerDialog" />
-
+            android:layout_marginTop="10dp" />
 
 </RelativeLayout>

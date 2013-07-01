@@ -69,21 +69,33 @@ public class SelectTypeFragment extends Fragment
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
 
 	// OnClickListeners for the buttons
-	Button.OnClickListener mTakePicOnClickListener =
-			new Button.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dispatchTakePictureIntent(ACTION_TAKE_PHOTO);
-				}
-			};
+	Button.OnClickListener mTakePicOnClickListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			dispatchTakePictureIntent(ACTION_TAKE_PHOTO);
+		}
+	};
 
-	Button.OnClickListener mTakeVidOnClickListener =
-			new Button.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					dispatchTakeVideoIntent(ACTION_TAKE_VIDEO);
-				}
-			};
+	Button.OnClickListener mTakeVidOnClickListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			dispatchTakeVideoIntent(ACTION_TAKE_VIDEO);
+		}
+	};
+
+	Button.OnClickListener mListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getActivity(), MetaFormActivity.class);
+			startActivity(intent);
+		}
+	};
 
 	/**
 	 * Constructor
@@ -135,13 +147,15 @@ public class SelectTypeFragment extends Fragment
 				MediaStore.ACTION_VIDEO_CAPTURE
 		);
 
+		Button fileBtn = (Button) view.findViewById(R.id.file);
+		fileBtn.setOnClickListener(mListener);
+
 		return view;
 	}
 
 	/**
-	 * Called when an activity you launched exits.
-	 * Giving you the requestCode you started it with,
-	 * the resultCode it returned, and any additional data from it.
+	 * Called when the activity you launched returns
+	 * with the requestCode, the resultCode, and any additional data from it.
 	 */
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode, final Intent data)
@@ -230,12 +244,17 @@ public class SelectTypeFragment extends Fragment
 //		);
 //	}
 
-	/** Set a buttonlistener or disable the button */
+	/**
+	 * Set a buttonlistener or disable the button.
+	 * @param btn (Button) the button to setup
+	 * @param onClickListener (Button.OnClickListener) the listener
+	 * @param intentName (String) the intent to perform
+	 */
 	private void setBtnListenerOrDisable(
 			Button btn,
 			Button.OnClickListener onClickListener,
-			String intentName
-	) {
+			String intentName)
+	{
 		if (isIntentAvailable(getActivity(), intentName)) {
 			btn.setOnClickListener(onClickListener);
 		} else {

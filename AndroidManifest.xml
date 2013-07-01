@@ -36,15 +36,14 @@
                   android:parentActivityName="SelectTypeActivity" />
 
         <activity
-                android:name=".DriveDemo"
-                android:label="@string/app_name"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <activity
                 android:name=".NoConnectionActivity"
                 android:noHistory="true" />
 
         <activity android:name=".MetaFormActivity"/>
+
+        <activity android:name=".TagsActivity"/>
+
+        <activity android:name=".HashTagsActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

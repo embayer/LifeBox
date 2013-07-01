@@ -1,17 +1,17 @@
 package de.lifebox.LifeBox;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 /**
  * Activity representing the form for getting the media's meta information
@@ -21,12 +21,65 @@ import android.widget.TimePicker;
 public class MetaFormActivity extends Activity
 {
 	// will be inserted into the database
+	// (
+	// the extras brought by SelectTypeFragment
 	private String mimeType;
 	private String fileUri;
 	private String timeStamp;
 
+	// the extras brought by TagsActivity
+	private boolean tagStateHobby = false;		// playing cards
+	// )
+
+	// codes for onActivityResult
+	private static final int ACTION_GATHER_TAGS = 1;
+	private static final int ACTION_GATHER_HASH_TAGS = 2;
+
 	private ResponseReceiver mResponseReceiver;
-	private TimePicker timepicker;
+
+	Button.OnClickListener mTimePickerListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			DialogFragment newFragment = new TimePickerFragment();
+			newFragment.show(getFragmentManager(), "timePicker");
+		}
+	};
+
+	Button.OnClickListener mDatePickerListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			DialogFragment newFragment = new DatePickerFragment();
+			newFragment.show(getFragmentManager(), "datePicker");
+		}
+	};
+
+	Button.OnClickListener mTagListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getBaseContext(), TagsActivity.class);
+
+			intent.putExtra("tagHobby", tagStateHobby);
+
+			startActivityForResult(intent, ACTION_GATHER_TAGS);
+		}
+	};
+
+	Button.OnClickListener mHashTagListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getBaseContext(), HashTagsActivity.class);
+
+			startActivityForResult(intent, ACTION_GATHER_HASH_TAGS);
+		}
+	};
 
 	/** Executed when the activity is first created. */
 	@Override
@@ -60,7 +113,44 @@ public class MetaFormActivity extends Activity
 		Intent callUploadServiceIntent = new Intent(this, UploadService.class);
 		callUploadServiceIntent.putExtra("mimeType", mimeType);
 		callUploadServiceIntent.putExtra("fileUri", fileUri);
-		startService(callUploadServiceIntent);
+		// TODO enable
+//		startService(callUploadServiceIntent);
+
+		// set the listeners to the buttons
+		Button tpBtn = (Button) findViewById(R.id.timepicker);
+		tpBtn.setOnClickListener(mTimePickerListener);
+
+		Button dpBtn = (Button) findViewById(R.id.datepicker);
+		dpBtn.setOnClickListener(mDatePickerListener);
+
+		Button tagBtn = (Button) findViewById(R.id.button_tags);
+		tagBtn.setOnClickListener(mTagListener);
+
+		Button hashTagBtn = (Button) findViewById(R.id.button_hashtags);
+		hashTagBtn.setOnClickListener(mHashTagListener);
+	}
+
+	/**
+	 * Called when the activity you launched returns
+	 * with the requestCode, the resultCode, and any additional data from it.
+	 */
+	@Override
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data)
+	{
+		// decide by request code what to do
+		switch(requestCode)
+		{
+			case ACTION_GATHER_TAGS:
+				if(resultCode == Activity.RESULT_OK)
+				{
+					tagStateHobby = data.getBooleanExtra("tagHobby", false);
+					if(tagStateHobby) Log.e("tag", "hobby set");
+				}
+				//TODO Fehlerbehandlung
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
