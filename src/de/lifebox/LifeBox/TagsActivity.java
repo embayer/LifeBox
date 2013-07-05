@@ -30,6 +30,7 @@ public class TagsActivity extends Activity
 //		}
 //	};
 
+	// listener for the save button
 	Button.OnClickListener mSaveListener = new Button.OnClickListener()
 	{
 		@Override

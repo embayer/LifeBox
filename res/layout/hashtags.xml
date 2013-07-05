@@ -10,17 +10,74 @@
 
     <EditText
             android:id="@+id/in_hashtag"
+            android:layout_alignParentTop="true"
             android:layout_width="294dp"
             android:layout_height="60dp"
             android:hint="Insert a new hashtag"
-            android:capitalize="sentences" />
+            android:capitalize="sentences"
+            android:singleLine="true"
+            android:maxLength="15"/>
 
     <Button
-            android:id="@+id/send_hashtag"
+            android:id="@+id/create_hashtag"
             android:text="Ok"
             android:layout_toRightOf="@id/in_hashtag"
-            android:layout_width="60dp"
+            android:layout_width="177dp"
             android:layout_height="60dp"
             android:layout_marginLeft="10dp"/>
+
+    <TextView
+            android:id="@+id/header_hashtags_history"
+            android:text="History"
+            android:layout_below="@id/in_hashtag"
+            android:layout_width="177dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="#828282"
+            android:textColor="#FFFFFF"/>
+
+    <TextView
+            android:id="@+id/header_hashtags"
+            android:text="Hashtags"
+            android:layout_below="@id/in_hashtag"
+            android:layout_toRightOf="@id/header_hashtags_history"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:paddingLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="#33B5E5"
+            android:textColor="#FFFFFF" />
+
+    <Button
+            android:id="@+id/save_hashtags"
+            android:text="Save"
+            android:layout_alignParentBottom="true"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp" />
+
+    <ListView
+            android:id="@+id/listview_history_hashtag"
+            android:layout_above="@id/save_hashtags"
+            android:layout_below="@id/header_hashtags_history"
+            android:layout_width="177dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:listSelector="?android:attr/activatedBackgroundIndicator"/>
+
+    <ListView
+            android:id="@+id/listview_hashtag"
+            android:layout_above="@id/save_hashtags"
+            android:layout_below="@id/header_hashtags_history"
+            android:layout_toRightOf="@id/listview_history_hashtag"
+            android:layout_width="177dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:listSelector="?android:attr/activatedBackgroundIndicator" />
 
 </RelativeLayout>

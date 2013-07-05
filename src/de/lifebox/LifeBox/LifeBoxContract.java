@@ -29,6 +29,7 @@ public final class LifeBoxContract
 	public static abstract class Hashtags implements BaseColumns
 	{
 		public static final String TABLE_NAME = "hashtags";
+		public static final String _ID = "_id";
 		public static final String COLUMN_NAME_HASHTAG = "hashtag";
 	}
 }

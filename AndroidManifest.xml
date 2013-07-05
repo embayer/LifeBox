@@ -5,7 +5,7 @@
           android:versionName="1.0" >
 
     <uses-sdk
-            android:minSdkVersion="8"
+            android:minSdkVersion="15"
             android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -43,7 +43,8 @@
 
         <activity android:name=".TagsActivity"/>
 
-        <activity android:name=".HashTagsActivity"/>
+        <activity android:name=".HashTagsActivity"
+                  android:windowSoftInputMode="stateVisible|adjustPan"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

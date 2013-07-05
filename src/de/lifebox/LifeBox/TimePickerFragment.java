@@ -25,13 +25,22 @@ public class TimePickerFragment extends DialogFragment
 	private int hour;
 	private int minute;
 
+	private int year;
+	private int month;
+	private int date;
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState)
 	{
 		// use the current time as the default values for the picker
 		c = Calendar.getInstance();
+
 		hour = c.get(Calendar.HOUR_OF_DAY);
 		minute = c.get(Calendar.MINUTE);
+
+		year = c.get(Calendar.YEAR);
+		month = c.get(Calendar.MONTH);
+		date = c.get(Calendar.DATE);
 
 		// create a new instance of TimePickerDialog and return it
 		return new TimePickerDialog(getActivity(), this, hour, minute,
@@ -40,8 +49,12 @@ public class TimePickerFragment extends DialogFragment
 
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute)
 	{
+		c.set(year, month, date, hourOfDay, minute);
+		Date d = c.getTime();
+		String time = new SimpleDateFormat("HH:mm").format(d);
 		// set the selected time as button text
 		Button mTimePickerBtn = (Button) getActivity().findViewById(R.id.timepicker);
-		mTimePickerBtn.setText(hourOfDay  + ":" + minute);
+//		mTimePickerBtn.setText(hourOfDay  + ":" + minute);
+		mTimePickerBtn.setText(time);
 	}
 }

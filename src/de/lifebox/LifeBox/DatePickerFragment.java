@@ -25,6 +25,10 @@ public class DatePickerFragment extends DialogFragment
 		implements DatePickerDialog.OnDateSetListener
 {
 	private Calendar c;
+
+	private int hour;
+	private int minute;
+
 	private int year;
 	private int month;
 	private int day;
@@ -34,9 +38,13 @@ public class DatePickerFragment extends DialogFragment
 	{
 		// Use the current date as the default date in the picker
 		c = Calendar.getInstance();
+
+		hour = c.get(Calendar.HOUR_OF_DAY);
+		minute = c.get(Calendar.MINUTE);
+
 		year = c.get(Calendar.YEAR);
 		month = c.get(Calendar.MONTH);
-		day = c.get(Calendar.DAY_OF_MONTH);
+		day = c.get(Calendar.DATE);
 
 		// Create a new instance of DatePickerDialog and return it
 		return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -44,14 +52,14 @@ public class DatePickerFragment extends DialogFragment
 
 	public void onDateSet(DatePicker view, int year, int month, int day)
 	{
-//		String timeStamp = new SimpleDateFormat("yyyy-MM-dd").format(year + "-" + month + "-" + day);
-//
-//		Button mDatePickerBtn = (Button) getActivity().findViewById(R.id.datepicker);
-//		mDatePickerBtn.setText(timeStamp);
+
+		c.set(year, month, day, hour, minute);
+		Date d = c.getTime();
+		String date = new SimpleDateFormat("yyyy-MM-dd").format(d);
 
 		// set the selected date as button text
 		Button mDatePickerBtn = (Button) getActivity().findViewById(R.id.datepicker);
-		mDatePickerBtn.setText(year  + "-" + month + "-" + day);
+		mDatePickerBtn.setText(date);
 		//TODO provide other date formats
 	}
 }

@@ -190,7 +190,7 @@ public class SelectTypeFragment extends Fragment
 					intent.putExtra("fileUri", mCurrentPhotoPath);
 					intent.putExtra("mimeType", Constants.MIME_TYPE_IMAGE);
 					intent.putExtra("timeStamp", mCurrentTimeStamp);
-					intent.putExtra("thumbnail", imageThumbnail);
+					intent.putExtra("thumbnailUri", imageThumbnail);
 					getActivity().startActivity(intent);
 
 
@@ -208,7 +208,7 @@ public class SelectTypeFragment extends Fragment
 					intent.putExtra("fileUri", mCurrentVideoPath);
 					intent.putExtra("mimeType", Constants.MIME_TYPE_VIDEO);
 					intent.putExtra("timeStamp", mCurrentTimeStamp);
-					intent.putExtra("thumbnail", videoThumbnail);
+					intent.putExtra("thumbnailUri", videoThumbnail);
 					getActivity().startService(intent);
 				}
 				break;

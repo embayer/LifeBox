@@ -6,12 +6,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Activity representing the form for getting the media's meta information
@@ -25,15 +32,19 @@ public class MetaFormActivity extends Activity
 	// the extras brought by SelectTypeFragment
 	private String mimeType;
 	private String fileUri;
+	private String thumbnailUri;
 	private String timeStamp;
 
 	// the extras brought by TagsActivity
 	private boolean tagStateHobby = false;		// playing cards
 	// )
 
+	// the extra brought by HashTagsActivity
+	private ArrayList<String> mHashtags;
+
 	// codes for onActivityResult
 	private static final int ACTION_GATHER_TAGS = 1;
-	private static final int ACTION_GATHER_HASH_TAGS = 2;
+	private static final int ACTION_GATHER_HASHTAGS = 2;
 
 	private ResponseReceiver mResponseReceiver;
 
@@ -77,7 +88,9 @@ public class MetaFormActivity extends Activity
 		{
 			Intent intent = new Intent(getBaseContext(), HashTagsActivity.class);
 
-			startActivityForResult(intent, ACTION_GATHER_HASH_TAGS);
+			intent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, mHashtags);
+
+			startActivityForResult(intent, ACTION_GATHER_HASHTAGS);
 		}
 	};
 
@@ -101,12 +114,16 @@ public class MetaFormActivity extends Activity
 		// Registers the ResponseReceiver and its intent filters
 		LocalBroadcastManager.getInstance(this).registerReceiver(mResponseReceiver, mStatusIntentFilter);
 
+		mHashtags = new ArrayList<String>();
+
 		// get the extras
 		// MIME-Type of file
 		Intent intent = getIntent();
 		mimeType = intent.getStringExtra("mimeType");
 		// path to the local file that was uploaded
 		fileUri = intent.getStringExtra("fileUri");
+		// path to the thumbnail uri
+		thumbnailUri = intent.getStringExtra("thumbnailUri");
 		// timestamp of the filecreation
 		timeStamp = intent.getStringExtra("timeStamp");
 
@@ -114,14 +131,21 @@ public class MetaFormActivity extends Activity
 		callUploadServiceIntent.putExtra("mimeType", mimeType);
 		callUploadServiceIntent.putExtra("fileUri", fileUri);
 		// TODO enable
-//		startService(callUploadServiceIntent);
+		startService(callUploadServiceIntent);
+
+		// the current system time
+		String time = new SimpleDateFormat("HH:mm").format(new Date());
+		// the current date
+		String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
 		// set the listeners to the buttons
 		Button tpBtn = (Button) findViewById(R.id.timepicker);
 		tpBtn.setOnClickListener(mTimePickerListener);
+		tpBtn.setText(time);
 
 		Button dpBtn = (Button) findViewById(R.id.datepicker);
 		dpBtn.setOnClickListener(mDatePickerListener);
+		dpBtn.setText(date);
 
 		Button tagBtn = (Button) findViewById(R.id.button_tags);
 		tagBtn.setOnClickListener(mTagListener);
@@ -144,7 +168,16 @@ public class MetaFormActivity extends Activity
 				if(resultCode == Activity.RESULT_OK)
 				{
 					tagStateHobby = data.getBooleanExtra("tagHobby", false);
-					if(tagStateHobby) Log.e("tag", "hobby set");
+				}
+				//TODO Fehlerbehandlung
+				break;
+			case ACTION_GATHER_HASHTAGS:
+				if(resultCode == Activity.RESULT_OK)
+				{
+					if(data.hasExtra(Constants.HASHTAG_EXTRA))
+					{
+						mHashtags = data.getStringArrayListExtra(Constants.HASHTAG_EXTRA);
+					}
 				}
 				//TODO Fehlerbehandlung
 				break;
@@ -178,6 +211,9 @@ public class MetaFormActivity extends Activity
 
 			TextView mTextView = (TextView) findViewById(R.id.description);
 			mTextView.setText(driveMetaData);
+
+			ImageView mImageView = (ImageView) findViewById(R.id.iv_thumbnail);
+			mImageView.setImageDrawable(Drawable.createFromPath(thumbnailUri));
 		}
 	}
 

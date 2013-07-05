@@ -21,7 +21,7 @@ public class HashtagsDbHelper extends SQLiteOpenHelper
 	// SQL Strings
 	private static final String SQL_CREATE_HASHTAGS =
 			"CREATE TABLE " + LifeBoxContract.Hashtags.TABLE_NAME + " (" +
-					LifeBoxContract.Hashtags._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+					LifeBoxContract.Hashtags._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
 					LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG + TEXT_TYPE +
 					" )";
 

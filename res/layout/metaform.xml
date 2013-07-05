@@ -13,10 +13,12 @@
             android:layout_width="294dp"
             android:layout_height="60dp"
             android:hint="Title"
-            android:capitalize="sentences" />
+            android:capitalize="sentences"
+            android:singleLine="true"
+            android:maxLength="25"/>
 
     <ImageView
-            android:id="@+id/button_ok"
+            android:id="@+id/iv_thumbnail"
             android:src="@drawable/picture_thumbnail"
             android:paddingTop="0dp"
             android:layout_toRightOf="@id/in_title"
@@ -34,11 +36,12 @@
             android:background="#949494"
             android:textColor="#000000"
             android:hint="Description..."
-            android:capitalize="sentences" />
+            android:capitalize="sentences"
+            android:maxLength="250"/>
 
     <Button
             android:id="@+id/timepicker"
-            android:text="23:51"
+            android:text=""
             android:layout_below="@id/description"
             android:layout_width="177dp"
             android:layout_height="40dp"
@@ -46,7 +49,7 @@
 
     <Button
             android:id="@+id/datepicker"
-            android:text="2013-12-24"
+            android:text=""
             android:layout_below="@id/description"
             android:layout_toRightOf="@id/timepicker"
             android:layout_width="177dp"
@@ -59,7 +62,7 @@
             android:text="tags"
             android:layout_below="@id/timepicker"
             android:layout_width="177dp"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginTop="10dp" />
 
     <Button
@@ -68,16 +71,16 @@
             android:layout_below="@id/datepicker"
             android:layout_toRightOf="@id/button_tags"
             android:layout_width="177dp"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp" />
 
     <Button
-            android:id="@+id/save"
+            android:id="@+id/save_meta_data"
             android:text="save"
-            android:layout_below="@id/button_tags"
+            android:layout_alignParentBottom="true"
             android:layout_width="364dp"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginTop="10dp" />
 
 </RelativeLayout>
