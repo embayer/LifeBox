@@ -49,6 +49,12 @@ public class FetchJsonService extends IntentService
 		String query = intent.getStringExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA);
 		String mediaType = intent.getStringExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA);
 
+		// the Apple-REST-Entity for music is song
+		if(mediaType.equals(Constants.TYPE_MUSIC))
+		{
+			mediaType = "song";
+		}
+
 		// encode the query using the format required by application/x-www-form-urlencoded MIME content type
 		try
 		{

@@ -15,12 +15,13 @@ public final class Constants
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
 	public static final String MIME_TYPE_VIDEO = "video/mp4";
 
-	public static final String TYPE_MOVIE = "movie";
-	public static final String TYPE_MUSIC = "song";
-
 	// codes for Thumbnails
 	public static final String MIME_TYPE_IMAGE_THUMB = "image/thumbnail";
 	public static final String MIME_TYPE_VIDEO_THUMB = "video/thumbnail";
+
+	// codes for media types
+	public static final String TYPE_MOVIE = "movie";
+	public static final String TYPE_MUSIC = "music";
 
 	// codes for the extras
 	// metadata of created files from SelectTypeFragment

@@ -20,13 +20,17 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "entries";
 		public static final String _ID = "_id";
 
+		public static final String COLUMN_NAME_MEDIA_ID = "media_id";   				// (table name)
 		public static final String COLUMN_NAME_TYPES_ID = "types_id";
-		public static final String COLUMN_NAME_META_DATA_ID = "meta_data_id";
-		public static final String COLUMN_NAME_TYPENAMES_ID = "typenames_id";   				// (table name)
+		public static final String COlUMN_NAME_TITLE = "title";
+		public static final String COlUMN_NAME_DESCRIPTION = "description";
+		public static final String COlUMN_NAME_USER_DATE = "user_date";
+		public static final String COlUMN_NAME_CREATION_DATE = "creation_date";
+		public static final String COlUMN_NAME_MODIFICATION_DATE = "modification_date";
 	}
 
 	// the possible types
-	/** The type files. (Images, Videos are of the type file. */
+	/** The media files. (Images, Videos are of the type file). */
 	public static abstract class Files implements BaseColumns
 	{
 		public static final String TABLE_NAME = "files";
@@ -35,7 +39,16 @@ public final class LifeBoxContract
 		public static final String COLUMN_NAME_FILETYPES_ID = "filetypes_id";
 	}
 
-	/** The type music. */
+	/** The media text. */
+	public static abstract class Text implements BaseColumns
+	{
+		public static final String TABLE_NAME = "text";
+		public static final String _ID = "_id";
+
+		public static final String COLUMN_NAME_TEXT = "text";
+	}
+
+	/** The media music. */
 	public static abstract class Music implements BaseColumns
 	{
 		public static final String TABLE_NAME = "music";
@@ -53,34 +66,21 @@ public final class LifeBoxContract
 		public static final String _ID = "_id";
 
 		public static final String COLUMN_NAME_TITLE = "title";
-		public static final String COLUMN_NAME_DESCRIPTION = "description";
 		public static final String COLUMN_NAME_DIRECTOR = "director";
+		public static final String COLUMN_NAME_DESCRIPTION = "description";
 		public static final String COLUMN_NAME_MOVIE_GENRE = "movie_genre";
 		public static final String COLUMN_NAME_RELEASE_DATE = "release_date";
 		public static final String COLUMN_NAME_THUMBNAIL_URL = "thumbnail_url";
 	}
 
 	// the attributes an entity can have
-	/** The meta data every entry has. */
-	public static abstract class MetaData implements BaseColumns
-	{
-		public static final String TABLE_NAME = "meta_data";
-		public static final String _ID = "_id";
-
-		public static final String COLUMN_NAME_TITLE = "title";
-		public static final String COLUMN_NAME_DESCRIPTION = "description";
-		public static final String COLUMN_NAME_USER_DATE = "user_date";
-		public static final String COLUMN_NAME_CREATION_DATE = "creation_date";
-		public static final String COLUMN_NAME_MODIFICATION_DATE = "modification_date";
-	}
-
 	/** The tags an entry may have. */
 	public static abstract class Tags implements BaseColumns
 	{
 		public static final String TABLE_NAME = "tags";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_TAG = "tag";
 	}
 
 	/** The hashtags an entry may have. */
@@ -89,7 +89,7 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "hashtags";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_HASHTAG = "hashtags";
 	}
 
 	/** The types an entry is of. */
@@ -98,16 +98,16 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "types";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_TYPE = "type";
 	}
 
-	/** The filetypes an file(table) is of. */
+	/** The filetypes a file(table) is of. */
 	public static abstract class Filetypes implements BaseColumns
 	{
 		public static final String TABLE_NAME = "filetypes";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_FILETYPE = "filetype";
 	}
 
 	/** The offline stored files a file(table) has. */
@@ -131,13 +131,13 @@ public final class LifeBoxContract
 		public static final String COLUMN_NAME_FILETYPES_ID = "filetypes_id";
 	}
 
-	/** The artists a music(table) is performed by. */
+	/** The artist a music(table) is performed by. */
 	public static abstract class Artists implements BaseColumns
 	{
 		public static final String TABLE_NAME = "artists";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_ARTIST = "artist";
 	}
 
 	/** The album a music(table) is on. */
@@ -146,22 +146,22 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "albums";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_ALBUM = "album";
 		public static final String COLUMN_NAME_RELEASE_DATE = "release_date";
 		public static final String COLUMN_NAME_THUMBNAIL_URL = "thumbnail_url";
 	}
 
 	/** The music genre a music(table) is of. */
-	public static abstract class MusicGenre implements BaseColumns
+	public static abstract class MusicGenres implements BaseColumns
 	{
-		public static final String TABLE_NAME = "music_genre";
+		public static final String TABLE_NAME = "music_genres";
 		public static final String _ID = "_id";
 
 		public static final String COLUMN_NAME_MUSIC_ID = "music_id";
-		public static final String COLUMN_NAME_NAME = "name";
+		public static final String COLUMN_NAME_MUSIC_GENRE = "music_genre";
 	}
 
-	// the connectors between two tables
+	// the connectors between two tables (1 to n relations)
 	/** Listing of tags an entry may have. */
 	public static abstract class EntryTags implements BaseColumns
 	{
@@ -188,7 +188,7 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "file_offline_files";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_FILE_ID = "files_id";
+		public static final String COLUMN_NAME_FILES_ID = "files_id";
 		public static final String COLUMN_NAME_OFFLINE_FILES_ID = "offline_files_id";
 	}
 
@@ -198,7 +198,7 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "file_online_files";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_FILE_ID = "files_id";
+		public static final String COLUMN_NAME_FILES_ID = "files_id";
 		public static final String COLUMN_NAME_ONLINE_FILES_ID = "online_files_id";
 	}
 }
