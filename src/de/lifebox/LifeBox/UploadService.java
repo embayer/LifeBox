@@ -160,7 +160,7 @@ public class UploadService extends IntentService
 	 */
 	private void sendDriveMetaData(String file)
 	{
-		Intent localIntent = new Intent(Constants.BROADCAST_ACTION);
+		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_UPLOADRESPONSE);
 		localIntent.putExtra("driveMetaData", file);
 		localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 

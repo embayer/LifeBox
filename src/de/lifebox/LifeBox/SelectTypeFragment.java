@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -34,6 +35,7 @@ public class SelectTypeFragment extends Fragment
 	private static final int ACTION_TAKE_PHOTO = 1;
 	private static final int ACTION_TAKE_PHOTO_S = 2;
 	private static final int ACTION_TAKE_VIDEO = 3;
+	private static final int ACTION_PICK_PHOTO = 4;
 
 	// keys for image display
 	private static final String BITMAP_STORAGE_KEY = "viewbitmap";
@@ -63,7 +65,7 @@ public class SelectTypeFragment extends Fragment
 	private static final String JPEG_FILE_SUFFIX = ".jpg";
 	private static final String MP4_FILE_PREFIX = "VID_";
 	private static final String MP4_FILE_SUFFIX = ".mp4";
-	private static final String THUMBNAIL_SUFFIX = "THM";
+	private static final String THUMBNAIL_SUFFIX = "_THM";
 
 	// instance of AlbumstoragedirFactory helper class to generate valid folder files
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
@@ -87,6 +89,16 @@ public class SelectTypeFragment extends Fragment
 		}
 	};
 
+	Button.OnClickListener mTextFormOnClickListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getActivity(), TextFormActivity.class);
+			startActivity(intent);
+		}
+	};
+
 	Button.OnClickListener mListener = new Button.OnClickListener()
 	{
 		@Override
@@ -94,6 +106,39 @@ public class SelectTypeFragment extends Fragment
 		{
 			Intent intent = new Intent(getActivity(), MetaFormActivity.class);
 			startActivity(intent);
+		}
+	};
+
+	Button.OnClickListener mSearchMoviesListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getActivity(), SearchMovieActivity.class);
+			intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, Constants.TYPE_MOVIE);
+
+			startActivity(intent);
+		}
+	};
+
+	Button.OnClickListener mSearchMusicListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			Intent intent = new Intent(getActivity(), SearchMusicActivity.class);
+			intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, Constants.TYPE_MUSIC);
+
+			startActivity(intent);
+		}
+	};
+
+	Button.OnClickListener mPickImageOnClickListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			dispatchPickImageIntent(ACTION_PICK_PHOTO);
 		}
 	};
 
@@ -147,8 +192,22 @@ public class SelectTypeFragment extends Fragment
 				MediaStore.ACTION_VIDEO_CAPTURE
 		);
 
+		Button textBtn = (Button) view.findViewById(R.id.text);
+		textBtn.setOnClickListener(mTextFormOnClickListener);
+
+//		Button fileBtn = (Button) view.findViewById(R.id.file);
+//		fileBtn.setOnClickListener(mListener);
+
+		Button movieBtn = (Button) view.findViewById(R.id.movie);
+		movieBtn.setOnClickListener(mSearchMoviesListener);
+
+		Button musicBtn = (Button) view.findViewById(R.id.music);
+		musicBtn.setOnClickListener(mSearchMusicListener);
+
 		Button fileBtn = (Button) view.findViewById(R.id.file);
-		fileBtn.setOnClickListener(mListener);
+		setBtnListenerOrDisable(fileBtn,
+				mPickImageOnClickListener,
+				Intent.ACTION_PICK);
 
 		return view;
 	}
@@ -212,6 +271,46 @@ public class SelectTypeFragment extends Fragment
 					getActivity().startService(intent);
 				}
 				break;
+			case ACTION_PICK_PHOTO:
+				if(resultCode == Activity.RESULT_OK)
+				{
+					// get the path to the selected image
+					Uri selectedImage = data.getData();
+					String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+					Cursor cursor = getActivity().getContentResolver().query(selectedImage,
+							filePathColumn, null, null, null);
+					cursor.moveToFirst();
+
+					int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+					// String picturePath contains the path of selected Image
+					String picturePath = cursor.getString(columnIndex);
+					cursor.close();
+
+					// get the original timestamp from the picturePath (which is like: '/storage/emulated/0/DCIM/Camera/IMG_20130712_112032.jpg')
+					String creationDate = picturePath.substring(picturePath.length() - 19, picturePath.length() - 4);
+
+					// set the current timestamp
+					String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+					mCurrentTimeStamp = timeStamp;
+
+					// scale the selected image
+					mCurrentPhotoPath = scale(picturePath);
+
+					// create a thumbnail for the image
+					String imageThumbnail = createImageThumbnail(picturePath);
+
+					// start an intent to navigate to the MetaFormActivity
+					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
+
+					// set the extras
+					intent.putExtra(Constants.FILE_URL_EXTRA, mCurrentPhotoPath);
+					intent.putExtra(Constants.MIME_TYPE_EXTRA, Constants.MIME_TYPE_IMAGE);
+					intent.putExtra(Constants.TIME_STAMP_EXTRA, mCurrentTimeStamp);
+					intent.putExtra(Constants.THUMBNAIL_URI_EXTRA, imageThumbnail);
+					intent.putExtra(Constants.CREATION_DATE_EXTRA, creationDate);
+					getActivity().startActivity(intent);
+				}
 			default:
 				//TODO default case
 		}
@@ -422,7 +521,6 @@ public class SelectTypeFragment extends Fragment
 
 	/**
 	 * Creates a new scaled down image of the image given in the parameter in order to reduce up- and downloadtime.
-	 *
 	 * @param path (String) to the picture that should be scaled.
 	 * @return newPath (String) to the newly created image.
 	 */
@@ -455,7 +553,7 @@ public class SelectTypeFragment extends Fragment
 		bmOptions.inPurgeable = true;
 
 		// decode the JPEG file into a Bitmap
-		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+		Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
 
 		// get the folder where the new file should be stored
 		File albumF = getAlbumDir(Constants.MIME_TYPE_IMAGE);
@@ -631,6 +729,13 @@ public class SelectTypeFragment extends Fragment
 				break;
 		}
 		startActivityForResult(takeVideoIntent, actionCode);
+	}
+
+	/** Call the ImagePicker dialog. */
+	private void dispatchPickImageIntent(int actionCode)
+	{
+		Intent pickImageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		startActivityForResult(pickImageIntent, actionCode);
 	}
 
 	//START unused methods----------------------------------------------------------------------------------------------

@@ -43,14 +43,21 @@
 
         <activity android:name=".TagsActivity"/>
 
-        <activity android:name=".HashTagsActivity"
+        <activity android:name=".HashtagsActivity"
                   android:windowSoftInputMode="stateVisible|adjustPan"/>
+        <activity android:name=".SearchMediaActivity"/>
+        <activity android:name=".SearchMovieActivity"/>
+        <activity android:name=".SearchMusicActivity"/>
+        <activity android:name=".TextFormActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="SelectTypeActivity" />
 
         <service android:name=".UploadService"
+                 android:exported="false" />
+
+        <service android:name=".FetchJsonService"
                  android:exported="false" />
 
     </application>

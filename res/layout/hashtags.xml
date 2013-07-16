@@ -61,7 +61,7 @@
             android:layout_marginTop="10dp" />
 
     <ListView
-            android:id="@+id/listview_history_hashtag"
+            android:id="@+id/listview_history_hashtags"
             android:layout_above="@id/save_hashtags"
             android:layout_below="@id/header_hashtags_history"
             android:layout_width="177dp"
@@ -70,10 +70,10 @@
             android:listSelector="?android:attr/activatedBackgroundIndicator"/>
 
     <ListView
-            android:id="@+id/listview_hashtag"
+            android:id="@+id/listview_hashtags"
             android:layout_above="@id/save_hashtags"
             android:layout_below="@id/header_hashtags_history"
-            android:layout_toRightOf="@id/listview_history_hashtag"
+            android:layout_toRightOf="@id/listview_history_hashtags"
             android:layout_width="177dp"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"

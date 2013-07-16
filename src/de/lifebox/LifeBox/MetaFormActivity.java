@@ -7,10 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -39,7 +37,7 @@ public class MetaFormActivity extends Activity
 	private boolean tagStateHobby = false;		// playing cards
 	// )
 
-	// the extra brought by HashTagsActivity
+	// the extra brought by HashtagsActivity
 	private ArrayList<String> mHashtags;
 
 	// codes for onActivityResult
@@ -86,7 +84,7 @@ public class MetaFormActivity extends Activity
 		@Override
 		public void onClick(View v)
 		{
-			Intent intent = new Intent(getBaseContext(), HashTagsActivity.class);
+			Intent intent = new Intent(getBaseContext(), HashtagsActivity.class);
 
 			intent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, mHashtags);
 
@@ -102,7 +100,7 @@ public class MetaFormActivity extends Activity
 		setContentView(R.layout.metaform);
 
 		// the filter
-		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION);
+		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_UPLOADRESPONSE);
 		// Adds a data filter for the HTTP scheme
 //		mStatusIntentFilter.addDataScheme("http");
 
