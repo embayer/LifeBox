@@ -7,4 +7,6 @@
     <string name="tab_timeline">Timeline</string>
     <string name="album_name">LifeBoxImages</string>
     <string name="cannot">Cannot</string>
+    <string name="headline_hashtag">Hashtags</string>
+    <string name="headline_tags">Tags</string>
 </resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp">>
+
+    <EditText
+            android:id="@+id/in_search_media"
+            android:layout_alignParentTop="true"
+            android:layout_width="294dp"
+            android:layout_height="60dp"
+            android:hint="Search for a movie"
+            android:capitalize="none"
+            android:singleLine="true"
+            android:maxLength="50"/>
+
+    <Button
+            android:id="@+id/button_search_media"
+            android:text="Ok"
+            android:layout_toRightOf="@id/in_search_media"
+            android:layout_width="177dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"/>
+
+    <Button
+            android:id="@+id/button_save_media"
+            android:text="Save"
+            android:layout_alignParentBottom="true"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp" />
+
+    <ListView
+            android:id="@+id/listview_searchresults"
+            android:layout_above="@id/button_save_media"
+            android:layout_below="@id/in_search_media"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:listSelector="?android:attr/activatedBackgroundIndicator"
+            android:choiceMode="singleChoice"
+            android:clickable="true"/>
+
+</RelativeLayout>
