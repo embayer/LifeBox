@@ -110,6 +110,7 @@ public class SearchMusicActivity extends Activity
 							&& mMusic.getAlbum().equals(selectedAlbum))
 					{
 						// set the extras
+						intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_MUSIC);
 						intent.putExtra(Constants.MUSIC_ARTIST_EXTRA, mMusic.getArtist());
 						intent.putExtra(Constants.MUSIC_ALBUM_EXTRA, mMusic.getAlbum());
 						intent.putExtra(Constants.MUSIC_REALEASE_DATE_EXTRA, mMusic.getReleaseDate());
@@ -131,11 +132,13 @@ public class SearchMusicActivity extends Activity
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
 			// get the text of the clicked item
-			TextView title = (TextView) view.findViewById(R.id.musiclist_title);
-			TextView artist = (TextView) view.findViewById(R.id.musiclist_artist);
+			TextView tvTitle = (TextView) view.findViewById(R.id.musiclist_title);
+			TextView tvArtist = (TextView) view.findViewById(R.id.musiclist_artist);
+			TextView tvAlbum = (TextView) view.findViewById(R.id.musiclist_album);
 			// and store it
-			selectedTitle = title.getText().toString();
-			selectedArtist = artist.getText().toString();
+			selectedTitle = tvTitle.getText().toString();
+			selectedArtist = tvArtist.getText().toString();
+			selectedAlbum = tvAlbum.getText().toString();
 		}
 	};
 

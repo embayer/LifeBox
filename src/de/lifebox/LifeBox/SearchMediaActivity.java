@@ -28,16 +28,13 @@ import java.util.ArrayList;
  * @version 0.1 05.07.13
  * @autor Markus Bayer
  */
-public class SearchMovieActivity extends Activity
+public class SearchMediaActivity extends Activity
 {
 	private ResponseReceiver mResponseReceiver;
 
-	// ArrayList to store the searchresults
-	private ArrayList<Movie> movieList;
-
-	// the movie title selected by the user
-	private String selectedTitle;
-	private String selectedDirector;
+	// ArrayLists to store the searchresults
+	ArrayList<Movie> movieList;
+	ArrayList<Music> musicList;
 
 	// the type of media to search for
 	private String mediaType;
@@ -47,15 +44,17 @@ public class SearchMovieActivity extends Activity
 	// the listviews to display the searchresult
 	private ListView searchResultListView;
 
-	// the elements of the ListView entries
+	// the elements of the ListView
 	private WebView thumbnailWebView;
 	private TextView titleTextView;
 	private TextView artistTextView;
 
 	// the adapter intermediate between view and data
 	private ArrayAdapter<Movie> mMovieAdapter;
+	private ArrayAdapter<Music> mMusicAdapter;
 
 	// the buttonlisteners
+	// Ok Button
 	Button.OnClickListener mSearchListener = new Button.OnClickListener()
 	{
 		@Override
@@ -90,34 +89,14 @@ public class SearchMovieActivity extends Activity
 		}
 	};
 
-	// the save Button
+	// save Button
 	Button.OnClickListener mSaveListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
-			if(null != selectedTitle)
-			{
-				Intent intent = new Intent(getBaseContext(), MetaFormActivity.class);
-
-				// find the selected Movie
-				for(Movie mMovie : movieList)
-				{
-					if(mMovie.getTitle().equals(selectedTitle) && mMovie.getDirector().equals(selectedDirector))
-					{
-						// set the extras
-						intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_MOVIE);
-						intent.putExtra(Constants.MOVIE_TITLE_EXTRA, mMovie.getTitle());
-						intent.putExtra(Constants.MOVIE_DESCRIPTION_EXTRA, mMovie.getDescription());
-						intent.putExtra(Constants.MOVIE_DIRECTOR_EXTRA, mMovie.getDirector());
-						intent.putExtra(Constants.MOVIE_GENRE_EXTRA, mMovie.getMovieGenre());
-						intent.putExtra(Constants.MOVIE_RELEASE_DATE_EXTRA, mMovie.getReleaseDate());
-						intent.putExtra(Constants.MOVIE_THUMBNAIL_URL_EXTRA, mMovie.getThumbnailUrl());
-					}
-				}
-
-				startActivity(intent);
-			}
+			Intent intent = new Intent(getBaseContext(), SearchMediaActivity.class);
+			startActivity(intent);
 		}
 	};
 
@@ -127,12 +106,10 @@ public class SearchMovieActivity extends Activity
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
-			// get the text of the clicked item
-			TextView tvTitle = (TextView) view.findViewById(R.id.searchresult_title);
-			TextView tvDirector = (TextView) view.findViewById(R.id.searchresult_artist);
-			// and store it
-			selectedTitle = tvTitle.getText().toString();
-			selectedDirector = tvDirector.getText().toString();
+//			ListView lv = (ListView) parent;
+//			TextView tv = (TextView) lv.getChildAt(position);
+//			Toast.makeText(getBaseContext(), "CLICK", Toast.LENGTH_LONG).show();
+			Log.e("click", "clack");
 		}
 
 	};
@@ -150,8 +127,12 @@ public class SearchMovieActivity extends Activity
 		Button saveBtn = (Button) findViewById(R.id.button_save_media);
 		saveBtn.setOnClickListener(mSaveListener);
 
+
+
 		// the filter
 		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_SEARCHRESPONSE);
+		// Adds a data filter for the HTTP scheme
+//		mStatusIntentFilter.addDataScheme("http");
 
 		// Sets the filter's category to DEFAULT
 		mStatusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -166,7 +147,14 @@ public class SearchMovieActivity extends Activity
 
 		// set the input hint according to the mediaType searching for
 		queryEditText = (EditText) findViewById(R.id.in_search_media);
-		queryEditText.setHint("Search for a movie");
+		if(mediaType.equals(Constants.TYPE_MOVIE))
+		{
+			queryEditText.setHint("Search for a movie");
+		}
+		else if(mediaType.equals(Constants.TYPE_MUSIC))
+		{
+			queryEditText.setHint("Search for a song");
+		}
 	}
 
 	/**
@@ -184,6 +172,30 @@ public class SearchMovieActivity extends Activity
 		try
 		{
 			return parseMovieArray(reader);
+
+		}
+			finally
+			{
+				reader.close();
+			}
+	}
+
+	/**
+	 * Reads a JSON-String and stores the results in a List
+	 * @param json (String) returned by FetchJsonService
+	 * @return (ArrayList<Music>) containing Music objects
+	 * @throws IOException
+	 */
+	public ArrayList<Music> parseMusicJsonString(String json) throws IOException
+	{
+		// convert the String into an InputStream
+		InputStream in = new ByteArrayInputStream(json.getBytes());
+
+		JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+		try
+		{
+			return parseMusicArray(reader);
+
 		}
 		finally
 		{
@@ -230,6 +242,44 @@ public class SearchMovieActivity extends Activity
 	}
 
 	/**
+	 * Reads a JSON-array and stores the single JSON-objects as Music objects.
+	 * @param reader (JsonReader) the parser object
+	 * @return (ArrayList<Music>) containing the Movie objects
+	 * @throws IOException
+	 */
+	public ArrayList<Music> parseMusicArray(JsonReader reader) throws IOException
+	{
+		ArrayList<Music> musicList = new ArrayList();
+
+		reader.beginObject();
+		while(reader.hasNext())
+		{
+			String name = reader.nextName();
+
+			// 'results' contains the needed JSON-array
+			if(name.equals("results"))
+			{
+				reader.beginArray();
+
+				// iterate through the JSON array
+				while (reader.hasNext())
+				{
+					// get the JSON-objects
+					musicList.add(parseMusic(reader));
+				}
+
+				reader.endArray();
+			}
+			else
+			{
+				// the JSON starts with the unneeded key-value pair 'resultCount'
+				reader.skipValue();
+			}
+		}
+		return musicList;
+	}
+
+	/**
 	 * Reads a single JSON-objects and stores the relevant values as movie object.
 	 * @param reader (JsonReader) the parser object
 	 * @return (Movie) object storing the JSON values
@@ -272,7 +322,7 @@ public class SearchMovieActivity extends Activity
 			else if (name.equals("longDescription"))
 			{
 				description = reader.nextString();
-			}
+            }
 			else
 			{
 				reader.skipValue();
@@ -283,19 +333,66 @@ public class SearchMovieActivity extends Activity
 	}
 
 	/**
-	 * Custom Adapter class to populate the ListView.
-	 * @author Markus Bayer
-	 * @version 0.1 12.07.13
-	 * */
+	 * Reads a single JSON-objects and stores the relevant values as movie object.
+	 * @param reader (JsonReader) the parser object
+	 * @return (Music) object storing the JSON values
+	 * @throws IOException
+	 */
+	public Music parseMusic(JsonReader reader) throws IOException
+	{
+		String artist = null;
+		String album = null;
+		String track = null;
+		String thumbnailUrl = null;
+		String releaseDate = null;
+		String musicGenre = null;
+
+		reader.beginObject();
+		while (reader.hasNext())
+		{
+			String name = reader.nextName();
+
+			if (name.equals("artistName"))
+			{
+				artist = reader.nextString();
+			}
+			else if (name.equals("collectionName"))
+			{
+				album = reader.nextString();
+			}
+			else if (name.equals("trackName"))
+			{
+				track = reader.nextString();
+			}
+			else if (name.equals("artworkUrl100"))
+			{
+				thumbnailUrl = reader.nextString();
+			}
+			else if (name.equals("releaseDate"))
+			{
+				releaseDate = reader.nextString();
+			}
+			else if (name.equals("primaryGenreName"))
+			{
+				musicGenre = reader.nextString();
+			}
+			else
+			{
+				reader.skipValue();
+			}
+		}
+		reader.endObject();
+		return new Music(artist, album, releaseDate, thumbnailUrl, track, musicGenre);
+	}
+
 	private class MovieAdapter extends ArrayAdapter<Movie>
 	{
 		/** Constructor */
 		public MovieAdapter()
 		{
-			super(SearchMovieActivity.this, R.layout.movielist, movieList);
+			super(SearchMediaActivity.this, R.layout.movielist, movieList);
 		}
 
-		/** Called when the ListView will be populated. */
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
@@ -341,19 +438,31 @@ public class SearchMovieActivity extends Activity
 			{
 				String result = intent.getStringExtra(Constants.MEDIA_RESULT_EXTRA);
 
+				Log.e("restresult", result);
+
 				try
 				{
-					// parse the result and store the movies in the specific ArrayList
-					movieList = parseMovieJsonString(result);
+					if(mediaType.equals(Constants.TYPE_MOVIE))
+					{
+						// parse the result and store the movies in the specific ArrayList
+						movieList = parseMovieJsonString(result);
 
-					// set the Adapter to the ListView
-					mMovieAdapter = new MovieAdapter();
-					searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
-					searchResultListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-					searchResultListView.setOnItemClickListener(searchresultOnClickListener);
-					searchResultListView.setAdapter(mMovieAdapter);
+						// set the Adapter to the ListView
+						mMovieAdapter = new MovieAdapter();
+						searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
+						searchResultListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+						searchResultListView.setOnItemClickListener(searchresultOnClickListener);
+						searchResultListView.setAdapter(mMovieAdapter);
 
-					if(movieList.isEmpty())
+						musicList = new ArrayList<Music>();
+					}
+					else if(mediaType.equals(Constants.TYPE_MUSIC))
+					{
+						//TODO
+						movieList = new ArrayList<Movie>();
+					}
+
+					if(movieList.isEmpty() && musicList.isEmpty())
 					{
 						Toast toast = Toast.makeText(getBaseContext(), "Sorry, nothing found", Toast.LENGTH_LONG);
 						toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 120);

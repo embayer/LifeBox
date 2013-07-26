@@ -37,6 +37,13 @@ public class UploadService extends IntentService
 	/** Handle to pass toasts from a service*/
 	private Handler mHandler;
 
+	// thumbnail flag (extra from MetaFormActivity)
+	private boolean isThumbnail;
+
+	// metadata of the uploaded file
+	private String driveId;
+	private String downloadUrl;
+
 	/** Constructor */
 	public UploadService()
 	{
@@ -59,9 +66,11 @@ public class UploadService extends IntentService
 
 		// get the extras
 		// MIME-Type of file
-		String mimeType = intent.getStringExtra("mimeType");
+		String mimeType = intent.getStringExtra(Constants.MIME_TYPE_EXTRA);
 		// Path to the local file that should be uploaded
-		Uri fileUri = Uri.parse(intent.getStringExtra("fileUri"));
+		Uri fileUri = Uri.parse(intent.getStringExtra(Constants.FILE_URL_EXTRA));
+		// thumbnail
+		isThumbnail = intent.getBooleanExtra(Constants.IS_THUMB_EXTRA, false);
 
 		// retrieve the users accountname from the sharedpreferences
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
@@ -121,7 +130,7 @@ public class UploadService extends IntentService
 
 					Log.e("json", file.toString());
 					Log.e("downloadUrl", file.get("downloadUrl").toString());
-					sendDriveMetaData(file.toString());
+					sendDriveMetaData(file);
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
@@ -156,12 +165,26 @@ public class UploadService extends IntentService
 	/**
 	 * Sends the fileId retrieved from the drive service back to the activity
 	 * which started this service
-	 * @param file String the id handle to the uploaded file stored on drive
+	 * @param file (File) the meta data of file stored on drive
 	 */
-	private void sendDriveMetaData(String file)
+	private void sendDriveMetaData(File file)
 	{
 		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_UPLOADRESPONSE);
-		localIntent.putExtra("driveMetaData", file);
+
+		// set the extras
+		localIntent.putExtra(Constants.DRIVE_ID_EXTRA, file.get("id").toString());
+		localIntent.putExtra(Constants.DOWNLOAD_URL_EXTRA, file.get("downloadUrl").toString());
+
+		// check if the uploaded file was a thumbnail
+		if(isThumbnail == true)
+		{
+			localIntent.putExtra(Constants.IS_THUMB_EXTRA, true);
+		}
+		else
+		{
+			localIntent.putExtra(Constants.IS_THUMB_EXTRA, false);
+		}
+
 		localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
 		// broadcasts the Intent to receivers in this app

@@ -89,7 +89,7 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "hashtags";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_HASHTAG = "hashtags";
+		public static final String COLUMN_NAME_HASHTAG = "hashtag";
 	}
 
 	/** The types an entry is of. */

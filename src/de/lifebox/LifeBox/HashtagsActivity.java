@@ -8,11 +8,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
-import de.lifebox.LifeBox.controller.HashtagsDbHelper;
 
 import java.util.ArrayList;
 
@@ -24,8 +22,7 @@ import java.util.ArrayList;
  */
 public class HashtagsActivity extends Activity
 {
-	//TODO PRIVATE
-	private HashtagsDbHelper mDbHelper;
+	private DbHelper mDbHelper;
 
 	// the listviews to hold the hashtags
 	private ListView historyListView;            	// previous created hashtags
@@ -44,9 +41,9 @@ public class HashtagsActivity extends Activity
 	// pointer to the selected db content
 	private Cursor mCursor;
 	// db-columns
-	private String[] projection = {LifeBoxContract.Hashtags._ID, LifeBoxContract.Hashtags.COLUMN_NAME_NAME};
+	private String[] projection = {LifeBoxContract.Hashtags._ID, LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
 
-	private ArrayList<String> mHashtags;
+	private ArrayList<String> hashtagList;
 
 	// listener for the historyListView
 	ListView.OnItemClickListener historyListener = new ListView.OnItemClickListener()
@@ -59,7 +56,7 @@ public class HashtagsActivity extends Activity
 			String item = tv.getText().toString();
 
 			// insert the item if it is not yet present
-			if(insertItem(item, mHashtags))
+			if(insertItem(item, hashtagList))
 			{
 				// notify the adapter that the data has changed
 				mAadapter.notifyDataSetChanged();
@@ -78,7 +75,7 @@ public class HashtagsActivity extends Activity
 			String item = tv.getText().toString();
 
 			// remove the item from the ListView
-			mHashtags.remove(item);
+			hashtagList.remove(item);
 
 			// notify the adapter that the data has changed
 			mAadapter.notifyDataSetChanged();
@@ -101,7 +98,7 @@ public class HashtagsActivity extends Activity
 			if( (null != hashtag) && (!hashtag.equals("") && (hashtag.length() >= 0)) )
 			{
 				// insert the item if it is not yet present
-				if(insertItem(hashtag, mHashtags))
+				if(insertItem(hashtag, hashtagList))
 				{
 					// notify the adapter that the data has changed
 					mAadapter.notifyDataSetChanged();
@@ -125,7 +122,7 @@ public class HashtagsActivity extends Activity
 		{
 			Intent returnIntent = new Intent(getBaseContext(), MetaFormActivity.class);
 
-			returnIntent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, mHashtags);
+			returnIntent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, hashtagList);
 
 			setResult(RESULT_OK, returnIntent);
 			finish();
@@ -216,7 +213,7 @@ public class HashtagsActivity extends Activity
 		historyListView.setOnItemClickListener(historyListener);
 
 		// query the db
-		mDbHelper = new HashtagsDbHelper(getBaseContext());
+		mDbHelper = new DbHelper(getBaseContext());
 		db = mDbHelper.getReadableDatabase();
 		mCursor = db.query(
 				LifeBoxContract.Hashtags.TABLE_NAME,
@@ -230,7 +227,7 @@ public class HashtagsActivity extends Activity
 		);
 
 		// for the cursor adapter, specify which columns go into which views
-		String[] fromColumns = {LifeBoxContract.Hashtags.COLUMN_NAME_NAME};
+		String[] fromColumns = {LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
 		int[] toViews = {R.id.entry_history_hashtag}; // The TextView in simple_list_item_1
 
 		// create the adapter
@@ -249,14 +246,14 @@ public class HashtagsActivity extends Activity
 		// get the extra
 		if(getIntent().hasExtra(Constants.HASHTAG_EXTRA))
 		{
-			mHashtags = getIntent().getStringArrayListExtra(Constants.HASHTAG_EXTRA);
+			hashtagList = getIntent().getStringArrayListExtra(Constants.HASHTAG_EXTRA);
 		}
 		else
 		{
-			mHashtags = new ArrayList<String>();
+			hashtagList = new ArrayList<String>();
 		}
 
-		mAadapter = new ArrayAdapter<String>(this, R.layout.hashtaglist, R.id.entry_hashtag, mHashtags);
+		mAadapter = new ArrayAdapter<String>(this, R.layout.hashtaglist, R.id.entry_hashtag, hashtagList);
 
 		hashtagListView.setAdapter(mAadapter);
 		// )

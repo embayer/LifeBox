@@ -54,6 +54,10 @@ public class FetchJsonService extends IntentService
 		{
 			mediaType = "song";
 		}
+		else if(mediaType.equals(Constants.TYPE_MOVIE))
+		{
+			mediaType = "movie";
+		}
 
 		// encode the query using the format required by application/x-www-form-urlencoded MIME content type
 		try

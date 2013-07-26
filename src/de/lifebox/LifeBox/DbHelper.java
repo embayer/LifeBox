@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class DbHelper extends SQLiteOpenHelper
 {
 	// if the database schema has changed, the database version must be increased.
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 14;
 	public static final String DATABASE_NAME = "LifeBox.db";
 
 	// data types
@@ -24,7 +24,7 @@ public class DbHelper extends SQLiteOpenHelper
 	private static final String INT_TYPE = " INTEGER";
 	// constraints
 	// keys
-	private static final String PRIMARY_KEY_TYPE = " INTEGER PRIMARY KEY";
+	private static final String PRIMARY_KEY_TYPE = " INTEGER PRIMARY KEY AUTOINCREMENT";
 	// not null
 	private static final String NOT_NULL = " NOT NULL";
 	// unique
@@ -32,8 +32,8 @@ public class DbHelper extends SQLiteOpenHelper
 	// chars
 	private static final String COMMA = ", ";
 	// begin and end (to wrap multiple db-operations)
-	private static final String SQL_BEGIN = "SQL_BEGIN IMMEDIATE TRANSACTION";
-	private static final String SQL_COMMIT = "SQL_COMMIT TRANSACTION";
+	private static final String SQL_BEGIN = "BEGIN IMMEDIATE TRANSACTION";
+	private static final String SQL_COMMIT = "COMMIT TRANSACTION";
 
 	// ArrayLists for predefined rows
 	private static ArrayList<String> tags;
@@ -311,40 +311,48 @@ public class DbHelper extends SQLiteOpenHelper
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
 		// tags
-		tags.add("laughing");
-		tags.add("smiling");
-		tags.add("blank");
-		tags.add("amazed");
-		tags.add("crying");
-		tags.add("angry");
+		tags = new ArrayList<String>();
+		tags.add(Constants.TAG_SMILEY1_EXTRA);
+		tags.add(Constants.TAG_SMILEY2_EXTRA);
+		tags.add(Constants.TAG_SMILEY3_EXTRA);
+		tags.add(Constants.TAG_SMILEY4_EXTRA);
+		tags.add(Constants.TAG_SMILEY5_EXTRA);
+		tags.add(Constants.TAG_SMILEY6_EXTRA);
+		tags.add(Constants.TAG_SMILEY7_EXTRA);
+		tags.add(Constants.TAG_SMILEY8_EXTRA);
+		tags.add(Constants.TAG_SMILEY9_EXTRA);
+		tags.add(Constants.TAG_SMILEY10_EXTRA);
 
-		tags.add("love");
-		tags.add("starred");
-		tags.add("family");
-
-		tags.add("home");
-		tags.add("travel");
-		tags.add("place");
-
-		tags.add("hobby");
-		tags.add("sport");
-		tags.add("food");
-
-		tags.add("event");
-		tags.add("achievement");
-		tags.add("party");
-
-		tags.add("product");
-		tags.add("cloth");
-		tags.add("animal");
+		tags.add(Constants.TAG_LOVE_EXTRA);
+		tags.add(Constants.TAG_STAR_EXTRA);
+		tags.add(Constants.TAG_DISLIKE_EXTRA);
+		tags.add(Constants.TAG_ACHIEVEMENT_EXTRA);
+		tags.add(Constants.TAG_WORK_EXTRA);
+        tags.add(Constants.TAG_FAMILY_EXTRA);
+		tags.add(Constants.TAG_CHILD_EXTRA);
+		tags.add(Constants.TAG_PET_EXTRA);
+		tags.add(Constants.TAG_FRIENDS_EXTRA);
+		tags.add(Constants.TAG_PARTY_EXTRA);
+		tags.add(Constants.TAG_OUTDOOR_EXTRA);
+		tags.add(Constants.TAG_HOME_EXTRA);
+		tags.add(Constants.TAG_TRIP_EXTRA);
+		tags.add(Constants.TAG_TRAVEL_EXTRA);
+		tags.add(Constants.TAG_EVENT_EXTRA);
+		tags.add(Constants.TAG_HOBBY_EXTRA);
+		tags.add(Constants.TAG_SPORT_EXTRA);
+		tags.add(Constants.TAG_FOOD_EXTRA);
+		tags.add(Constants.TAG_CLOTH_EXTRA);
+		tags.add(Constants.TAG_SHOPPING_EXTRA);
 
 		// tablenames of the different mediatypes
-		types.add("files");
-		types.add("text");
-		types.add("music");
-		types.add("movies");
+		types = new ArrayList<String>();
+		types.add(Constants.TYPE_FILE);
+		types.add(Constants.TYPE_MOVIE);
+		types.add(Constants.TYPE_MUSIC);
+		types.add(Constants.TYPE_TEXT);
 
 		// different types of (offline / online) files
+		filetypes = new ArrayList<String>();
 		filetypes.add(Constants.MIME_TYPE_IMAGE);
 		filetypes.add(Constants.MIME_TYPE_IMAGE_THUMB);
 		filetypes.add(Constants.MIME_TYPE_VIDEO_THUMB);
@@ -380,8 +388,8 @@ public class DbHelper extends SQLiteOpenHelper
 		for(String tag : tags)
 		{
 			// build the statement
-			String sql = "INSERT INTO " + LifeBoxContract.Tags.TABLE_NAME + "(" + LifeBoxContract.Tags.COLUMN_NAME_TAG +
-					") VALUES(" + tag + ");";
+			String sql = "INSERT OR IGNORE INTO " + LifeBoxContract.Tags.TABLE_NAME + "(" + LifeBoxContract.Tags.COLUMN_NAME_TAG +
+					") VALUES('" + tag + "');";
 
 			db.execSQL(sql);
 		}
@@ -389,8 +397,8 @@ public class DbHelper extends SQLiteOpenHelper
 		for(String type : types)
 		{
 			// build the statement
-			String sql = "INSERT INTO " + LifeBoxContract.Types.TABLE_NAME + "(" + LifeBoxContract.Types.COLUMN_NAME_TYPE +
-					") VALUES(" + type + ");";
+			String sql = "INSERT OR IGNORE INTO " + LifeBoxContract.Types.TABLE_NAME + "(" + LifeBoxContract.Types.COLUMN_NAME_TYPE +
+					") VALUES('" + type + "');";
 
 			db.execSQL(sql);
 		}
@@ -398,11 +406,16 @@ public class DbHelper extends SQLiteOpenHelper
 		for(String filetype : filetypes)
 		{
 			// build the statement
-			String sql = "INSERT INTO " + LifeBoxContract.Filetypes.TABLE_NAME + "(" + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE +
-					") VALUES(" + filetype + ");";
+			String sql = "INSERT OR IGNORE INTO " + LifeBoxContract.Filetypes.TABLE_NAME + "(" + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE +
+					") VALUES('" + filetype + "');";
 
 			db.execSQL(sql);
 		}
+
+		//todo delete
+//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag1')");
+//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag2')");
+//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag3')");
 
 		db.execSQL(SQL_COMMIT);
 	}

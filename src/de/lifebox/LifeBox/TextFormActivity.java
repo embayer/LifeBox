@@ -32,10 +32,11 @@ public class TextFormActivity extends Activity
 			if(null != text && !text.trim().equals(""))
 			{
 				// set the extra
+				intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_TEXT);
 				intent.putExtra(Constants.TEXT_EXTRA, text);
-			}
 
-			startActivity(intent);
+				startActivity(intent);
+			}
 		}
 	};
 

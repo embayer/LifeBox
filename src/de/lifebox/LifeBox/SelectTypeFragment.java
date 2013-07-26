@@ -246,13 +246,12 @@ public class SelectTypeFragment extends Fragment
 					// start an intent to navigate to the MetaFormActivity
 					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
 					Log.e("path", mCurrentPhotoPath);
-					intent.putExtra("fileUri", mCurrentPhotoPath);
-					intent.putExtra("mimeType", Constants.MIME_TYPE_IMAGE);
-					intent.putExtra("timeStamp", mCurrentTimeStamp);
-					intent.putExtra("thumbnailUri", imageThumbnail);
+					intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_FILE);
+					intent.putExtra(Constants.FILE_URL_EXTRA, mCurrentPhotoPath);
+					intent.putExtra(Constants.MIME_TYPE_EXTRA, Constants.MIME_TYPE_IMAGE);
+					intent.putExtra(Constants.CREATION_DATE_EXTRA, mCurrentTimeStamp);
+					intent.putExtra(Constants.THUMBNAIL_URL_EXTRA, imageThumbnail);
 					getActivity().startActivity(intent);
-
-
 				}
 				//TODO Fehlerbehandlung
 				break;
@@ -263,12 +262,13 @@ public class SelectTypeFragment extends Fragment
 					String videoThumbnail = createVideoThumbnail(mCurrentVideoPath);
 
 					// start an intent to navigate to the MetaFormActivity
-					Intent intent = new Intent(getActivity(), UploadService.class);
-					intent.putExtra("fileUri", mCurrentVideoPath);
-					intent.putExtra("mimeType", Constants.MIME_TYPE_VIDEO);
-					intent.putExtra("timeStamp", mCurrentTimeStamp);
-					intent.putExtra("thumbnailUri", videoThumbnail);
-					getActivity().startService(intent);
+					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
+					intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_FILE);
+					intent.putExtra(Constants.FILE_URL_EXTRA, mCurrentVideoPath);
+					intent.putExtra(Constants.MIME_TYPE_EXTRA, Constants.MIME_TYPE_VIDEO);
+					intent.putExtra(Constants.CREATION_DATE_EXTRA, mCurrentTimeStamp);
+					intent.putExtra(Constants.THUMBNAIL_URL_EXTRA, videoThumbnail);
+					getActivity().startActivity(intent);
 				}
 				break;
 			case ACTION_PICK_PHOTO:
@@ -304,11 +304,12 @@ public class SelectTypeFragment extends Fragment
 					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
 
 					// set the extras
+					intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_FILE);
 					intent.putExtra(Constants.FILE_URL_EXTRA, mCurrentPhotoPath);
 					intent.putExtra(Constants.MIME_TYPE_EXTRA, Constants.MIME_TYPE_IMAGE);
-					intent.putExtra(Constants.TIME_STAMP_EXTRA, mCurrentTimeStamp);
-					intent.putExtra(Constants.THUMBNAIL_URI_EXTRA, imageThumbnail);
 					intent.putExtra(Constants.CREATION_DATE_EXTRA, creationDate);
+					intent.putExtra(Constants.THUMBNAIL_URL_EXTRA, imageThumbnail);
+					intent.putExtra(Constants.TIME_STAMP_EXTRA, mCurrentTimeStamp);
 					getActivity().startActivity(intent);
 				}
 			default:
