@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -47,6 +48,8 @@ public class SearchMusicActivity extends Activity
 	private EditText queryEditText;
 	// the listviews to display the searchresult
 	private ListView searchResultListView;
+	// the progress bar
+	private ProgressBar mProgressBar;
 
 	// the elements of the ListView entries
 	private WebView thumbnailWebView;
@@ -57,38 +60,48 @@ public class SearchMusicActivity extends Activity
 	// the adapter intermediate between view and data
 	private ArrayAdapter<Music> mMusicAdapter;
 
+	// OnKeyListener for the Enter softkey button
+	EditText.OnKeyListener queryKeyListener = new View.OnKeyListener()
+	{
+		@Override
+		public boolean onKey(View v, int keyCode, KeyEvent event)
+		{
+			boolean eventConsumed = false;
+
+			// listen to the dpad and the enter softkey
+			if(keyCode ==  KeyEvent.KEYCODE_DPAD_CENTER
+					|| keyCode ==  KeyEvent.KEYCODE_ENTER)
+			{
+
+				// to prevent default behavior do nothing on down but on up
+				if(event.getAction() == KeyEvent.ACTION_DOWN)
+				{
+					// do nothing
+				}
+				else if(event.getAction() == KeyEvent.ACTION_UP)
+				{
+					searchMedia();
+				}
+				eventConsumed = true;
+
+			}
+			else
+			{
+				// other key
+				eventConsumed = false;
+			}
+
+			return eventConsumed;
+		}
+	};
+
 	// the buttonlisteners
 	Button.OnClickListener mSearchListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
-			// get the search query from the edit-text field
-			queryEditText = (EditText) findViewById(R.id.in_search_media);
-			String query =  queryEditText.getText().toString();
-			query = query.trim();
-
-			//check if there is a user input to fetch
-			if( (null != query) && (!query.equals("") && (query.length() >= 0)) )
-			{
-				// put the extras, start the service
-				Intent intent = new Intent(getBaseContext(), FetchJsonService.class);
-				intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, mediaType);
-				intent.putExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA, query);
-
-				startService(intent);
-
-				// clear the input field
-				queryEditText.setText("");
-
-				// remove the soft keyboard
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(queryEditText.getWindowToken(), 0);
-			}
-			else
-			{
-				Toast.makeText(getBaseContext(), "Please insert a search term.", Toast.LENGTH_SHORT);
-			}
+			searchMedia();
 		}
 	};
 
@@ -148,6 +161,12 @@ public class SearchMusicActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.searchmedia);
 
+		searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
+
+		// the progress bar
+		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_search_media);
+		mProgressBar.setVisibility(View.INVISIBLE);
+
 		// the buttons
 		Button searchBtn = (Button) findViewById(R.id.button_search_media);
 		searchBtn.setOnClickListener(mSearchListener);
@@ -172,6 +191,42 @@ public class SearchMusicActivity extends Activity
 		// set the input hint according to the mediaType searching for
 		queryEditText = (EditText) findViewById(R.id.in_search_media);
 		queryEditText.setHint("Search for a song");
+		queryEditText.setOnKeyListener(queryKeyListener);
+	}
+
+	/**
+	 * Fetches the user input and redirects it to the FetchJsonService.
+	 */
+	private void searchMedia()
+	{
+		// hide the ListView show the ProgressBar
+		searchResultListView.setVisibility(View.INVISIBLE);
+		mProgressBar.setVisibility(View.VISIBLE);
+		// get the search query from the edit-text field
+		String query =  queryEditText.getText().toString();
+		query = query.trim();
+
+		//check if there is a user input to fetch
+		if(!query.equals(""))
+		{
+			// put the extras, start the service
+			Intent intent = new Intent(getBaseContext(), FetchJsonService.class);
+			intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, mediaType);
+			intent.putExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA, query);
+
+			startService(intent);
+
+			// clear the input field
+			queryEditText.setText("");
+
+			// remove the soft keyboard
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(queryEditText.getWindowToken(), 0);
+		}
+		else
+		{
+			Toast.makeText(getBaseContext(), "Please insert a search term.", Toast.LENGTH_SHORT);
+		}
 	}
 
 	/**
@@ -180,7 +235,7 @@ public class SearchMusicActivity extends Activity
 	 * @return (ArrayList<Music>) containing Music objects
 	 * @throws IOException
 	 */
-	public ArrayList<Music> parseMusicJsonString(String json) throws IOException
+	private ArrayList<Music> parseMusicJsonString(String json) throws IOException
 	{
 		// convert the String into an InputStream
 		InputStream in = new ByteArrayInputStream(json.getBytes());
@@ -202,7 +257,7 @@ public class SearchMusicActivity extends Activity
 	 * @return (ArrayList<Movie>) containing the Movie objects
 	 * @throws IOException
 	 */
-	public ArrayList<Music> parseMusicArray(JsonReader reader) throws IOException
+	private ArrayList<Music> parseMusicArray(JsonReader reader) throws IOException
 	{
 		ArrayList<Music> musicList = new ArrayList();
 
@@ -240,7 +295,7 @@ public class SearchMusicActivity extends Activity
 	 * @return (Music) object storing the JSON values
 	 * @throws IOException
 	 */
-	public Music parseMusic(JsonReader reader) throws IOException
+	private Music parseMusic(JsonReader reader) throws IOException
 	{
 		String artist = null;
 		String album = null;
@@ -345,6 +400,9 @@ public class SearchMusicActivity extends Activity
 		/** Called when the BroadcastReceiver gets an Intent it's registered to receive */
 		public void onReceive(Context context, Intent intent)
 		{
+			// remove the progress bar, enable the ListView
+			mProgressBar.setVisibility(View.GONE);
+			searchResultListView.setVisibility(View.VISIBLE);
 			// get the extras
 			if(intent.hasExtra(Constants.MEDIA_RESULT_EXTRA))
 			{
@@ -359,7 +417,6 @@ public class SearchMusicActivity extends Activity
 
 					// set the Adapter to the ListView
 					mMusicAdapter = new MusicAdapter();
-					searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
 					searchResultListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 					searchResultListView.setOnItemClickListener(searchresultOnClickListener);
 					searchResultListView.setAdapter(mMusicAdapter);

@@ -12,17 +12,17 @@
             android:id="@+id/in_text"
             android:padding="6dp"
             android:layout_width="364dp"
-            android:layout_height="430dp"
-            android:layout_marginTop="10dp"
-            android:background="#949494"
-            android:textColor="#000000"
+            android:layout_height="160dp"
+            android:layout_alignParentTop="true"
+            android:background="#FFFFFF"
             android:hint="Your text..."
             android:capitalize="sentences"
             android:maxLength="10000"/>
 
     <Button
             android:id="@+id/save_text"
-            android:text="save"
+            android:text="Save"
+            android:windowSoftInputMode="adjustPan"
             android:layout_alignParentBottom="true"
             android:layout_width="364dp"
             android:layout_height="60dp"

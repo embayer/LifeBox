@@ -50,7 +50,8 @@
         <activity android:name=".SearchMediaActivity"/>
         <activity android:name=".SearchMovieActivity"/>
         <activity android:name=".SearchMusicActivity"/>
-        <activity android:name=".TextFormActivity"/>
+        <activity android:name=".TextFormActivity"
+                  android:windowSoftInputMode="stateVisible|adjustResize"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
@@ -29,7 +30,6 @@ public class HashtagsActivity extends Activity
 	private ListView hashtagListView;               // hashtags for the entry
 
 	// the entries of the listviews
-	private EditText historyEditText;
 	private EditText hashtagEditText;
 
 	// the adapter intermediate between view and data
@@ -44,6 +44,42 @@ public class HashtagsActivity extends Activity
 	private String[] projection = {LifeBoxContract.Hashtags._ID, LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
 
 	private ArrayList<String> hashtagList;
+
+	// OnKeyListener for the Enter softkey button
+	EditText.OnKeyListener hashtagKeyListener = new View.OnKeyListener()
+	{
+		@Override
+		public boolean onKey(View v, int keyCode, KeyEvent event)
+		{
+			boolean eventConsumed = false;
+
+			// listen to the dpad and the enter softkey
+			if(keyCode ==  KeyEvent.KEYCODE_DPAD_CENTER
+					|| keyCode ==  KeyEvent.KEYCODE_ENTER)
+			{
+
+				// to prevent default behavior do nothing on down but on up
+				if(event.getAction() == KeyEvent.ACTION_DOWN)
+				{
+					// do nothing
+				}
+				else if(event.getAction() == KeyEvent.ACTION_UP)
+				{
+					fetchHashtag();
+				}
+				eventConsumed = true;
+
+			}
+			else
+			{
+				// other key
+				eventConsumed = false;
+			}
+
+			return eventConsumed;
+		}
+	};
+
 
 	// listener for the historyListView
 	ListView.OnItemClickListener historyListener = new ListView.OnItemClickListener()
@@ -90,27 +126,7 @@ public class HashtagsActivity extends Activity
 		public void onClick(View v)
 		{
 			// get the hashtag from the edit-text field
-			historyEditText = (EditText) findViewById(R.id.in_hashtag);
-			String hashtag = historyEditText.getText().toString();
-			hashtag = hashtag.trim();
-
-			// check if there is a user input to fetch
-			if( (null != hashtag) && (!hashtag.equals("") && (hashtag.length() >= 0)) )
-			{
-				// insert the item if it is not yet present
-				if(insertItem(hashtag, hashtagList))
-				{
-					// notify the adapter that the data has changed
-					mAadapter.notifyDataSetChanged();
-				}
-
-				// clear the input field
-				historyEditText.setText("");
-			}
-			else
-			{
-				Toast.makeText(getBaseContext(), "Please insert a hashtag.", Toast.LENGTH_SHORT);
-			}
+			fetchHashtag();
 		}
 	};
 
@@ -131,8 +147,8 @@ public class HashtagsActivity extends Activity
 //			SQLiteDatabase db = mDbHelper.getWritableDatabase();
 //
 //			// get the hashtag from the edit-text field
-//			historyEditText = (EditText) findViewById(R.id.in_hashtag);
-//			String hashtag = historyEditText.getText().toString();
+//			hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
+//			String hashtag = hashtagEditText.getText().toString();
 //
 //			// check if there is a user input to fetch
 //			if( (null != hashtag) && (!hashtag.equals("") && (hashtag.trim().length() >= 0)) )
@@ -169,7 +185,7 @@ public class HashtagsActivity extends Activity
 //				mScAdapter.notifyDataSetChanged();
 //
 //				// clear the input field
-//				historyEditText.setText("");
+//				hashtagEditText.setText("");
 //
 ////				historyListView.requestFocusFromTouch();
 ////				historyListView.setSelection(1);
@@ -199,6 +215,10 @@ public class HashtagsActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.hashtags);
+
+		// create the EditText, add the listener
+		hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
+		hashtagEditText.setOnKeyListener(hashtagKeyListener);
 
 		// create the buttons, add the listeners
 		Button createBtn = (Button) findViewById(R.id.create_hashtag);
@@ -259,7 +279,7 @@ public class HashtagsActivity extends Activity
 		// )
 
 		//##############################################################################################################
-		historyEditText = (EditText) findViewById(R.id.in_hashtag);
+		hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
 		// provide clear functionality by the "x" icon within the input field
 		String value = "";    // pre-fill the input field
 
@@ -267,14 +287,14 @@ public class HashtagsActivity extends Activity
 		final Drawable x = getResources().getDrawable(R.drawable.x);
 		// place it
 		x.setBounds(0, 0, x.getIntrinsicWidth(), x.getIntrinsicHeight());
-		historyEditText.setCompoundDrawables(null, null, value.equals("") ? null : x, null);
+		hashtagEditText.setCompoundDrawables(null, null, value.equals("") ? null : x, null);
 
-		historyEditText.setOnTouchListener(new View.OnTouchListener()
+		hashtagEditText.setOnTouchListener(new View.OnTouchListener()
 		{
 			@Override
 			public boolean onTouch(View v, MotionEvent event)
 			{
-				if (historyEditText.getCompoundDrawables()[2] == null)
+				if (hashtagEditText.getCompoundDrawables()[2] == null)
 				{
 					return false;
 				}
@@ -283,32 +303,36 @@ public class HashtagsActivity extends Activity
 					return false;
 				}
 				// when clicked
-				if (event.getX() > historyEditText.getWidth() - historyEditText.getPaddingRight() - x.getIntrinsicWidth())
+				if (event.getX() > hashtagEditText.getWidth() - hashtagEditText.getPaddingRight() - x.getIntrinsicWidth())
 				{
 					// clear text
-					historyEditText.setText("");
+					hashtagEditText.setText("");
 					// remove icon
-					historyEditText.setCompoundDrawables(null, null, null, null);
+					hashtagEditText.setCompoundDrawables(null, null, null, null);
 				}
 				return false;
 			}
 		});
 
 		// show icon when there is an input
-		historyEditText.addTextChangedListener(new TextWatcher()
+		hashtagEditText.addTextChangedListener(new TextWatcher()
 		{
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count)
 			{
-				historyEditText.setCompoundDrawables(null, null, historyEditText.getText().toString().equals("") ? null : x, null);
+				hashtagEditText.setCompoundDrawables(null, null, hashtagEditText.getText().toString().equals("") ? null : x, null);
 			}
 
 			// unneeded methods
 			@Override
-			public void afterTextChanged(Editable arg0) {}
+			public void afterTextChanged(Editable arg0)
+			{
+			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+			}
 		});
 		//##############################################################################################################
 
@@ -328,7 +352,7 @@ public class HashtagsActivity extends Activity
 	 * @param list (ArrayList<String>) the list holding the hashtags
 	 * @return true if the item was inserted, otherwise false
 	 */
-	public boolean insertItem(String item, ArrayList<String> list)
+	private boolean insertItem(String item, ArrayList<String> list)
 	{
 		boolean success = false;
 
@@ -339,6 +363,34 @@ public class HashtagsActivity extends Activity
 		}
 
 		return success;
+	}
+
+	/**
+	 * Fetch the user input and add it to the hashtags
+	 */
+	private void fetchHashtag()
+	{
+		// get the hashtag from the edit-text field
+		String hashtag = hashtagEditText.getText().toString();
+		hashtag = hashtag.trim();
+
+		// check if there is a user input to fetch
+		if(!hashtag.equals(""))
+		{
+			// insert the item if it is not yet present
+			if(insertItem(hashtag, hashtagList))
+			{
+				// notify the adapter that the data has changed
+				mAadapter.notifyDataSetChanged();
+			}
+
+			// clear the input field
+			hashtagEditText.setText("");
+		}
+		else
+		{
+			Toast.makeText(getBaseContext(), "Please insert a hashtag.", Toast.LENGTH_SHORT);
+		}
 	}
 
 //	// Called when a new Loader needs to be created
