@@ -33,6 +33,9 @@ public class SearchMusicActivity extends Activity
 {
 	private ResponseReceiver mResponseReceiver;
 
+	// the adapter intermediate between view and data
+	private ArrayAdapter<Music> mMusicAdapter;
+
 	// ArrayList to store the searchresults
 	private ArrayList<Music> musicList;
 
@@ -56,9 +59,6 @@ public class SearchMusicActivity extends Activity
 	private TextView titleTextView;
 	private TextView artistTextView;
 	private TextView albumTextView;
-
-	// the adapter intermediate between view and data
-	private ArrayAdapter<Music> mMusicAdapter;
 
 	// OnKeyListener for the Enter softkey button
 	EditText.OnKeyListener queryKeyListener = new View.OnKeyListener()

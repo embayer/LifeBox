@@ -1,11 +1,13 @@
 package de.lifebox.LifeBox;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
  */
 public class MainActivity extends FragmentActivity
 {
+	String TAG = "MainActivity";
+
 	MainPageAdapter mPageAdapter;		// managing the different views
 	ViewPager mViewPager;               // switch between views through swiping
 
@@ -66,19 +70,14 @@ public class MainActivity extends FragmentActivity
 				mViewPager.setCurrentItem(tab.getPosition());
 			}
 
+			// unused methods
 			/** Called when a tab exits the selected state. */
 			@Override
-			public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-			{
-				// unused method
-			}
+			public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft){}
 
 			/** Called when a tab that is already selected is chosen again by the user. */
 			@Override
-			public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-			{
-				// unused method
-			}
+			public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft){}
 		};
 
 		// add the tabs
@@ -86,7 +85,25 @@ public class MainActivity extends FragmentActivity
 		actionBar.addTab(actionBar.newTab().setText(getString(R.string.tab_input)).setTabListener(tabListener));
 		actionBar.addTab(actionBar.newTab().setText(getString(R.string.tab_timeline)).setTabListener(tabListener));
 
-		mViewPager.setCurrentItem(1, true);						// display the second tab on startup
+	    // get the intent
+		Intent intent = getIntent();
+		int callerId = intent.getIntExtra(Constants.CALLER_EXTRA, 100);
+
+		if(callerId == Constants.CALLER_SIGN_IN_ACTIVITY)
+		{
+			// display the inputmethod on startup
+			mViewPager.setCurrentItem(1, true);
+		}
+		else if(callerId == Constants.CALLER_META_FORM_ACTIVITY)
+		{
+			// display the timeline
+			mViewPager.setCurrentItem(2, true);
+		}
+		else if(callerId == 100)
+		{
+			mViewPager.setCurrentItem(1, true);
+			Log.e(TAG, "No caller");
+		}
 	}
 
 	/**

@@ -89,6 +89,10 @@ public class MetaFormActivity extends Activity
 
 	private ResponseReceiver mResponseReceiver;
 
+	// the counters
+	private TextView tagsCount;
+	private TextView hashtagsCount;
+
 	Button.OnClickListener mTimePickerListener = new Button.OnClickListener()
 	{
 		@Override
@@ -135,18 +139,6 @@ public class MetaFormActivity extends Activity
 		}
 	};
 
-	Button.OnClickListener mLocationListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-			mDbHelper = new DbHelper(getBaseContext());
-			SQLiteDatabase db = mDbHelper.getReadableDatabase();
-			Log.d("DB Path", db.getPath());
-			// /data/data/de.lifebox.LifeBox/databases/LifeBox.db
-		}
-	};
-
 	Button.OnClickListener mSaveListener = new Button.OnClickListener()
 	{
 		@Override
@@ -158,26 +150,31 @@ public class MetaFormActivity extends Activity
 			{
 				if( (mediaType.equals(Constants.TYPE_FILE)) && (uploadComplete == true) )
 				{
-					insertFile();
+					mDbHelper.insertFile(mimeType, mediaType, userTitle, userDescription, userTimestamp, fileUrl,
+						thumbnailUrl, fileDriveId, fileDownloadUrl, thumbDriveId, thumbDownloadUrl, hashtagList, tagList);
 					Log.d("entry inserted", Constants.TYPE_FILE);
 				}
 				else if(mediaType.equals(Constants.TYPE_TEXT))
 				{
-					insertText();
+					mDbHelper.insertText(text, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
 					Log.d("entry inserted", Constants.TYPE_TEXT);
 				}
 				else if(mediaType.equals(Constants.TYPE_MOVIE))
 				{
-					insertMovie();
+					mDbHelper.insertMovie(movieTitle, movieDirector, movieDescription, movieGenre, movieTimestamp,
+							movieThumbnailUrl, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
 					Log.d("entry inserted", Constants.TYPE_MOVIE);
 				}
 				else if(mediaType.equals(Constants.TYPE_MUSIC))
 				{
-					insertMusic();
+					mDbHelper.insertMusic(musicArtist, musicAlbum, musicTimestamp, musicThumbnailUrl, musicTrack,
+							musicGenre, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
 					Log.d("entry inserted", Constants.TYPE_MUSIC);
 				}
 
+				// pass to MainActivity
 				Intent intent = new Intent(getBaseContext(), MainActivity.class);
+				intent.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_META_FORM_ACTIVITY);
 				startActivity(intent);
 			};
 		}
@@ -197,6 +194,8 @@ public class MetaFormActivity extends Activity
 
 		// Sets the filter's category to DEFAULT
 		mStatusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+
+		mDbHelper = new DbHelper(getBaseContext());
 
 		// Instantiates a new ResponseReceiver
 		mResponseReceiver = new ResponseReceiver();
@@ -268,6 +267,11 @@ public class MetaFormActivity extends Activity
 			musicGenre = intent.getStringExtra(Constants.MUSIC_GENRE_EXTRA);
 		}
 
+		// the counters
+		tagsCount = (TextView) findViewById(R.id.textview_tagscount);
+		hashtagsCount = (TextView) findViewById(R.id.textview_hashtagscount);
+
+
 		// set the listeners to the buttons
 		Button tpBtn = (Button) findViewById(R.id.timepicker);
 		tpBtn.setOnClickListener(mTimePickerListener);
@@ -286,12 +290,12 @@ public class MetaFormActivity extends Activity
 		Button saveBtn = (Button) findViewById(R.id.save_meta_data);
 		saveBtn.setOnClickListener(mSaveListener);
 
-		Button locationBtn = (Button) findViewById(R.id.button_location);
-		locationBtn.setOnClickListener(mLocationListener);
+//		Button locationBtn = (Button) findViewById(R.id.button_location);
+//		locationBtn.setOnClickListener(mLocationListener);
 	}
 
 	/**
-	 * Called when the activity you launched returns
+	 * Called when the launched activity returns
 	 * with the requestCode, the resultCode, and any additional data from it.
 	 */
 	@Override
@@ -303,7 +307,14 @@ public class MetaFormActivity extends Activity
 			case ACTION_GATHER_TAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
+					// get the extra
 					tagList = data.getStringArrayListExtra(Constants.TAG_ARRAY_EXTRA);
+
+					// set the counter
+					if(!tagList.isEmpty())
+					{
+						tagsCount.setText(""+tagList.size());
+					}
 				}
 				//TODO Fehlerbehandlung
 				break;
@@ -312,7 +323,14 @@ public class MetaFormActivity extends Activity
 				{
 					if(data.hasExtra(Constants.HASHTAG_EXTRA))
 					{
+						// get the extras
 						hashtagList = data.getStringArrayListExtra(Constants.HASHTAG_EXTRA);
+
+						// set the counter
+						if(!hashtagList.isEmpty())
+						{
+							hashtagsCount.setText(""+hashtagList.size());
+						}
 					}
 				}
 				//TODO Fehlerbehandlung
@@ -430,623 +448,6 @@ public class MetaFormActivity extends Activity
 
 		return timestamp;
 	}
-
-	/**
-	 * Inserts a entry of the mediatype file.
-	 */
-	private void insertFile()
-	{
-		mDbHelper = new DbHelper(getBaseContext());
-		// get the data repository in read mode
-		// get the data repository in write mode
-		SQLiteDatabase dbIn = mDbHelper.getWritableDatabase();
-		ContentValues values = new ContentValues();
-
-		// get the filetypes_id for files ------------------------------------------------------------------------------
-		long filetypesId = getDbKey
-				(
-						LifeBoxContract.Filetypes.TABLE_NAME,
-						LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE,
-						LifeBoxContract.Filetypes._ID,
-						mimeType
-				);
-
-		// insert into files -------------------------------------------------------------------------------------------
-		long filesId = regularDbInsert
-				(
-						LifeBoxContract.Files.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Files.COLUMN_NAME_FILETYPES_ID, filetypesId)
-				);
-
-		// get the types_id for entries --------------------------------------------------------------------------------
-		long typesId = getTypesId(mediaType);
-
-		// insert into entries -----------------------------------------------------------------------------------------
-		long entriesId = regularDbInsert
-				(
-						LifeBoxContract.Entries.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID, filesId),
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID, typesId),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_TITLE, userTitle),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION, userDescription),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_USER_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE, userTimestamp)
-				);
-
-		// insert (file) into offline_files ----------------------------------------------------------------------------
-		long offlineFilesId = regularDbInsert
-				(
-						LifeBoxContract.OfflineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.OfflineFiles.COLUMN_NAME_PATH, fileUrl),
-						new KeyValuePair(LifeBoxContract.OfflineFiles.COLUMN_NAME_FILETYPES_ID, filetypesId)
-						);
-
-		// insert (thumbnail) into offline_files -----------------------------------------------------------------------
-
-		values.put(LifeBoxContract.OfflineFiles.COLUMN_NAME_PATH, thumbnailUrl);
-		values.put(LifeBoxContract.OfflineFiles.COLUMN_NAME_FILETYPES_ID, getThumbtype(mimeType));
-
-		long offlineFilesTmbId = dbIn.insert(LifeBoxContract.OfflineFiles.TABLE_NAME, null, values);
-
-		values.clear();
-
-		// insert (file) into online_files -----------------------------------------------------------------------------
-		long onlineFilesId = regularDbInsert
-				(
-						LifeBoxContract.OnlineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.OnlineFiles.COLUMN_NAME_DRIVEID, fileDriveId),
-						new KeyValuePair(LifeBoxContract.OnlineFiles.COLUMN_NAME_URL, fileDownloadUrl),
-						new KeyValuePair(LifeBoxContract.OnlineFiles.COLUMN_NAME_FILETYPES_ID, filetypesId)
-				);
-
-		// insert (thumbnail) into online_files ------------------------------------------------------------------------
-
-		values.put(LifeBoxContract.OnlineFiles.COLUMN_NAME_DRIVEID, thumbDriveId);
-		values.put(LifeBoxContract.OnlineFiles.COLUMN_NAME_URL, thumbDownloadUrl);
-		values.put(LifeBoxContract.OnlineFiles.COLUMN_NAME_FILETYPES_ID, getThumbtype(mimeType));
-
-		long onlineFilesTmbId = dbIn.insert(LifeBoxContract.OnlineFiles.TABLE_NAME, null, values);
-
-		values.clear();
-
-
-		// insert (file) into file_offline_files -----------------------------------------------------------------------
-		long fileOfflineFilesId = regularDbInsert
-				(
-						LifeBoxContract.FileOfflineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.FileOfflineFiles.COLUMN_NAME_FILES_ID, filesId),
-						new KeyValuePair(LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID, offlineFilesId)
-				);
-
-		// insert (thumbnail) into file_offline_files ------------------------------------------------------------------
-		long fileOfflineFilesTmbId = regularDbInsert
-				(
-						LifeBoxContract.FileOfflineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.FileOfflineFiles.COLUMN_NAME_FILES_ID, filesId),
-						new KeyValuePair(LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID, offlineFilesTmbId)
-				);
-
-		// insert (file) into file_online_files ------------------------------------------------------------------------
-		long fileOnlineFilesId = regularDbInsert
-				(
-						LifeBoxContract.FileOnlineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.FileOnlineFiles.COLUMN_NAME_FILES_ID, filesId),
-						new KeyValuePair(LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID, onlineFilesId)
-				);
-
-		// insert (thumbnail) into file_online_files -------------------------------------------------------------------
-		long fileOnlineFilesTmbId = regularDbInsert
-				(
-						LifeBoxContract.FileOnlineFiles.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.FileOnlineFiles.COLUMN_NAME_FILES_ID, filesId),
-						new KeyValuePair(LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID, onlineFilesTmbId)
-				);
-
-		// insert into entry_hashtags ----------------------------------------------------------------------------------
-		hashtagsDbInsert(entriesId, hashtagList);
-
-		// insert into entry_tags --------------------------------------------------------------------------------------
-		entryTagsDbInsert(entriesId, tagList);
-
-		// close the handler
-		dbIn.close();
-	}
-
-	/**
-	 * Insert a entry of the mediatype text.
-	 */
-	private void insertText()
-	{
-		// insert into text --------------------------------------------------------------------------------------------
-		long textId = regularDbInsert
-				(
-						LifeBoxContract.Text.TABLE_NAME, false, new KeyValuePair(LifeBoxContract.Text.COLUMN_NAME_TEXT, text)
-				);
-
-		// get the types_id for entries --------------------------------------------------------------------------------
-		long typesId = getTypesId(mediaType);
-
-		// insert into entries -----------------------------------------------------------------------------------------
-		long entriesId = regularDbInsert
-				(
-						LifeBoxContract.Entries.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID, textId),
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID, typesId),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_TITLE, userTitle),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION, userDescription),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_USER_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE, userTimestamp)
-				);
-
-		// insert into hashtags & entry_hashtags -----------------------------------------------------------------------
-		hashtagsDbInsert(entriesId, hashtagList);
-
-		// insert into entry_tags --------------------------------------------------------------------------------------
-		entryTagsDbInsert(entriesId, tagList);
-	}
-
-	/**
-	 * Insert a entry of the mediatype movie
-	 */
-	private void insertMovie()
-	{
-		// insert into movies ------------------------------------------------------------------------------------------
-		long moviesId = regularDbInsert
-				(
-						LifeBoxContract.Movies.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_TITLE, movieTitle),
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_DIRECTOR, movieDirector),
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_DESCRIPTION, movieDescription),
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_MOVIE_GENRE, movieGenre),
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_RELEASE_DATE, movieTimestamp),
-						new KeyValuePair(LifeBoxContract.Movies.COLUMN_NAME_THUMBNAIL_URL, movieThumbnailUrl)
-				);
-
-		// get the types_id for entries --------------------------------------------------------------------------------
-		long typesId = getTypesId(mediaType);
-
-		// insert into entries -----------------------------------------------------------------------------------------
-		long entriesId = regularDbInsert
-				(
-						LifeBoxContract.Entries.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID, moviesId),
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID, typesId),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_TITLE, userTitle),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION, userDescription),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_USER_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE, userTimestamp)
-				);
-
-		// insert into hashtags & entry_hashtags -----------------------------------------------------------------------
-		hashtagsDbInsert(entriesId, hashtagList);
-
-		// insert into entry_tags
-		entryTagsDbInsert(entriesId, tagList);
-	}
-
-	/**
-	 * Insert a entry of the mediatype music.
-	 */
-	private void insertMusic()
-	{
-		// insert into artists if not exists ---------------------------------------------------------------------------
-		long artistsId = regularDbInsert
-				(
-					LifeBoxContract.Artists.TABLE_NAME,
-					true,
-					new KeyValuePair(LifeBoxContract.Artists.COLUMN_NAME_ARTIST, musicArtist)
-				);
-
-		// insert into albums ------------------------------------------------------------------------------------------
-		long albumsId = regularDbInsert
-				(
-					LifeBoxContract.Albums.TABLE_NAME,
-					true,
-					new KeyValuePair(LifeBoxContract.Albums.COLUMN_NAME_ALBUM, musicAlbum),
-					new KeyValuePair(LifeBoxContract.Albums.COLUMN_NAME_RELEASE_DATE, musicTimestamp),
-					new KeyValuePair(LifeBoxContract.Albums.COLUMN_NAME_THUMBNAIL_URL, musicThumbnailUrl)
-				);
-
-		// insert into music -------------------------------------------------------------------------------------------
-		long musicId = regularDbInsert
-				(
-						LifeBoxContract.Music.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Music.COLUMN_NAME_TRACK, musicTrack),
-						new KeyValuePair(LifeBoxContract.Music.COLUMN_NAME_ARTISTS_ID, artistsId),
-						new KeyValuePair(LifeBoxContract.Music.COLUMN_NAME_ALBUMS_ID, albumsId)
-				);
-
-		// get the types_id for entries --------------------------------------------------------------------------------
-		long typesId = getTypesId(mediaType);
-
-		// insert into entries -----------------------------------------------------------------------------------------
-		long entriesId = regularDbInsert
-				(
-						LifeBoxContract.Entries.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID, musicId),
-						new KeyValuePair(LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID, typesId),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_TITLE, userTitle),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION, userDescription),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_USER_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE, userTimestamp),
-						new KeyValuePair(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE, userTimestamp)
-				);
-
-		// insert into music_genres ------------------------------------------------------------------------------------
-		long musicGenresId = regularDbInsert
-				(
-						LifeBoxContract.MusicGenres.TABLE_NAME,
-						false,
-						new KeyValuePair(LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_ID, musicId),
-						new KeyValuePair(LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_GENRE, musicGenre)
-				);
-
-		// insert into hashtags & entry_hashtags -----------------------------------------------------------------------
-		hashtagsDbInsert(entriesId, hashtagList);
-
-		// insert into entry_tags --------------------------------------------------------------------------------------
-		entryTagsDbInsert(entriesId, tagList);
-
-	}
-
-	/**
-	 * Queries a database table in order to get the key matching a condition.
-	 * @param table (String) the db table
-	 * @param dataColumn (String) the db column to compare with the condition
-	 * @param keyColumn (String) the db collumn holding the key
-	 * @param condition (String) the term to compare with dataColumn
-	 * @return _id (long) of the matching row or -1 if it fails.
-	 */
-	private long getDbKey(String table, String dataColumn, String keyColumn, String condition)
-	{
-		mDbHelper = new DbHelper(getBaseContext());
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-		// define the projection
-		String[] projection = {keyColumn};
-
-		// define the selection
-		String selection = dataColumn + " == " + "'" + condition +"'";
-
-		// query the database to retrieve a cursor object containing the data
-		Cursor c = db.query
-				(
-						table,
-						projection,
-						selection,
-						null,
-						null,
-						null,
-						null
-				);
-
-		// adjust the read position
-		c.moveToFirst();
-
-		// get the key
-		long id = -1;
-		try
-		{
-			id = c.getLong(c.getColumnIndexOrThrow(keyColumn));
-		}
-		catch(CursorIndexOutOfBoundsException e)
-		{
-			id = -1;
-			Log.e("cursor out of bounds: ", e.getMessage());
-		}
-
-		// cleanup
-		c.close();
-		db.close();
-
-		return id;
-	}
-
-	/**
-	 * Queries the database to get the primary key of the table types, matching a given mediatype.
-	 * @param mediaType (String) the mediatype that have to match
-	 * @return _id (long) the primary key of the row
-	 */
-	private long getTypesId(String mediaType)
-	{
-		return getDbKey
-				(
-						LifeBoxContract.Types.TABLE_NAME,
-						LifeBoxContract.Types.COLUMN_NAME_TYPE,
-						LifeBoxContract.Types._ID,
-						mediaType
-				);
-	}
-
-	/**
-	 * Queries the database to get the primary key of the table filetypes,
-	 * in order to figure out what thumbnail-mimetype matchas a given (file-)mimeType.
-	 * @param mimeType (String) the mimetype that have to match
-	 * @return _id (long) the primary key of the row
-	 */
-	private long getThumbtype(String mimeType)
-	{
-		long filetypesId = -1;
-		// decide what MIME-Type the thumbnail is of
-		if(mimeType.equals(Constants.MIME_TYPE_IMAGE))
-		{
-			filetypesId = getDbKey
-				(
-						LifeBoxContract.Filetypes.TABLE_NAME,
-						LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE,
-						LifeBoxContract.Filetypes._ID,
-						Constants.MIME_TYPE_IMAGE_THUMB
-				);
-		}
-		else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
-		{
-			filetypesId = getDbKey
-				(
-						LifeBoxContract.Filetypes.TABLE_NAME,
-						LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE,
-						LifeBoxContract.Filetypes._ID,
-						Constants.MIME_TYPE_VIDEO_THUMB
-				);
-		}
-
-		return filetypesId;
-	}
-
-	/**
-	 * Performs regular insert into a given table.
-	 * @param table (String) the target table
-	 * @param unique (boolean) if the row should be unique or not
-	 * @param keyValuePair (KeyValuePair [varargs]) variable number of key value pairs,
-	 *                     where column=key, insertfield=value
-	 * @return _id (long) of the newly inserted row
-	 */
-	private long regularDbInsert(String table, boolean unique, KeyValuePair... keyValuePair)
-	{
-		mDbHelper = new DbHelper(getBaseContext());
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-
-		for(KeyValuePair kvp : keyValuePair)
-		{
-			if(kvp.getValueIsString() == true)
-			{
-				if(kvp.getStringValue().trim().equals(""))
-				{
-					// insert NULL
-					values.putNull(kvp.getKey());
-					Log.d(kvp.getKey(), "null i am stfu joda");
-				}
-				else
-				{
-					Log.d(kvp.getKey(), kvp.getStringValue());
-					values.put(kvp.getKey(), kvp.getStringValue());
-				}
-
-			}
-			else if(kvp.getValueIsString() == false)
-			{
-				if(kvp.getLongValue() == 0)
-				{
-					// insert NULL
-					values.putNull(kvp.getKey());
-					Log.d(kvp.getKey(), "null i am stfu joda");
-				}
-				else
-				{
-					Log.d(kvp.getKey(), ""+kvp.getLongValue());
-					values.put(kvp.getKey(), kvp.getLongValue());
-				}
-
-			}
-		}
-
-		// get the key
-		long id = -1;
-
-		if(unique == false)
-		{
-			id = db.insertOrThrow(table, null, values);
-		}
-		else if(unique == true)
-		{
-			// only insert new rows, but always retrieve an id
-			id = db.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-		}
-
-		// cleanup
-		values.clear();
-		db.close();
-
-		return id;
-	}
-
-	/**
-	 * Inserts all new hashtags of a List into the hashtags-table
-	 * and inserts all hashtags that belong to a single entry.
-	 * @param entriesId (long) the primary key of the entry
-	 * @param hashtagList (ArrayList<String>) List containing the hashtags
-	 */
-	private void hashtagsDbInsert(long entriesId, ArrayList<String> hashtagList)
-	{
-		if(!hashtagList.isEmpty())
-		{
-			// initialize db object
-			mDbHelper = new DbHelper(getBaseContext());
-			SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-			// for all hashtags in the List
-			for(String hashtag : hashtagList)
-			{
-				// get the id (long > 0 || -1)
-				long hashtagsId = getDbKey
-						(
-							LifeBoxContract.Hashtags.TABLE_NAME,
-							LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG,
-							LifeBoxContract.Hashtags._ID,
-							hashtag
-						);
-				Log.d("hashtag", hashtag+" id: "+hashtagsId+" found");
-
-				// insert if new
-				if(hashtagsId == -1)
-				{
-					hashtagsId = regularDbInsert
-							(
-								LifeBoxContract.Hashtags.TABLE_NAME,
-								true,
-								new KeyValuePair(LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG, hashtag)
-							);
-
-					Log.d("hashtag", hashtag+" id: "+hashtagsId+" inserted into hashtags");
-				}
-
-				// always insert the hashtag in enty_hashtags
-				long entryHashtagsId = regularDbInsert
-						(
-								LifeBoxContract.EntryHashtags.TABLE_NAME,
-								false,
-								new KeyValuePair(LifeBoxContract.EntryHashtags.COLUMN_NAME_ENTRIES_ID, entriesId),
-								new KeyValuePair(LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID, hashtag)
-						);
-				Log.d("hashtag", hashtag+" id: "+hashtagsId+" inserted into entry_hashtags");
-			}
-
-			db.close();
-		}
-	}
-
-	/**
-	 * Inserts all tags that belong to a single entry.
-	 * @param entriesId (long) the primary key of the entry
-	 * @param tagList (ArrayList<String>) List containing the tagnames
-	 */
-	private void entryTagsDbInsert(long entriesId, ArrayList<String> tagList)
-	{
-		if(!tagList.isEmpty())
-		{
-			mDbHelper = new DbHelper(getBaseContext());
-			SQLiteDatabase db = mDbHelper.getWritableDatabase();
-			ContentValues values = new ContentValues();
-
-			for(String tag : tagList)
-			{
-				// get the db-key of the tag(name)
-				long tagsId = getDbKey(LifeBoxContract.Tags.TABLE_NAME, LifeBoxContract.Tags.COLUMN_NAME_TAG, LifeBoxContract.Tags._ID, tag);
-
-				values.put(LifeBoxContract.EntryTags.COLUMN_NAME_ENTRIES_ID, entriesId);
-				values.put(LifeBoxContract.EntryTags.COLUMN_NAME_TAGS_ID, tagsId);
-
-				long id = db.insertOrThrow(LifeBoxContract.EntryTags.TABLE_NAME, null, values);
-			}
-
-			db.close();
-		}
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//			// gets the data repository in write mode
-//			SQLiteDatabase db = mDbHelper.getWritableDatabase();
-//
-//			// get the hashtag from the edit-text field
-//			historyEditText = (EditText) findViewById(R.id.in_hashtag);
-//			String hashtag = historyEditText.getText().toString();
-//
-//			// check if there is a user input to fetch
-//			if( (null != hashtag) && (!hashtag.equals("") && (hashtag.trim().length() >= 0)) )
-//			{
-//				// create a new map of values, where column names are the keys
-//				ContentValues values = new ContentValues();
-//				values.put(LifeBoxContract.Hashtags.COLUMN_NAME_NAME, hashtag);
-//
-//				// insert the new row, returning the primary key value of the new row
-//				long newRowId;
-//				newRowId = db.insert(
-//						LifeBoxContract.Hashtags.TABLE_NAME,
-//						null,
-//						values);
-//
-//				db = mDbHelper.getReadableDatabase();
-//				mCursor = db.query(
-//						LifeBoxContract.Hashtags.TABLE_NAME,
-//						projection,
-//						null,
-//						null,
-//						null,
-//						null,
-//						null,
-//						null
-//				);
-//
-//				// for the cursor adapter, specify which columns go into which views
-//				String[] fromColumns = {LifeBoxContract.Hashtags.COLUMN_NAME_NAME};
-//				int[] toViews = {R.id.entry_history_hashtag}; // The TextView in simple_list_item_1
-//
-//				// refresh the view
-//				mScAdapter.changeCursorAndColumns(mCursor, fromColumns, toViews);
-//				mScAdapter.notifyDataSetChanged();
-//
-//				// clear the input field
-//				historyEditText.setText("");
-//
-////				historyListView.requestFocusFromTouch();
-////				historyListView.setSelection(1);
-//
-////				historyListView.setItemChecked(historyListView.getCount(), true);
-////				long[] ids = historyListView.getCheckedItemIds();
-////
-////				long id = ids[0];
-////
-////				Log.e("selection", "" + "" + id);
-////
-////				historyListView.deferNotifyDataSetChanged();
-//
-//
-//
-//				Log.e("sql", "" + values);
-
-
-
-
-
-
-
-
 
 	/**
 	 * Broadcast receiver for receiving the Google Drive fileId from the UploadService

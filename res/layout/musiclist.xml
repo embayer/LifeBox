@@ -10,7 +10,7 @@
     <WebView
             android:id="@+id/musiclist_thumbnail"
             android:layout_width="100dp"
-            android:layout_height="99dp" />
+            android:layout_height="100dp" />
 
 
     <TextView

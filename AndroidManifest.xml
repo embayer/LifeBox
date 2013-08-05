@@ -63,5 +63,8 @@
         <service android:name=".FetchJsonService"
                  android:exported="false" />
 
+        <service android:name=".TimelineReloadService"
+                 android:exported="false" />
+
     </application>
 </manifest>

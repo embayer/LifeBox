@@ -137,6 +137,7 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 
 		// Logged in successfully, call MainActivity
 		Intent callSelectTypeActivity = new Intent(this, MainActivity.class);
+		callSelectTypeActivity.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_SIGN_IN_ACTIVITY);
 		startActivity(callSelectTypeActivity);
 	}
 

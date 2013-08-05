@@ -9,9 +9,18 @@ import java.util.ArrayList;
  */
 public final class Constants
 {
+	//TODO set the package name prefix for all extras
+	//TODO split in extra name, extra
+	// the name of the package
+	public static final String PACKAGE_NAME_PREFIX = "de.lifebox.LifeBox.";
 	// defines a custom Intent action for the communication from UploadService to MetaFormActivity
-	public static final String BROADCAST_ACTION_UPLOADRESPONSE = "de.lifebox.LifeBox.UPLOADRESPONSE";
-	public static final String BROADCAST_ACTION_SEARCHRESPONSE = "de.lifebox.LifeBox.SEARCHRESPONSE";
+	public static final String BROADCAST_ACTION_UPLOADRESPONSE = PACKAGE_NAME_PREFIX + "UPLOADRESPONSE";
+	public static final String BROADCAST_ACTION_SEARCHRESPONSE = PACKAGE_NAME_PREFIX + "SEARCHRESPONSE";
+	public static final String BROADCAST_ACTION_RELOADRESPONSE = PACKAGE_NAME_PREFIX + "RELOADRESPONSE";
+
+	// caller identification
+	public static final int CALLER_SIGN_IN_ACTIVITY = 101;
+	public static final int CALLER_META_FORM_ACTIVITY = 102;
 
 	// codes for the different MIME-Types
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
@@ -28,6 +37,8 @@ public final class Constants
 	public static final String TYPE_TEXT = "text";
 
 	// codes for the extras
+	// caller identification
+	public static final String CALLER_EXTRA = "callerExtra";
 	// mediatypes
 	public static final String MEDIA_TYPE_EXTRA = "mediaTypeExtra";
 	// metadata of created files from SelectTypeFragment
@@ -97,6 +108,17 @@ public final class Constants
 	public static final String TAG_SHOPPING_EXTRA = "tagShopping";
 
 	public static final String TAG_ARRAY_EXTRA = "tagArrayExtra";
+
+	// offset from TimelineFragment
+	public static final String OFFSET_EXTRA = PACKAGE_NAME_PREFIX + "offsetExtra";
+	// database Lists from TimelineFragment
+	public static final String ENTRY_INDEX_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "entryIndexArrayExtra";
+	public static final String MEDIA_INDEX_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "mediaIndexArrayExtra";
+	public static final String TYPES_INDEX_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "typesIndexArrayExtra";
+
+	// database Lists from TimelineReloadService
+	public static final String TIMELINE_ENTRIES_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "timelineEntriesArrayExtra";
+	public static final String TIMELINE_ENTRIES_BUNDLE_EXTRA = PACKAGE_NAME_PREFIX + "timelineEntriesBundleExtra";
 
 	/** Constructor is empty to prevent instantiating the Constants class. */
 	public Constants() {}

@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class FetchJsonService extends IntentService
 {
+	private String TAG = "FetchJsonService";
+
 	/** Creates an IntentService.  Invoked by your subclass's constructor. */
 	public FetchJsonService()
 	{
@@ -65,7 +67,7 @@ public class FetchJsonService extends IntentService
 			URLEncoder.encode(query, "UTF-8");
 		} catch (UnsupportedEncodingException e)
 		{
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			Log.e(TAG, e.getMessage());
 		}
 
 		// set up a key-value list with the parameter entities
@@ -86,7 +88,7 @@ public class FetchJsonService extends IntentService
 			// broadcasts the Intent to receivers in this app
 			LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
 
-			Log.e("result", result);
+			Log.d(TAG, result);
 		}
 	}
 

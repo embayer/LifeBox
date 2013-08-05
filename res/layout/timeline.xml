@@ -2,10 +2,18 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-    <Button
-            android:text="TIMELINE"
-            android:layout_width="384dp"
-            android:layout_height="470dp"/>
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp">
+
+    <ListView
+            android:id="@+id/listview_timeline"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:listSelector="?android:attr/activatedBackgroundIndicator"
+            android:choiceMode="singleChoice"
+            android:clickable="true"/>
 
 </RelativeLayout>

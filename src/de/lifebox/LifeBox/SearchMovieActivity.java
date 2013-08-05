@@ -36,6 +36,9 @@ public class SearchMovieActivity extends Activity
 	// ArrayList to store the searchresults
 	private ArrayList<Movie> movieList;
 
+	// the adapter intermediate between view and data
+	private ArrayAdapter<Movie> mMovieAdapter;
+
 	// the movie title selected by the user
 	private String selectedTitle;
 	private String selectedDirector;
@@ -54,9 +57,6 @@ public class SearchMovieActivity extends Activity
 	private WebView thumbnailWebView;
 	private TextView titleTextView;
 	private TextView artistTextView;
-
-	// the adapter intermediate between view and data
-	private ArrayAdapter<Movie> mMovieAdapter;
 
 	// OnKeyListener for the Enter softkey button
 	EditText.OnKeyListener queryKeyListener = new View.OnKeyListener()
