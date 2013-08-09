@@ -490,8 +490,6 @@ public class MetaFormActivity extends Activity
 
 			TextView mTextView = (TextView) findViewById(R.id.in_description);
 			mTextView.setText(driveMetaData);
-
-
 		}
 	}
 

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp">
+
+    <TextView
+            android:id="@+id/timelinedetail_date_textview"
+            android:text="01.01.2013"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+            android:id="@+id/timelinedetail_time_textview"
+            android:text="23:55"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/timelinedetail_date_textview"
+            android:paddingLeft="20dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+            android:id="@+id/timelinedetail_title_textview"
+            android:text="Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timelinedetail_date_textview"
+            android:paddingLeft="6dp"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+            android:id="@+id/timelinedetail_description_textview"
+            android:text="So much text, unbelievable,"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timelinedetail_title_textview"
+            android:paddingLeft="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+   <LinearLayout
+            android:id="@+id/timelinedetail_specific_linearlayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timelinedetail_description_textview">
+        <!-->
+        <include
+                android:layout_below="@id/timelinedetail_description_textview"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                layout="@layout/timelinedetailtext"/>
+        <-->
+   </LinearLayout>
+
+    <TableLayout
+            android:id="@+id/timelinedetail_tags_tablelayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timelinedetail_specific_linearlayout">
+
+            <TableRow
+                android:id="@+id/timelinedetail_tags_row1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="2dp" />
+
+            <TableRow
+                    android:id="@+id/timelinedetail_tags_row2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp" />
+
+            <TableRow
+                    android:id="@+id/timelinedetail_tags_row3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp" />
+
+    </TableLayout>
+
+    <TextView
+            android:id="@+id/timelinedetail_hashtags_textview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/timelinedetail_tags_tablelayout"
+            android:singleLine="false" />
+
+</RelativeLayout>

@@ -142,6 +142,15 @@ public class SelectTypeFragment extends Fragment
 		}
 	};
 
+	Button.OnClickListener mDbBackupOnClickListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			copyDatabase(getActivity().getBaseContext(), "LifeBox.db");
+		}
+	};
+
 	/**
 	 * Constructor
 	 * @return SelectTypeFragment instance
@@ -208,6 +217,9 @@ public class SelectTypeFragment extends Fragment
 		setBtnListenerOrDisable(fileBtn,
 				mPickImageOnClickListener,
 				Intent.ACTION_PICK);
+
+		Button dbBackupBtn = (Button) view.findViewById(R.id.tvshow);
+		dbBackupBtn.setOnClickListener(mDbBackupOnClickListener);
 
 		return view;
 	}
@@ -737,6 +749,49 @@ public class SelectTypeFragment extends Fragment
 	{
 		Intent pickImageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(pickImageIntent, actionCode);
+	}
+
+	public static void copyDatabase(Context c, String DATABASE_NAME) {
+		String databasePath = c.getDatabasePath(DATABASE_NAME).getPath();
+		File f = new File(databasePath);
+		OutputStream myOutput = null;
+		InputStream myInput = null;
+		Log.d("testing", " testing db path " + databasePath);
+		Log.d("testing", " testing db exist " + f.exists());
+
+		if (f.exists()) {
+			try {
+
+				File directory = new File(Environment.getExternalStorageDirectory().getPath()+"LifeBox");
+				if (!directory.exists())
+					directory.mkdir();
+
+				myOutput = new FileOutputStream(directory.getAbsolutePath()
+						+ "/" + DATABASE_NAME);
+				myInput = new FileInputStream(databasePath);
+
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = myInput.read(buffer)) > 0) {
+					myOutput.write(buffer, 0, length);
+				}
+
+				myOutput.flush();
+			} catch (Exception e) {
+			} finally {
+				try {
+					if (myOutput != null) {
+						myOutput.close();
+						myOutput = null;
+					}
+					if (myInput != null) {
+						myInput.close();
+						myInput = null;
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
 	}
 
 	//START unused methods----------------------------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 package de.lifebox.LifeBox;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Class for the media type music.
  * @version 0.1 11.07.13
@@ -53,5 +57,33 @@ public class Music
 	public String getMusicGenre()
 	{
 		return musicGenre;
+	}
+
+	/**
+	 * Converts the userDate timestamp and returns the date.
+	 * @return (String) the date
+	 */
+	public String getDate()
+	{
+		Timestamp timestamp = new Timestamp(Long.parseLong(releaseDate));
+		Date date = new Date(timestamp.getTime());
+
+		String dateString = new SimpleDateFormat("yyyy-MM-dd").format(date);
+
+		return dateString;
+	}
+
+	/**
+	 * Converts the userDate timestamp and returns the time.
+	 * @return (String) the time
+	 */
+	public String getTime()
+	{
+		Timestamp timestamp = new Timestamp(Long.parseLong(releaseDate));
+		Date date = new Date(timestamp.getTime());
+
+		String timeString = new SimpleDateFormat("HH:mm").format(date);
+
+		return timeString;
 	}
 }

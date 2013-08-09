@@ -52,6 +52,12 @@
         <activity android:name=".SearchMusicActivity"/>
         <activity android:name=".TextFormActivity"
                   android:windowSoftInputMode="stateVisible|adjustResize"/>
+        <activity android:name=".TimelineDetailActivity"/>
+        <activity android:name=".TimelineDetailTextActivity"/>
+        <activity android:name=".TimelineDetailFileImageActivity"/>
+        <activity android:name=".TimelineDetailMovieActivity"/>
+        <activity android:name=".TimelineDetailMusicActivity"/>
+        <activity android:name=".TimelineDetailFileVideoActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

@@ -191,12 +191,15 @@ public class TimelineReloadService extends IntentService
 								true
 						);
 
+				secondText = "";
+
+				thumbnail = "";
 				filetype = "";
 				Log.e(TAG, "text "+firstText);
 			}
 			else if(type.equals(Constants.TYPE_MUSIC))
 			{
-				Map<String, String> musicList = mDbHelper.selectMusic(mediaId);
+				Map<String, String> musicList = mDbHelper.selectMusicMap(mediaId);
 				// the track
 				firstText = musicList.get("Track");
 				// the artist
@@ -211,7 +214,7 @@ public class TimelineReloadService extends IntentService
 			}
 			else if(type.equals((Constants.TYPE_MOVIE)))
 			{
-				Map<String, String> movieList = mDbHelper.selectMovie(mediaId);
+				Map<String, String> movieList = mDbHelper.selectMovieMap(mediaId);
 				// the movie title
 				firstText = movieList.get("Movie Title");
 				// the director
@@ -268,10 +271,12 @@ public class TimelineReloadService extends IntentService
 					case 7:
 						// first text
 						resultList[r][col] = firstText;
+						break;
 
 					case 8:
 						// second text
 						resultList[r][col] = secondText;
+						break;
 
 					default:
 						break;
@@ -300,32 +305,5 @@ public class TimelineReloadService extends IntentService
 		String timeString = new SimpleDateFormat("HH:mm").format(date);
 
 		return timeString;
-	}
-
-	/**
-	 * Parses a String and tries to get the timestamp from.
-	 * @param string (String) String in the format: 'yyyy-MM-dd'T'HH:mm:ssZ'
-	 * @return (Timestamp) of the parsed String
-	 */
-	private Timestamp stringToTimestamp(String string)
-	{
-		// yyyy-MM-dd'T'HH:mm:ss:SSS'Z' -> yyyy-MM-dd HH:mm
-		string = string.substring(0, 16);
-		string = string.replace('T', ' ');
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-		Date parsedDate = null;
-		try
-		{
-			parsedDate = sdf.parse(string);
-		}
-		catch (ParseException e)
-		{
-			Log.e("parse date error", e.getMessage());
-		}
-		Timestamp timestamp = new Timestamp(parsedDate.getTime());
-
-		return timestamp;
 	}
 }

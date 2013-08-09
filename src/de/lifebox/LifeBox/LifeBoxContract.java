@@ -20,13 +20,22 @@ public final class LifeBoxContract
 		public static final String TABLE_NAME = "entries";
 		public static final String _ID = "_id";
 
-		public static final String COLUMN_NAME_MEDIA_ID = "media_id";   				// (table name)
+		public static final String COLUMN_NAME_MEDIA_ID = "media_id";
 		public static final String COLUMN_NAME_TYPES_ID = "types_id";
 		public static final String COlUMN_NAME_TITLE = "title";
 		public static final String COlUMN_NAME_DESCRIPTION = "description";
 		public static final String COlUMN_NAME_USER_DATE = "user_date";
 		public static final String COlUMN_NAME_CREATION_DATE = "creation_date";
 		public static final String COlUMN_NAME_MODIFICATION_DATE = "modification_date";
+
+		public static final String DOT_ID = TABLE_NAME + "." + _ID;
+		public static final String DOT_COLUMN_NAME_MEDIA_ID = TABLE_NAME + "." + COLUMN_NAME_MEDIA_ID;
+		public static final String DOT_COLUMN_NAME_TYPES_ID = TABLE_NAME + "." + COLUMN_NAME_TYPES_ID;
+		public static final String DOT_COlUMN_NAME_TITLE = TABLE_NAME + "." + COlUMN_NAME_TITLE;
+		public static final String DOT_COlUMN_NAME_DESCRIPTION = TABLE_NAME + "." + COlUMN_NAME_DESCRIPTION;
+		public static final String DOT_COlUMN_NAME_USER_DATE = TABLE_NAME + "." + COlUMN_NAME_USER_DATE;
+		public static final String DOT_COlUMN_NAME_CREATION_DATE = TABLE_NAME + "." + COlUMN_NAME_CREATION_DATE;
+		public static final String DOT_COlUMN_NAME_MODIFICATION_DATE = TABLE_NAME + "." + COlUMN_NAME_MODIFICATION_DATE;
 	}
 
 	// the possible types

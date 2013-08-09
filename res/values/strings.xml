@@ -9,4 +9,7 @@
     <string name="cannot">Cannot</string>
     <string name="headline_hashtag">Hashtags</string>
     <string name="headline_tags">Tags</string>
+    <string name="dialog_delete_confirmation">Delete this entry?</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
 </resources>

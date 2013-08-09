@@ -51,7 +51,6 @@ public class TimelineFragment extends Fragment
 	// the ui elements
 	private ListView timelineLV;
 
-	private TextView idTV;
 	private FrameLayout imageFrame;
 	private ImageView imageView;
 	private WebView movieWebView;
@@ -62,7 +61,57 @@ public class TimelineFragment extends Fragment
 	private TextView firstlineTV;
 	private TextView secondlineTV;
 
+	// Listener for the timeline items
+	ListView.OnItemClickListener timelineListener = new ListView.OnItemClickListener()
+	{
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+		{
+			Intent intent = null;
 
+			// decide what type the clicked entry is of
+			// the position of the listview == the position in the entryList
+			String type = entryList.get(position).getType();
+
+			// text
+			if(type.equals(Constants.TYPE_TEXT))
+			{
+				intent = new Intent(getActivity(), TimelineDetailTextActivity.class);
+			}
+			// movie
+			else if(type.equals(Constants.TYPE_MOVIE))
+			{
+				intent = new Intent(getActivity(), TimelineDetailMovieActivity.class);
+			}
+			// music
+			else if(type.equals(Constants.TYPE_MUSIC))
+			{
+				intent = new Intent(getActivity(), TimelineDetailMusicActivity.class);
+			}
+			// file
+			else if(type.equals(Constants.TYPE_FILE))
+			{
+				String filetype = entryList.get(position).getFiletype();
+
+				// image
+				if(filetype.equals(Constants.MIME_TYPE_IMAGE))
+				{
+					intent = new Intent(getActivity(), TimelineDetailFileImageActivity.class);
+				}
+				// video
+				if(filetype.equals(Constants.MIME_TYPE_VIDEO))
+				{
+					intent = new Intent(getActivity(), TimelineDetailFileVideoActivity.class);
+				}
+			}
+
+
+			// get the entryId and set it as extra
+			intent.putExtra(Constants.ENTRY_ID_EXTRA, entryList.get(position).getEntryId());
+
+			startActivity(intent);
+		}
+	};
 
 	/** Called when the fragment is first created. */
 	public static final TimelineFragment newInstance()
@@ -111,8 +160,8 @@ public class TimelineFragment extends Fragment
 
 		// initialize the ui elements
 		timelineLV = (ListView) view.findViewById(R.id.listview_timeline);
+		timelineLV.setOnItemClickListener(timelineListener);
 
-		idTV = (TextView) view.findViewById(R.id.hidden_id_textview);
 		imageFrame = (FrameLayout) view.findViewById(R.id.image_frame);
 		imageView = (ImageView) view.findViewById(R.id.thumbnail_imageview);
 		movieWebView = (WebView) view.findViewById(R.id.movie_webview);
@@ -123,6 +172,16 @@ public class TimelineFragment extends Fragment
 		secondlineTV = (TextView) view.findViewById(R.id.timeline_secondline_textview);
 
 		return view;
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+
+//		mTimelilneAdapter.notifyDataSetChanged();
+//		mTimelilneAdapter.notify();
+		Log.e("triggert", "onResume");
 	}
 
 	/**
@@ -141,8 +200,6 @@ public class TimelineFragment extends Fragment
 
 	private BitmapDrawable downloadBitmap(String url)
 	{
-		Log.e("upsala", url);
-
 		Bitmap bitmap = null;
 		InputStream in = null;
 		BufferedOutputStream out = null;
@@ -226,25 +283,12 @@ public class TimelineFragment extends Fragment
 			TimelineEntry currentEntry = entryList.get(position);
 
 			String type = currentEntry.getType();
-			// set the thumbnail image
-			// TODO remove network operation from the main thread
-//			movieWebView = (WebView) itemView.findViewById(R.id.searchresult_thumbnail);
-//			movieWebView.loadUrl(currentEntry.getThumbnail());
 
-			idTV = (TextView) itemView.findViewById(R.id.hidden_id_textview);
-			idTV.setText(currentEntry.getEntryId());
-			idTV.setVisibility(View.INVISIBLE);
+			// TODO remove network operation from the main thread
 
 			imageFrame = (FrameLayout) itemView.findViewById(R.id.image_frame);
 
 			imageView = (ImageView) itemView.findViewById(R.id.thumbnail_imageview);
-
-//			imageFrame.setBackgroundResource(R.color.blue);
-
-//			imageView.setImageDrawable(downloadBitmap(currentEntry.getThumbnail()));
-//			mImageView.setImageDrawable(Drawable.createFromPath(thumbnailUrl));
-
-
 
 			dateTV = (TextView) itemView.findViewById(R.id.timeline_date_textview);
 			dateTV.setText(currentEntry.getDate());
@@ -252,7 +296,6 @@ public class TimelineFragment extends Fragment
 			timeTV = (TextView) itemView.findViewById(R.id.timeline_time_textview);
 			timeTV.setText(currentEntry.getTime());
 
-			// set the title
 			titleTV = (TextView) itemView.findViewById(R.id.timeline_title_textview);
 			titleTV.setText(currentEntry.getTitle());
 
@@ -266,7 +309,11 @@ public class TimelineFragment extends Fragment
 
 			musicWebView = (WebView) itemView.findViewById(R.id.music_webview);
 
+//			image_view.getLayoutParams().height = 20;
+
+
 			// set the type specific values
+			// type file
 			if(type.equals(Constants.TYPE_FILE))
 			{
 				if(currentEntry.getFiletype().equals(Constants.MIME_TYPE_IMAGE))
@@ -280,29 +327,36 @@ public class TimelineFragment extends Fragment
 
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
+				imageView.setVisibility(View.VISIBLE);
 				imageView.setImageDrawable(Drawable.createFromPath(currentEntry.getThumbnail()));
 			}
+			// type text
 			else if(type.equals(Constants.TYPE_TEXT))
 			{
 				imageFrame.setBackgroundResource(R.color.green);
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
+				imageView.setVisibility(View.VISIBLE);
 				imageView.setImageDrawable(getResources().getDrawable(R.drawable.placeholder_text));
 			}
+			// type movie
 			else if(type.equals(Constants.TYPE_MOVIE))
 			{
 				imageFrame.setBackgroundResource(R.color.purple);
 				imageView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
+				movieWebView.setVisibility(View.VISIBLE);
 				movieWebView.loadUrl(currentEntry.getThumbnail());
 
 //				imageView.setImageDrawable(downloadBitmap(currentEntry.getThumbnail()));
 			}
+			// type music
 			else if(type.equals(Constants.TYPE_MUSIC))
 			{
 				imageFrame.setBackgroundResource(R.color.yellow);
 				imageView.setVisibility(View.INVISIBLE);
 				movieWebView.setVisibility(View.INVISIBLE);
+				musicWebView.setVisibility(View.VISIBLE);
 				musicWebView.loadUrl(currentEntry.getThumbnail());
 
 //				imageView.setImageDrawable(downloadBitmap(currentEntry.getThumbnail()));
@@ -323,8 +377,8 @@ public class TimelineFragment extends Fragment
 		/** Called when the BroadcastReceiver gets an Intent it's registered to receive */
 		public void onReceive(Context context, Intent intent)
 		{
-			// set the Adapter to the ListView
 			mTimelilneAdapter = new TimelineAdapter();
+			// set the Adapter to the ListView
 			timelineLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 //			timelineLV.setOnItemClickListener(searchresultOnClickListener);
 			timelineLV.setAdapter(mTimelilneAdapter);
@@ -395,10 +449,12 @@ public class TimelineFragment extends Fragment
 							case 7:
 								// first text
 								firstText = reloadResultList[r][c];
+//								Log.e(TAG, "first: "+reloadResultList[r][c]);
 
 							case 8:
 								// second text
 								secondText = reloadResultList[r][c];
+//								Log.e(TAG, "second: "+reloadResultList[r][c]);
 
 							default:
 								break;
@@ -407,7 +463,7 @@ public class TimelineFragment extends Fragment
 					// save the entries
 					entryList.add
 							(
-									new TimelineEntry(type,filetype, entryId, thumbnail,date, time, title, firstText, secondText)
+									new TimelineEntry(type, filetype, entryId, thumbnail,date, time, title, firstText, secondText)
 							);
 				}
 

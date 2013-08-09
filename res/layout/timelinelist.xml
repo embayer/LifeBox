@@ -7,11 +7,6 @@
                 android:background="?android:attr/activatedBackgroundIndicator"
                 android:descendantFocusability="blocksDescendants"> >
 
-    <TextView
-            android:id="@+id/hidden_id_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
     <FrameLayout
             android:id="@+id/image_frame"
             android:layout_width="104dp"

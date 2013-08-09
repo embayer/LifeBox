@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <FrameLayout
+            android:id="@+id/moviedetail_image_frame"
+            android:background="@color/purple"
+            android:layout_width="104dp"
+            android:layout_height="104dp" >
+
+        <WebView
+                android:id="@+id/moviedetail_webview"
+                android:layout_width="67dp"
+                android:layout_height="96dp" />
+
+    </FrameLayout>
+
+    <TextView
+            android:id="@+id/moviedetail_title_textview"
+            android:text="title"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/moviedetail_image_frame"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/moviedetail_director_textview"
+            android:text="director"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/moviedetail_image_frame"
+            android:layout_below="@id/moviedetail_title_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/moviedetail_releasedate_textview"
+            android:text="releasedate"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/moviedetail_image_frame"
+            android:layout_below="@id/moviedetail_director_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/moviedetail_genre_textview"
+            android:text="genre"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/moviedetail_image_frame"
+            android:layout_below="@id/moviedetail_releasedate_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/moviedetail_description_textview"
+            android:text="description"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/moviedetail_image_frame"/>
+
+</RelativeLayout>

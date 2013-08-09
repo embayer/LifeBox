@@ -10,7 +10,7 @@
                     android:layout_marginLeft="10dp">
 
     <ToggleButton android:id="@+id/tb_smiley1"
-                  android:background="@drawable/tag_smiley1"
+                  android:background="@drawable/tag_switch_smiley1"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_marginLeft="2dp"
@@ -20,7 +20,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley2"
-                  android:background="@drawable/tag_smiley2"
+                  android:background="@drawable/tag_switch_smiley2"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_toRightOf="@id/tb_smiley1"
@@ -31,7 +31,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley3"
-                  android:background="@drawable/tag_smiley3"
+                  android:background="@drawable/tag_switch_smiley3"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_toRightOf="@id/tb_smiley2"
@@ -42,7 +42,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley4"
-                  android:background="@drawable/tag_smiley4"
+                  android:background="@drawable/tag_switch_smiley4"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_toRightOf="@id/tb_smiley3"
@@ -53,7 +53,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley5"
-                  android:background="@drawable/tag_smiley5"
+                  android:background="@drawable/tag_switch_smiley5"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_toRightOf="@id/tb_smiley4"
@@ -64,7 +64,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley6"
-                  android:background="@drawable/tag_smiley6"
+                  android:background="@drawable/tag_switch_smiley6"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley1"
@@ -76,7 +76,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley7"
-                  android:background="@drawable/tag_smiley7"
+                  android:background="@drawable/tag_switch_smiley7"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley2"
@@ -89,7 +89,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley8"
-                  android:background="@drawable/tag_smiley8"
+                  android:background="@drawable/tag_switch_smiley8"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley3"
@@ -102,7 +102,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley9"
-                  android:background="@drawable/tag_smiley9"
+                  android:background="@drawable/tag_switch_smiley9"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley4"
@@ -115,7 +115,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_smiley10"
-                  android:background="@drawable/tag_smiley10"
+                  android:background="@drawable/tag_switch_smiley10"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley5"
@@ -128,7 +128,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_love"
-                  android:background="@drawable/tag_love"
+                  android:background="@drawable/tag_switch_love"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley6"
@@ -140,7 +140,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_star"
-                  android:background="@drawable/tag_star"
+                  android:background="@drawable/tag_switch_star"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley7"
@@ -153,7 +153,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_dislike"
-                  android:background="@drawable/tag_dislike"
+                  android:background="@drawable/tag_switch_dislike"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley8"
@@ -166,7 +166,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_achievement"
-                  android:background="@drawable/tag_achievement"
+                  android:background="@drawable/tag_switch_achievement"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley9"
@@ -179,7 +179,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_work"
-                  android:background="@drawable/tag_work"
+                  android:background="@drawable/tag_switch_work"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_smiley10"
@@ -192,7 +192,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_family"
-                  android:background="@drawable/tag_family"
+                  android:background="@drawable/tag_switch_family"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_love"
@@ -204,7 +204,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_child"
-                  android:background="@drawable/tag_child"
+                  android:background="@drawable/tag_switch_child"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_star"
@@ -217,7 +217,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_pet"
-                  android:background="@drawable/tag_pet"
+                  android:background="@drawable/tag_switch_pet"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_dislike"
@@ -230,7 +230,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_friends"
-                  android:background="@drawable/tag_friends"
+                  android:background="@drawable/tag_switch_friends"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_achievement"
@@ -243,7 +243,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_party"
-                  android:background="@drawable/tag_party"
+                  android:background="@drawable/tag_switch_party"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_work"
@@ -256,7 +256,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_outdoor"
-                  android:background="@drawable/tag_outdoor"
+                  android:background="@drawable/tag_switch_outdoor"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_family"
@@ -268,7 +268,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_home"
-                  android:background="@drawable/tag_home"
+                  android:background="@drawable/tag_switch_home"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_child"
@@ -281,7 +281,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_trip"
-                  android:background="@drawable/tag_trip"
+                  android:background="@drawable/tag_switch_trip"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_pet"
@@ -294,7 +294,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_travel"
-                  android:background="@drawable/tag_travel"
+                  android:background="@drawable/tag_switch_travel"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_friends"
@@ -307,7 +307,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_event"
-                  android:background="@drawable/tag_event"
+                  android:background="@drawable/tag_switch_event"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_party"
@@ -320,7 +320,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_hobby"
-                  android:background="@drawable/tag_hobby"
+                  android:background="@drawable/tag_switch_hobby"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_outdoor"
@@ -332,7 +332,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_sport"
-                  android:background="@drawable/tag_sport"
+                  android:background="@drawable/tag_switch_sport"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_home"
@@ -345,7 +345,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_food"
-                  android:background="@drawable/tag_food"
+                  android:background="@drawable/tag_switch_food"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_trip"
@@ -358,7 +358,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_cloth"
-                  android:background="@drawable/tag_cloth"
+                  android:background="@drawable/tag_switch_cloth"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_travel"
@@ -371,7 +371,7 @@
                   android:focusableInTouchMode="false"/>
 
     <ToggleButton android:id="@+id/tb_shopping"
-                  android:background="@drawable/tag_shopping"
+                  android:background="@drawable/tag_switch_shopping"
                   android:layout_width="64dp"
                   android:layout_height="64dp"
                   android:layout_below="@id/tb_event"

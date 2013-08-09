@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <FrameLayout
+            android:id="@+id/musicdetail_image_frame"
+            android:background="@color/purple"
+            android:layout_width="104dp"
+            android:layout_height="104dp" >
+
+        <WebView
+                android:id="@+id/musicdetail_webview"
+                android:layout_width="100dp"
+                android:layout_height="100dp" />
+
+    </FrameLayout>
+
+    <TextView
+            android:id="@+id/musicdetail_track_textview"
+            android:text="track"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/musicdetail_image_frame"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/musicdetail_artist_textview"
+            android:text="artist"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/musicdetail_image_frame"
+            android:layout_below="@id/musicdetail_track_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/musicdetail_album_textview"
+            android:text="album"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/musicdetail_image_frame"
+            android:layout_below="@id/musicdetail_artist_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/musicdetail_releasedate_textview"
+            android:text="releasedate"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/musicdetail_image_frame"
+            android:layout_below="@id/musicdetail_album_textview"
+            android:paddingLeft="6dp"/>
+
+    <TextView
+            android:id="@+id/musicdetail_genre_textview"
+            android:text="genre"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/musicdetail_image_frame"
+            android:layout_below="@id/musicdetail_releasedate_textview"
+            android:paddingLeft="6dp"/>
+
+</RelativeLayout>

@@ -20,7 +20,7 @@ import java.util.Map;
 public class DbHelper extends SQLiteOpenHelper
 {
 	// if the database schema has changed, the database version must be increased.
-	public static final int DATABASE_VERSION = 18;
+	public static final int DATABASE_VERSION = 20;
 	public static final String DATABASE_NAME = "LifeBox.db";
 
 	// data types
@@ -309,7 +309,6 @@ public class DbHelper extends SQLiteOpenHelper
 	private static final String SQL_DROP_FILE_ONLINE_FILES =
 			"DROP TABLE IF EXISTS " + LifeBoxContract.FileOnlineFiles.TABLE_NAME + ";";
 
-
 	public DbHelper(Context context)
 	{
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -416,11 +415,6 @@ public class DbHelper extends SQLiteOpenHelper
 			db.execSQL(sql);
 		}
 
-		//todo delete
-//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag1')");
-//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag2')");
-//		db.execSQL("INSERT INTO hashtags(hashtag) VALUES('hashtag3')");
-
 		db.execSQL(SQL_COMMIT);
 	}
 
@@ -466,6 +460,408 @@ public class DbHelper extends SQLiteOpenHelper
 	{
 		onUpgrade(db, oldVersion, newVersion);
 	}
+	//##################################################################################################################
+	// DELETE ----------------------------------------------------------------------------------------------------------
+	//##################################################################################################################
+
+	/**
+	 * Delete all rows in all tables associated with a mediafile.
+	 * @param entriesId (String) the entries._id
+	 * @param mediaId (String) entries.media_id
+	 * @return true if all associated rows where deleted otherwise false.
+	 */
+	public boolean deleteFile(String entriesId, String mediaId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		// the result
+		boolean success = false;
+
+		int deletedRows = 0;
+
+		// delete entries row
+		// where clause for entries
+		String clause = LifeBoxContract.Entries._ID + " == " + entriesId;
+
+		deletedRows += db.delete(LifeBoxContract.Entries.TABLE_NAME, clause, null);
+
+		// delete files row
+		clause = LifeBoxContract.Files._ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.Files.TABLE_NAME, clause, null);
+
+		// delete offline_files rows
+		// get the offline_files._id(s) from file_offline_files
+		// projection
+		String[] columns = {LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID};
+
+		// selection
+		String selection = LifeBoxContract.FileOfflineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId;
+
+		Cursor c = db.query(LifeBoxContract.FileOfflineFiles.TABLE_NAME, columns, selection,null, null, null,null);
+
+		ArrayList<String> offlineFilesIds = new ArrayList<String>();
+
+		// if there are results
+		if(c.moveToFirst())
+		{
+			// for all results
+			while(!c.isAfterLast())
+			{
+				offlineFilesIds.add(String.valueOf(c.getLong(
+						c.getColumnIndexOrThrow(LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID))));
+
+				c.moveToNext();
+			}
+		}
+
+		c.close();
+
+		// results?
+		if(offlineFilesIds.size() > 0)
+		{
+			for(String offlineFileId : offlineFilesIds)
+			{
+				clause = LifeBoxContract.OfflineFiles._ID + " == " + offlineFileId;
+
+				deletedRows += db.delete(LifeBoxContract.OfflineFiles.TABLE_NAME, clause, null);
+			}
+		}
+
+		// delete file_offline_files rows
+		clause = LifeBoxContract.FileOfflineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.FileOfflineFiles.TABLE_NAME, clause, null);
+
+		// delete online_files rows
+		// get the online_files._id(s) from file_online_files
+		// projection
+		String[] onlineColumns = {LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID};
+
+		// selection
+		selection = LifeBoxContract.FileOnlineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId;
+
+		c = db.query(LifeBoxContract.FileOnlineFiles.TABLE_NAME, onlineColumns, selection,null, null, null,null);
+
+		ArrayList<String> onlineFilesIds = new ArrayList<String>();
+
+		// if there are results
+		if(c.moveToFirst())
+		{
+			// for all results
+			while(!c.isAfterLast())
+			{
+				onlineFilesIds.add(String.valueOf(c.getLong(
+						c.getColumnIndexOrThrow(LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID))));
+
+				c.moveToNext();
+			}
+		}
+
+		c.close();
+
+		// results?
+		if(onlineFilesIds.size() > 0)
+		{
+			for(String onlineFileId : onlineFilesIds)
+			{
+				clause = LifeBoxContract.OnlineFiles._ID + " == " + onlineFileId;
+
+				deletedRows += db.delete(LifeBoxContract.OnlineFiles.TABLE_NAME, clause, null);
+			}
+		}
+
+		// delete file_online_files rows
+		clause = LifeBoxContract.FileOnlineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.FileOnlineFiles.TABLE_NAME, clause, null);
+
+		// delete entry_tags row(s)
+		deleteEntryTags(entriesId);
+
+		// delete entry_hashtags (if there any) and hashtags row(s) (if they was unique)
+		deleteHashtags(entriesId);
+
+		// check if all rows where deleted
+		// 1x entries, 1x files, 2x offline_files, 2x file_offline_files, 2x online_files, 2x file_online_files = 10
+		// tags and hashtags are variable so they don't count
+		if(deletedRows == 10)
+		{
+			success = true;
+		}
+
+		// clean up
+		db.close();
+
+		return success;
+	}
+
+	/**
+	 * Delete all rows in all tables associated with a text.
+	 * @param entriesId (String) the entries._id
+	 * @param mediaId (String) entries.media_id
+	 * @return true if all associated rows where deleted otherwise false.
+	 */
+	public boolean deleteText(String entriesId, String mediaId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		// the result
+		boolean success = false;
+
+		int deletedRows = 0;
+
+		// delete entries row
+		String clause = LifeBoxContract.Entries._ID + " == " + entriesId;
+
+		deletedRows += db.delete(LifeBoxContract.Entries.TABLE_NAME, clause, null);
+
+		// delete text row
+		clause = LifeBoxContract.Text._ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.Text.TABLE_NAME, clause, null);
+
+		// delete entry_tags row(s)
+		deleteEntryTags(entriesId);
+
+		// delete entry_hashtags (if there any) and hashtags row(s) (if they was unique)
+		deleteHashtags(entriesId);
+
+		// check if all rows where deleted
+		// 1x entries, 1x text = 2
+		if(deletedRows == 2)
+		{
+			success = true;
+		}
+
+		// clean up
+		db.close();
+
+		return success;
+	}
+
+	/**
+	 * Delete all rows in all tables associated with a music.
+	 * @param entriesId (String) the entries._id
+	 * @param mediaId (String) entries.media_id
+	 * @return true if all associated rows where deleted otherwise false.
+	 */
+	public boolean deleteMusic(String entriesId, String mediaId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		// the result
+		boolean success = false;
+
+		int deletedRows = 0;
+
+		// delete entries row
+		String clause = LifeBoxContract.Entries._ID + " == " + entriesId;
+
+		deletedRows += db.delete(LifeBoxContract.Entries.TABLE_NAME, clause, null);
+
+		// get artists_id and albums_id from music
+		String[] columns = {LifeBoxContract.Music.COLUMN_NAME_ARTISTS_ID, LifeBoxContract.Music.COLUMN_NAME_ALBUMS_ID};
+
+		String selection = LifeBoxContract.Music._ID + " == " + mediaId;
+
+		Cursor c = db.query(LifeBoxContract.Music.TABLE_NAME, columns, selection, null, null, null, null);
+
+		String artistsId = "";
+		String albumsId = "";
+
+		if(c.moveToFirst())
+		{
+			artistsId = String.valueOf(c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Music.COLUMN_NAME_ARTISTS_ID)));
+			albumsId = String.valueOf(c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Music.COLUMN_NAME_ALBUMS_ID)));
+		}
+
+		c.close();
+
+		// delete music row
+		clause = LifeBoxContract.Music._ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.Music.TABLE_NAME, clause, null);
+
+		// delete albums row
+		clause = LifeBoxContract.Albums._ID + " == " + albumsId;
+
+		deletedRows += db.delete(LifeBoxContract.Albums.TABLE_NAME, clause, null);
+
+		// delete music_genres row
+		clause = LifeBoxContract.MusicGenres._ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.MusicGenres.TABLE_NAME, clause, null);
+
+		// check if the deleted artist was unique
+		selection = LifeBoxContract.Music.COLUMN_NAME_ARTISTS_ID + " == " + artistsId;
+
+		c = db.query(LifeBoxContract.Music.TABLE_NAME, null, selection, null, null, null, null);
+
+		if(c.getCount() == 0)
+		{
+			// artist was unique
+			// delete artists row
+			clause = LifeBoxContract.Artists._ID + " == " + artistsId;
+
+			deletedRows += db.delete(LifeBoxContract.Artists.TABLE_NAME, clause, null);
+		}
+
+		c.close();
+
+		// delete entry_tags row(s)
+		deleteEntryTags(entriesId);
+
+		// delete entry_hashtags (if there any) and hashtags row(s) (if they was unique)
+		deleteHashtags(entriesId);
+
+		// check if all rows where deleted
+		// 1x entries, 1x music, 1x artists, 1x albums, 1x music_genres = 5
+		if(deletedRows == 5)
+		{
+			success = true;
+		}
+
+		// clean up
+		db.close();
+
+		return success;
+	}
+
+	/**
+	 * Delete all rows in all tables associated with a movie.
+	 * @param entriesId (String) the entries._id
+	 * @param mediaId (String) entries.media_id
+	 * @return true if all associated rows where deleted otherwise false.
+	 */
+	public boolean deleteMovie(String entriesId, String mediaId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		// the result
+		boolean success = false;
+
+		int deletedRows = 0;
+
+		// delete entries row
+		String clause = LifeBoxContract.Entries._ID + " == " + entriesId;
+
+		deletedRows += db.delete(LifeBoxContract.Entries.TABLE_NAME, clause, null);
+
+		// delete movies row
+		clause = LifeBoxContract.Movies._ID + " == " + mediaId;
+
+		deletedRows += db.delete(LifeBoxContract.Movies.TABLE_NAME, clause, null);
+
+		// delete entry_tags row(s)
+		deleteEntryTags(entriesId);
+
+		// delete entry_hashtags (if there any) and hashtags row(s) (if they was unique)
+		deleteHashtags(entriesId);
+
+		// check if all rows where deleted
+		// 1x entries, 1x movies = 2
+		if(deletedRows == 2)
+		{
+			success = true;
+		}
+
+		// clean up
+		db.close();
+
+		return success;
+	}
+
+	/**
+	 * Delete all rows of entry_tags matching a given entriesId.
+	 * @param entriesId (String) the entries._id is the condition
+	 */
+	public void deleteEntryTags(String entriesId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		String clause = LifeBoxContract.EntryTags.COLUMN_NAME_ENTRIES_ID + " == " + entriesId;
+
+		db.delete(LifeBoxContract.EntryTags.TABLE_NAME, clause, null);
+
+		db.close();
+	}
+
+	/**
+	 * Delete all rows of entry_hashtags matching the given entriesId,
+	 * and all rows of hashtags if the corresponding row of entry_hashtags was unique.
+	 * @param entriesId (String) the entries._id is the condition
+	 */
+	public void deleteHashtags(String entriesId)
+	{
+		SQLiteDatabase db = getWritableDatabase();
+
+		// select entry_hashtags.hashtags_id for the given entries._id
+		String[] columns = {LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID};
+
+		String selection = LifeBoxContract.EntryHashtags.COLUMN_NAME_ENTRIES_ID + " == " + entriesId;
+
+		Cursor c = db.query(LifeBoxContract.EntryHashtags.TABLE_NAME, columns, selection, null, null, null, null);
+
+		ArrayList<String> hashtagsIds = new ArrayList<String>();
+
+		String clause;
+
+		if(c.moveToFirst())
+		{
+			while(!c.isAfterLast())
+			{
+				// save the hashtags
+				hashtagsIds.add(String.valueOf(
+						c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID))));
+
+				c.moveToNext();
+			}
+
+			// delete entry_hashtags
+			clause = LifeBoxContract.EntryHashtags.COLUMN_NAME_ENTRIES_ID + " == " + entriesId;
+
+			db.delete(LifeBoxContract.EntryHashtags.TABLE_NAME, clause, null);
+		}
+
+		c.close();
+
+		// check if the deleted hashtags where unique and save them
+		ArrayList<String> uniqueHashtagsIds = new ArrayList<String>();
+
+		if(hashtagsIds.size() > 0)
+		{
+			for(String hashtagId : hashtagsIds)
+			{
+				selection = LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID + " == " + hashtagId;
+
+				c = db.query(LifeBoxContract.EntryHashtags.TABLE_NAME, null, selection, null, null, null, null);
+
+				// if there are no results (after deleting) the deleted hashtag was unique -> save
+				if(c.getCount() == 0)
+				{
+					uniqueHashtagsIds.add(hashtagId);
+				}
+			}
+
+			c.close();
+		}
+
+		// delete from hashtags
+		// are there unique hashtags?
+		if(uniqueHashtagsIds.size() > 0)
+		{
+			for(String hashtagsId : uniqueHashtagsIds)
+			{
+				clause = LifeBoxContract.Hashtags._ID + " == " + hashtagsId;
+
+				db.delete(LifeBoxContract.Hashtags.TABLE_NAME, clause, null);
+			}
+		}
+
+		db.close();
+	}
+
 	//##################################################################################################################
 	// INSERT ----------------------------------------------------------------------------------------------------------
 	//##################################################################################################################
@@ -969,7 +1365,7 @@ public class DbHelper extends SQLiteOpenHelper
 								LifeBoxContract.EntryHashtags.TABLE_NAME,
 								false,
 								new KeyValuePair(LifeBoxContract.EntryHashtags.COLUMN_NAME_ENTRIES_ID, entriesId),
-								new KeyValuePair(LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID, hashtag)
+								new KeyValuePair(LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID, hashtagsId)
 						);
 				Log.d("hashtag", hashtag+" id: "+hashtagsId+" inserted into entry_hashtags");
 			}
@@ -987,7 +1383,7 @@ public class DbHelper extends SQLiteOpenHelper
 	{
 		if(!tagList.isEmpty())
 		{
-			SQLiteDatabase db = this.getWritableDatabase();
+
 			ContentValues values = new ContentValues();
 
 			for(String tag : tagList)
@@ -1003,15 +1399,414 @@ public class DbHelper extends SQLiteOpenHelper
 				values.put(LifeBoxContract.EntryTags.COLUMN_NAME_ENTRIES_ID, entriesId);
 				values.put(LifeBoxContract.EntryTags.COLUMN_NAME_TAGS_ID, tagsId);
 
-				long id = db.insertOrThrow(LifeBoxContract.EntryTags.TABLE_NAME, null, values);
-			}
+				SQLiteDatabase db = getWritableDatabase();
 
-			db.close();
+				long id = db.insertOrThrow(LifeBoxContract.EntryTags.TABLE_NAME, null, values);
+				db.close();
+			}
 		}
 	}
 	//##################################################################################################################
 	// SELECT ----------------------------------------------------------------------------------------------------------
 	//##################################################################################################################
+
+	/**
+	 * Select media_id, types_id, title, description, user_date from entries and the matching type from types.
+	 * @param id the _id of the requested entry.
+	 * @return (Entry) entry object from the target row.
+	 */
+	public Entry selectEntry(String id)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+
+		// result Entry
+		Entry entry = null;
+
+		/* ~query
+		SELECT entries._id, entries.media_id, entries.types_id, entries.title, entries.description,
+		entries.user_date, types.type FROM entries LEFT OUTER JOIN types ON entries.types_id = types._id
+		WHERE entries._id == 1
+		*/
+
+		String query = "SELECT " + LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries._ID + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_TITLE + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE + "," +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE + "," +
+				LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " FROM " +
+				LifeBoxContract.Entries.TABLE_NAME + " LEFT OUTER JOIN " + LifeBoxContract.Types.TABLE_NAME +
+				" ON " + LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
+				" = " + LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types._ID + " WHERE " +
+				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries._ID + " == " + id + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			long mediaId = c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID));
+			long typesId = c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID));
+			String title = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_TITLE));
+
+			// could be null
+			String description = "";
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION)))
+			{
+				description = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_DESCRIPTION));
+			}
+
+			long userDate = c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_USER_DATE));
+
+			long creationDate = c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_CREATION_DATE));
+
+			// could be null
+			long modificationDate = -1;
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE)))
+			{
+				modificationDate = c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_MODIFICATION_DATE));
+			}
+
+
+			String type = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Types.COLUMN_NAME_TYPE));
+
+			entry = new Entry(mediaId, typesId, title, description, userDate, creationDate, modificationDate);
+			entry.setType(type);
+		}
+
+		db.close();
+
+		return entry;
+	}
+
+	/**
+	 * Select a single MediaFile matching a given mediaId.
+	 * @param mediaId (String) the _id from files is the condition
+	 * @return (MediaFile) the selected MediaFile or null if none matches the condition.
+	 */
+	public MediaFile selectMediaFile(String mediaId)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+
+		// the result MediaFile
+		MediaFile mediaFile = null;
+
+		/* ~query
+		SELECT filetype, path, driveid, url
+		FROM (file_offline_files
+		INNER JOIN offline_files ON file_offline_files.offline_files_id = offline_files._id
+		INNER JOIN filetypes ON offline_files.filetypes_id = filetypes._id) AS offline
+		INNER JOIN (file_online_files
+		INNER JOIN online_files ON file_online_files.online_files_id = online_files._id) AS online
+		ON offline_files_id = online_files_id
+		WHERE offline.files_id == 1 AND online.files_id == 1
+		 */
+
+		String query = "SELECT " + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE + ", " +
+				LifeBoxContract.OfflineFiles.COLUMN_NAME_PATH + ", " +
+				LifeBoxContract.OnlineFiles.COLUMN_NAME_DRIVEID + ", " +
+				LifeBoxContract.OnlineFiles.COLUMN_NAME_URL + " FROM (" + LifeBoxContract.FileOfflineFiles.TABLE_NAME +
+				" INNER JOIN " + LifeBoxContract.OfflineFiles.TABLE_NAME + " ON " +
+				LifeBoxContract.FileOfflineFiles.TABLE_NAME + "." +
+				LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID + " = " +
+				LifeBoxContract.OfflineFiles.TABLE_NAME + "." + LifeBoxContract.OfflineFiles._ID +
+				" INNER JOIN " + LifeBoxContract.Filetypes.TABLE_NAME + " ON " +
+				LifeBoxContract.OfflineFiles.TABLE_NAME + "." + LifeBoxContract.OfflineFiles.COLUMN_NAME_FILETYPES_ID +
+				" = " + LifeBoxContract.Filetypes.TABLE_NAME + "." + LifeBoxContract.Filetypes._ID + ")AS offline INNER JOIN (" +
+				LifeBoxContract.FileOnlineFiles.TABLE_NAME + " INNER JOIN " +
+				LifeBoxContract.OnlineFiles.TABLE_NAME + " ON " + LifeBoxContract.FileOnlineFiles.TABLE_NAME + "." +
+				LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID + " = " +
+				LifeBoxContract.OnlineFiles.TABLE_NAME + "." + LifeBoxContract.OnlineFiles._ID + ")as online ON " +
+				LifeBoxContract.FileOfflineFiles.COLUMN_NAME_OFFLINE_FILES_ID + " = " +
+				LifeBoxContract.FileOnlineFiles.COLUMN_NAME_ONLINE_FILES_ID + " WHERE offline." +
+				LifeBoxContract.FileOfflineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId + " AND online." +
+				LifeBoxContract.FileOnlineFiles.COLUMN_NAME_FILES_ID + " == " + mediaId + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		String filetype = "";
+
+		String offlinePathFile = "";
+		String offlinePathThumbnail = "";
+
+		if(c.moveToFirst())
+		{
+			String driveIdFile = "";
+			String driveIdThumbnail = "";
+			String urlFile = "";
+			String urlThumbnail = "";
+
+			while(!c.isAfterLast())
+			{
+				String thisFiletype = c.getString(
+						c.getColumnIndexOrThrow(LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE));
+
+				// check if the current row is a file or a thumbnail
+				if(thisFiletype.equals(Constants.MIME_TYPE_IMAGE) || thisFiletype.equals(Constants.MIME_TYPE_VIDEO))
+				{
+					// file
+					filetype = thisFiletype;
+
+					offlinePathFile = c.getString(
+							c.getColumnIndexOrThrow(LifeBoxContract.OfflineFiles.COLUMN_NAME_PATH));
+					driveIdFile = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.OnlineFiles.COLUMN_NAME_DRIVEID));
+					urlFile = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.OnlineFiles.COLUMN_NAME_URL));
+				}
+				else if(thisFiletype.equals(Constants.MIME_TYPE_IMAGE_THUMB)
+						|| thisFiletype.equals(Constants.MIME_TYPE_VIDEO_THUMB))
+				{
+					// thumbnail
+					offlinePathThumbnail = c.getString(
+							c.getColumnIndexOrThrow(LifeBoxContract.OfflineFiles.COLUMN_NAME_PATH));
+					driveIdThumbnail = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.OnlineFiles.COLUMN_NAME_DRIVEID));
+					urlThumbnail = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.OnlineFiles.COLUMN_NAME_URL));
+				}
+
+				c.moveToNext();
+			}
+
+			// all fields are fetched -> build the file
+			mediaFile = new MediaFile
+					(
+							filetype,
+							offlinePathFile,
+							offlinePathThumbnail,
+							driveIdFile,
+							driveIdThumbnail,
+							urlFile,
+							urlThumbnail
+					);
+		}
+
+		db.close();
+
+		return mediaFile;
+	}
+
+	/**
+	 * Select a single Movie matching a given mediaId.
+	 * @param mediaId (String) the _id from movies is the condition
+	 * @return (Movie) the selected Movie or null if none matches the condition.
+	 */
+	public Movie selectMovie(String mediaId)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+
+		// the result Movie
+		Movie movie = null;
+
+		/* ~query
+		SELECT title, director description, movie_genre, release_date, thumbnail_url
+		FROM movies WHERE _id == 1
+		 */
+
+		String query = "SELECT " + LifeBoxContract.Movies.COLUMN_NAME_TITLE + ", " +
+				LifeBoxContract.Movies.COLUMN_NAME_DIRECTOR + ", " +
+				LifeBoxContract.Movies.COLUMN_NAME_DESCRIPTION + ", " +
+				LifeBoxContract.Movies.COLUMN_NAME_MOVIE_GENRE + ", " +
+				LifeBoxContract.Movies.COLUMN_NAME_RELEASE_DATE + ", " +
+				LifeBoxContract.Movies.COLUMN_NAME_THUMBNAIL_URL + " FROM " +
+				LifeBoxContract.Movies.TABLE_NAME + " WHERE " + LifeBoxContract.Movies._ID + " == " + mediaId + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			String title = "";
+			String director = "";
+			String description = "";
+			String movieGenre = "";
+			String releaseDate = "";
+			String thumbnailUrl = "";
+
+			title = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_TITLE));
+			director = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DIRECTOR));
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DESCRIPTION)))
+			{
+				description = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DESCRIPTION));
+			}
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_MOVIE_GENRE)))
+			{
+				movieGenre = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_MOVIE_GENRE));
+			}
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_RELEASE_DATE)))
+			{
+				releaseDate = String.valueOf(c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_RELEASE_DATE)));
+			}
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_THUMBNAIL_URL)))
+			{
+				thumbnailUrl = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_THUMBNAIL_URL));
+			}
+
+			movie = new Movie(title, description, director, movieGenre, releaseDate, thumbnailUrl);
+		}
+
+		db.close();
+
+		return movie;
+	}
+
+	/**
+	 * Select a single Music matching a given mediaId.
+	 * @param mediaId (String) the _id from Music is the condition
+	 * @return (Music) the selected Music or null if none matches the condition.
+	 */
+	public Music selectMusic(String mediaId)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+
+		// the result Music
+		Music music = null;
+
+		/* ~query
+		SELECT track, artist, album, release_date, thumbnail_url, music_genre
+		FROM music
+		INNER JOIN albums ON albums_id = albums._id
+		INNER JOIN artists ON artists_id = artists._id
+		INNER JOIN music_genres ON music._id = music_genres.music_id
+		WHERE music._id = 1
+		 */
+
+		String query = "SELECT " + LifeBoxContract.Music.COLUMN_NAME_TRACK + ", " +
+				LifeBoxContract.Artists.COLUMN_NAME_ARTIST + ", " +
+				LifeBoxContract.Albums.COLUMN_NAME_ALBUM + ", " +
+				LifeBoxContract.Albums.COLUMN_NAME_RELEASE_DATE + ", " +
+				LifeBoxContract.Albums.COLUMN_NAME_THUMBNAIL_URL + ", " +
+				LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_GENRE + " FROM " +
+				LifeBoxContract.Music.TABLE_NAME + " INNER JOIN " + LifeBoxContract.Albums.TABLE_NAME + " ON " +
+				LifeBoxContract.Music.COLUMN_NAME_ALBUMS_ID + " = " +  LifeBoxContract.Albums.TABLE_NAME + "." +
+				LifeBoxContract.Albums._ID + " INNER JOIN " + LifeBoxContract.Artists.TABLE_NAME + " ON " +
+				LifeBoxContract.Music.COLUMN_NAME_ARTISTS_ID + " = " + LifeBoxContract.Artists.TABLE_NAME + "." +
+				LifeBoxContract.Artists._ID + " INNER JOIN " + LifeBoxContract.MusicGenres.TABLE_NAME + " ON " +
+				LifeBoxContract.Music.TABLE_NAME + "." + LifeBoxContract.Music._ID + " = " +
+				LifeBoxContract.MusicGenres.TABLE_NAME + "." + LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_ID +
+				" WHERE " + LifeBoxContract.Music.TABLE_NAME + "." + LifeBoxContract.Music._ID + " = " + mediaId + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			String track = "";
+			String artist = "";
+			String album = "";
+			String releaseDate = "";
+			String thumbnailUrl = "";
+			String musicGenre = "";
+
+			track = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Music.COLUMN_NAME_TRACK));
+			artist = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Artists.COLUMN_NAME_ARTIST));
+			album = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_ALBUM));
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_RELEASE_DATE)))
+			{
+				releaseDate = String.valueOf(c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_RELEASE_DATE)));
+			}
+
+			// could be null
+			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_THUMBNAIL_URL)))
+			{
+				thumbnailUrl = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_THUMBNAIL_URL));
+			}
+
+			musicGenre = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_GENRE));
+
+			music = new Music(artist, album, releaseDate, thumbnailUrl, track, musicGenre);
+		}
+
+		db.close();
+
+		return music;
+	}
+
+	/**
+	 * Select all tags related to a given entry_id
+ 	 * @param id the entry_id is the condition
+	 * @return (ArrayList<String>) List of all tags related to a given entry_id (can have length == 0)
+	 */
+	public ArrayList<String> selectTags(String id)
+	{
+		// result List
+		ArrayList<String> tagList = new ArrayList<String>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT tag FROM entry_tags LEFT OUTER JOIN tags ON entry_tags.tags_id = tags._id
+		WHERE entry_tags.entries_id == 13
+		 */
+		String query = "SELECT " + LifeBoxContract.Tags.COLUMN_NAME_TAG + " FROM " +
+				LifeBoxContract.EntryTags.TABLE_NAME + " LEFT OUTER JOIN " + LifeBoxContract.Tags.TABLE_NAME + " ON " +
+				LifeBoxContract.EntryTags.TABLE_NAME + "." + LifeBoxContract.EntryTags.COLUMN_NAME_TAGS_ID + " = " +
+				LifeBoxContract.Tags.TABLE_NAME + "." + LifeBoxContract.Tags._ID + " WHERE " +
+				LifeBoxContract.EntryTags.TABLE_NAME + "." + LifeBoxContract.EntryTags.COLUMN_NAME_ENTRIES_ID +
+				" == " + id + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			while(!c.isAfterLast())
+			{
+				tagList.add(c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Tags.COLUMN_NAME_TAG)));
+
+				c.moveToNext();
+			}
+		}
+		db.close();
+
+		return tagList;
+	}
+
+	/**
+	 * Select all hashtags related to a given entry_id
+	 * @param id the entry_id is the condition
+	 * @return (ArrayList<String>) List of all hashtags related to a given entry_id (can have length == 0)
+	 */
+	public ArrayList<String> selectHashtags(String id)
+	{
+		// result List
+		ArrayList<String> hashtagList = new ArrayList<String>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT hashtag FROM entry_hashtags LEFT OUTER JOIN hashtags ON entry_hashtags.hashtagstags_id = hashtags._id
+		WHERE entry_hashtagstags.entries_id == 13
+		 */
+		String query = "SELECT " + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG + " FROM " +
+				LifeBoxContract.EntryHashtags.TABLE_NAME + " LEFT OUTER JOIN " + LifeBoxContract.Hashtags.TABLE_NAME +
+				" ON " + LifeBoxContract.EntryHashtags.TABLE_NAME + "." +
+				LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID + " = " +	LifeBoxContract.Hashtags.TABLE_NAME +
+				"." + LifeBoxContract.Hashtags._ID + " WHERE " + LifeBoxContract.EntryHashtags.TABLE_NAME + "." +
+				LifeBoxContract.EntryHashtags.COLUMN_NAME_ENTRIES_ID + " == " + id + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			while(!c.isAfterLast())
+			{
+				hashtagList.add(c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG)));
+
+				c.moveToNext();
+			}
+		}
+
+		db.close();
+
+		return hashtagList;
+	}
+
 	/**
 	 * Queries the entries table of the database in order to retrieve
 	 * _id, media_id, types_id, title, description and user_date,
@@ -1039,7 +1834,7 @@ public class DbHelper extends SQLiteOpenHelper
 				" ON " + LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
 				" = " + LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types._ID + " ORDER BY " +
 				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE +
-				" LIMIT " + limit + " OFFSET " + offset + ";";
+				" DESC LIMIT " + limit + " OFFSET " + offset + ";";
 
 		Cursor c = db.rawQuery(query, null);
 
@@ -1090,12 +1885,14 @@ public class DbHelper extends SQLiteOpenHelper
 	{
 		SQLiteDatabase db = this.getReadableDatabase();
 
+		String s = columns[0] + " == " + selection;
+
 		// fetch the row
 		Cursor c = db.query
 				(
 						table,
 						columns,
-						selection,
+						s,
 						null,
 						null,
 						null,
@@ -1285,7 +2082,7 @@ public class DbHelper extends SQLiteOpenHelper
 	 * @param musicId (String) the _id of music is the condition
 	 * @return (HashMap<String, String>) storing track, artist and thumbnail of the selected music row
 	 */
-	public Map<String, String> selectMusic(String musicId)
+	public Map<String, String> selectMusicMap(String musicId)
 	{
 		// the result (associative) List
 		Map<String, String> musicList = new HashMap<String, String>();
@@ -1345,7 +2142,7 @@ public class DbHelper extends SQLiteOpenHelper
 	 * @param movieId (String) the _id of movies is the condition
 	 * @return (HashMap<String, String>) storing title, director and thumbnail of the selected movie row
 	 */
-	public Map<String, String> selectMovie(String movieId)
+	public Map<String, String> selectMovieMap(String movieId)
 	{
 		// the result (associative) List
 		Map<String, String> movieList = new HashMap<String, String>();

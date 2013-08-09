@@ -21,6 +21,7 @@ public final class Constants
 	// caller identification
 	public static final int CALLER_SIGN_IN_ACTIVITY = 101;
 	public static final int CALLER_META_FORM_ACTIVITY = 102;
+	public static final int CALLER_TIMELINE_DETAIL_ACTIVITY = 103;
 
 	// codes for the different MIME-Types
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
@@ -75,42 +76,44 @@ public final class Constants
 	// hashtag from HashtagActivity
 	public static final String HASHTAG_EXTRA = "hashtagExtra";
 	// tags from TagsActivity
-	public static final String TAG_SMILEY1_EXTRA = "tagSmiley1";
-	public static final String TAG_SMILEY2_EXTRA = "tagSmiley2";
-	public static final String TAG_SMILEY3_EXTRA = "tagSmiley3";
-	public static final String TAG_SMILEY4_EXTRA = "tagSmiley4";
-	public static final String TAG_SMILEY5_EXTRA = "tagSmiley5";
-	public static final String TAG_SMILEY6_EXTRA = "tagSmiley6";
-	public static final String TAG_SMILEY7_EXTRA = "tagSmiley7";
-	public static final String TAG_SMILEY8_EXTRA = "tagSmiley8";
-	public static final String TAG_SMILEY9_EXTRA = "tagSmiley9";
-	public static final String TAG_SMILEY10_EXTRA = "tagSmiley10";
+	public static final String TAG_SMILEY1_EXTRA = "tag_smiley1";
+	public static final String TAG_SMILEY2_EXTRA = "tag_smiley2";
+	public static final String TAG_SMILEY3_EXTRA = "tag_smiley3";
+	public static final String TAG_SMILEY4_EXTRA = "tag_smiley4";
+	public static final String TAG_SMILEY5_EXTRA = "tag_smiley5";
+	public static final String TAG_SMILEY6_EXTRA = "tag_smiley6";
+	public static final String TAG_SMILEY7_EXTRA = "tag_smiley7";
+	public static final String TAG_SMILEY8_EXTRA = "tag_smiley8";
+	public static final String TAG_SMILEY9_EXTRA = "tag_smiley9";
+	public static final String TAG_SMILEY10_EXTRA = "tag_smiley10";
 
-	public static final String TAG_LOVE_EXTRA = "tagLove";
-	public static final String TAG_STAR_EXTRA = "tagStar";
-	public static final String TAG_DISLIKE_EXTRA = "tagDislike";
-	public static final String TAG_ACHIEVEMENT_EXTRA = "tagAchievement";
-	public static final String TAG_WORK_EXTRA = "tagWork";
-	public static final String TAG_FAMILY_EXTRA = "tagFamily";
-	public static final String TAG_CHILD_EXTRA = "tagChild";
-	public static final String TAG_PET_EXTRA = "tagPet";
-	public static final String TAG_FRIENDS_EXTRA = "tagFriends";
-	public static final String TAG_PARTY_EXTRA = "tagParty";
-	public static final String TAG_OUTDOOR_EXTRA = "tagOutdoor";
-	public static final String TAG_HOME_EXTRA = "tagHome";
-	public static final String TAG_TRIP_EXTRA = "tagTrip";
-	public static final String TAG_TRAVEL_EXTRA = "tagTravel";
-	public static final String TAG_EVENT_EXTRA = "tagEvent";
-	public static final String TAG_HOBBY_EXTRA = "tagHobby";
-	public static final String TAG_SPORT_EXTRA = "tagSport";
-	public static final String TAG_FOOD_EXTRA = "tagFood";
-	public static final String TAG_CLOTH_EXTRA = "tagCloth";
-	public static final String TAG_SHOPPING_EXTRA = "tagShopping";
+	public static final String TAG_LOVE_EXTRA = "tag_love";
+	public static final String TAG_STAR_EXTRA = "tag_star";
+	public static final String TAG_DISLIKE_EXTRA = "tag_dislike";
+	public static final String TAG_ACHIEVEMENT_EXTRA = "tag_achievement";
+	public static final String TAG_WORK_EXTRA = "tag_work";
+	public static final String TAG_FAMILY_EXTRA = "tag_family";
+	public static final String TAG_CHILD_EXTRA = "tag_child";
+	public static final String TAG_PET_EXTRA = "tag_pet";
+	public static final String TAG_FRIENDS_EXTRA = "tag_friends";
+	public static final String TAG_PARTY_EXTRA = "tag_party";
+	public static final String TAG_OUTDOOR_EXTRA = "tag_outdoor";
+	public static final String TAG_HOME_EXTRA = "tag_home";
+	public static final String TAG_TRIP_EXTRA = "tag_trip";
+	public static final String TAG_TRAVEL_EXTRA = "tag_travel";
+	public static final String TAG_EVENT_EXTRA = "tag_event";
+	public static final String TAG_HOBBY_EXTRA = "tag_hobby";
+	public static final String TAG_SPORT_EXTRA = "tag_sport";
+	public static final String TAG_FOOD_EXTRA = "tag_food";
+	public static final String TAG_CLOTH_EXTRA = "tag_cloth";
+	public static final String TAG_SHOPPING_EXTRA = "tag_shopping";
 
 	public static final String TAG_ARRAY_EXTRA = "tagArrayExtra";
 
 	// offset from TimelineFragment
 	public static final String OFFSET_EXTRA = PACKAGE_NAME_PREFIX + "offsetExtra";
+	// entryId from TimelineFragment
+	public static final String ENTRY_ID_EXTRA = PACKAGE_NAME_PREFIX + "entryIdExtra";
 	// database Lists from TimelineFragment
 	public static final String ENTRY_INDEX_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "entryIndexArrayExtra";
 	public static final String MEDIA_INDEX_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "mediaIndexArrayExtra";

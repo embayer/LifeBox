@@ -94,7 +94,8 @@ public class MainActivity extends FragmentActivity
 			// display the inputmethod on startup
 			mViewPager.setCurrentItem(1, true);
 		}
-		else if(callerId == Constants.CALLER_META_FORM_ACTIVITY)
+		else if(callerId == Constants.CALLER_META_FORM_ACTIVITY
+				|| callerId == Constants.CALLER_TIMELINE_DETAIL_ACTIVITY)
 		{
 			// display the timeline
 			mViewPager.setCurrentItem(2, true);
