@@ -58,6 +58,8 @@
         <activity android:name=".TimelineDetailMovieActivity"/>
         <activity android:name=".TimelineDetailMusicActivity"/>
         <activity android:name=".TimelineDetailFileVideoActivity"/>
+        <activity android:name=".FilterActivity"/>
+        <activity android:name=".FilterHashtagsActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -70,6 +72,9 @@
                  android:exported="false" />
 
         <service android:name=".TimelineReloadService"
+                 android:exported="false" />
+
+        <service android:name=".BackupDbService"
                  android:exported="false" />
 
     </application>

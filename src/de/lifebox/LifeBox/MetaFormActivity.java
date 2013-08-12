@@ -3,9 +3,6 @@ package de.lifebox.LifeBox;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.*;
-import android.database.Cursor;
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -83,10 +80,6 @@ public class MetaFormActivity extends Activity
 
 	private boolean uploadComplete;
 
-	// codes for onActivityResult
-	private static final int ACTION_GATHER_TAGS = 1;
-	private static final int ACTION_GATHER_HASHTAGS = 2;
-
 	private ResponseReceiver mResponseReceiver;
 
 	// the counters
@@ -122,7 +115,7 @@ public class MetaFormActivity extends Activity
 
 			intent.putStringArrayListExtra(Constants.TAG_ARRAY_EXTRA, tagList);
 
-			startActivityForResult(intent, ACTION_GATHER_TAGS);
+			startActivityForResult(intent, Constants.ACTION_GATHER_TAGS);
 		}
 	};
 
@@ -133,9 +126,9 @@ public class MetaFormActivity extends Activity
 		{
 			Intent intent = new Intent(getBaseContext(), HashtagsActivity.class);
 
-			intent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, hashtagList);
+			intent.putStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA, hashtagList);
 
-			startActivityForResult(intent, ACTION_GATHER_HASHTAGS);
+			startActivityForResult(intent, Constants.ACTION_GATHER_HASHTAGS);
 		}
 	};
 
@@ -304,7 +297,7 @@ public class MetaFormActivity extends Activity
 		// decide by request code what to do
 		switch(requestCode)
 		{
-			case ACTION_GATHER_TAGS:
+			case Constants.ACTION_GATHER_TAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
 					// get the extra
@@ -318,13 +311,13 @@ public class MetaFormActivity extends Activity
 				}
 				//TODO Fehlerbehandlung
 				break;
-			case ACTION_GATHER_HASHTAGS:
+			case Constants.ACTION_GATHER_HASHTAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
-					if(data.hasExtra(Constants.HASHTAG_EXTRA))
+					if(data.hasExtra(Constants.HASHTAG_ARRAY_EXTRA))
 					{
 						// get the extras
-						hashtagList = data.getStringArrayListExtra(Constants.HASHTAG_EXTRA);
+						hashtagList = data.getStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA);
 
 						// set the counter
 						if(!hashtagList.isEmpty())

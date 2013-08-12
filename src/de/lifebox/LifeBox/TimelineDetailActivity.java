@@ -177,7 +177,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 	{
 		// inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.actionbar, menu);
+		inflater.inflate(R.menu.entrydetail, menu);
 
 
 		return super.onCreateOptionsMenu(menu);
@@ -218,6 +218,11 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 	// the dialog fragment receives a reference to this Activity through the
 	// Fragment.onAttach() callback, which it uses to call the following methods
 	// defined by the NoticeDialogFragment.NoticeDialogListener interface
+
+	/**
+	 * Called when the user clicks 'confirm' on the dialog.
+	 * @param dialog (DialogFragment) the popup dialog.
+	 */
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog)
 	{

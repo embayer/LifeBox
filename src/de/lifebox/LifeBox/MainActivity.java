@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,5 +122,40 @@ public class MainActivity extends FragmentActivity
 		fList.add(TimelineFragment.newInstance());
 
 		return fList;
+	}
+
+	/**
+	 * Called when the activity is first created.
+	 * Builds the action bar menu
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		// inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	/** Called when the a item on the action bar is pressed. */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// handle presses on the action bar items
+		switch (item.getItemId())
+		{
+			case R.id.action_filter:
+				// call FilterActivity
+				Intent filterIntent = new Intent(this, FilterActivity.class);
+				startActivity(filterIntent);
+				return true;
+			case R.id.action_backupdb:
+				// call BackupDbService in order to backup the database
+				Intent backupIntent = new Intent(this, BackupDbService.class);
+				startService(backupIntent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 }

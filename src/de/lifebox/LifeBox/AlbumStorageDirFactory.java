@@ -16,6 +16,8 @@ public class AlbumStorageDirFactory
 	private static final String VIDEOS_DIR = "Videos";          // video folder
 	private static final String THUMBNAILS_DIR = "Thumbnails";
 
+	private static final String DATABASE_DIR = ".Database";
+
 	/**
 	 * Get the proper path for a specific MIME-Type and create a folder.
 	 * @param mimeType the type of media to store
@@ -77,6 +79,24 @@ public class AlbumStorageDirFactory
 		{
 			storageDir = null;
 		}
+
+		return storageDir;
+	}
+
+	/**
+	 * Get the proper path for a database backup on sd-card and creates a folder.
+	 * @return (File) the folder.
+	 */
+	public File getDbStorageDir()
+	{
+		File storageDir = new File
+				(
+						Environment.getExternalStorageDirectory()
+						+ File.separator
+						+ LIFEBOX_DIR
+						+ File.separator
+						+ DATABASE_DIR
+				);
 
 		return storageDir;
 	}

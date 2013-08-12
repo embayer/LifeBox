@@ -1411,6 +1411,62 @@ public class DbHelper extends SQLiteOpenHelper
 	//##################################################################################################################
 
 	/**
+	 * Select the first user_date from entries.
+	 * @return (long) the selected user_date or -1 if entries has no rows
+	 */
+	public long selectFirstUserDate()
+	{
+		// the result
+		long firstUserDate = -1;
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		String query = "SELECT MIN(" + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + ") FROM " +
+				LifeBoxContract.Entries.TABLE_NAME + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			firstUserDate = c.getLong(0);
+		}
+
+		// clean up
+		c.close();
+		db.close();
+
+		return firstUserDate;
+	}
+
+	/**
+	 * Select the last user_date from entries.
+	 * @return (long) the selected user_date or -1 if entries has no rows
+	 */
+	public long selectLastUserDate()
+	{
+		// the result
+		long lastUserDate = -1;
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		String query = "SELECT MAX(" + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + ") FROM " +
+				LifeBoxContract.Entries.TABLE_NAME + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			lastUserDate = c.getLong(0);
+		}
+
+		// clean up
+		c.close();
+		db.close();
+
+		return lastUserDate;
+	}
+
+	/**
 	 * Select media_id, types_id, title, description, user_date from entries and the matching type from types.
 	 * @param id the _id of the requested entry.
 	 * @return (Entry) entry object from the target row.
@@ -1951,6 +2007,9 @@ public class DbHelper extends SQLiteOpenHelper
 				c.moveToNext();
 			}
 		}
+
+		c.close();
+		db.close();
 
 		return rowList;
 	}

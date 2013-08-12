@@ -30,11 +30,11 @@ public class HashtagsActivity extends Activity
 	private ListView hashtagListView;               // hashtags for the entry
 
 	// the entries of the listviews
-	private EditText hashtagEditText;
+	protected EditText hashtagEditText;
 
 	// the adapter intermediate between view and data
 	private SimpleCursorAdapter mScAdapter;
-	private ArrayAdapter<String> mAadapter;
+	protected ArrayAdapter<String> mAadapter;
 
 	// db-instance
 	private SQLiteDatabase db;
@@ -43,7 +43,8 @@ public class HashtagsActivity extends Activity
 	// db-columns
 	private String[] projection = {LifeBoxContract.Hashtags._ID, LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
 
-	private ArrayList<String> hashtagList;
+	protected ArrayList<String> hashtagList;
+	protected ArrayList<String> hashtagHistoryList;
 
 	// OnKeyListener for the Enter softkey button
 	EditText.OnKeyListener hashtagKeyListener = new View.OnKeyListener()
@@ -136,77 +137,7 @@ public class HashtagsActivity extends Activity
 		@Override
 		public void onClick(View v)
 		{
-			Intent returnIntent = new Intent(getBaseContext(), MetaFormActivity.class);
-
-			returnIntent.putStringArrayListExtra(Constants.HASHTAG_EXTRA, hashtagList);
-
-			setResult(RESULT_OK, returnIntent);
-			finish();
-
-//			// gets the data repository in write mode
-//			SQLiteDatabase db = mDbHelper.getWritableDatabase();
-//
-//			// get the hashtag from the edit-text field
-//			hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
-//			String hashtag = hashtagEditText.getText().toString();
-//
-//			// check if there is a user input to fetch
-//			if( (null != hashtag) && (!hashtag.equals("") && (hashtag.trim().length() >= 0)) )
-//			{
-//				// create a new map of values, where column names are the keys
-//				ContentValues values = new ContentValues();
-//				values.put(LifeBoxContract.Hashtags.COLUMN_NAME_NAME, hashtag);
-//
-//				// insert the new row, returning the primary key value of the new row
-//				long newRowId;
-//				newRowId = db.insert(
-//						LifeBoxContract.Hashtags.TABLE_NAME,
-//						null,
-//						values);
-//
-//				db = mDbHelper.getReadableDatabase();
-//				mCursor = db.query(
-//						LifeBoxContract.Hashtags.TABLE_NAME,
-//						projection,
-//						null,
-//						null,
-//						null,
-//						null,
-//						null,
-//						null
-//				);
-//
-//				// for the cursor adapter, specify which columns go into which views
-//				String[] fromColumns = {LifeBoxContract.Hashtags.COLUMN_NAME_NAME};
-//				int[] toViews = {R.id.entry_history_hashtag}; // The TextView in simple_list_item_1
-//
-//				// refresh the view
-//				mScAdapter.changeCursorAndColumns(mCursor, fromColumns, toViews);
-//				mScAdapter.notifyDataSetChanged();
-//
-//				// clear the input field
-//				hashtagEditText.setText("");
-//
-////				historyListView.requestFocusFromTouch();
-////				historyListView.setSelection(1);
-//
-////				historyListView.setItemChecked(historyListView.getCount(), true);
-////				long[] ids = historyListView.getCheckedItemIds();
-////
-////				long id = ids[0];
-////
-////				Log.e("selection", "" + "" + id);
-////
-////				historyListView.deferNotifyDataSetChanged();
-//
-//
-//
-//				Log.e("sql", "" + values);
-//			}
-//			else
-//			{
-//				Toast.makeText(getBaseContext(), "Please insert a hashtag.", Toast.LENGTH_SHORT);
-//			}
+			saveHashtags();
 		}
 	};
 
@@ -255,6 +186,18 @@ public class HashtagsActivity extends Activity
 				R.layout.hashtaghistorylist, mCursor,
 				fromColumns, toViews, 0);
 
+		// save the history hashtags
+		hashtagHistoryList = new ArrayList<String>();
+		if(mCursor.moveToFirst())
+		{
+			while(!mCursor.isAfterLast())
+			{
+				hashtagHistoryList.add(mCursor.getString(mCursor.getColumnIndexOrThrow(LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG)));
+
+				mCursor.moveToNext();
+			}
+		}
+
 		historyListView.setAdapter(mScAdapter);
 		// )
 
@@ -264,9 +207,9 @@ public class HashtagsActivity extends Activity
 		hashtagListView.setOnItemClickListener(hashtagListener);
 
 		// get the extra
-		if(getIntent().hasExtra(Constants.HASHTAG_EXTRA))
+		if(getIntent().hasExtra(Constants.HASHTAG_ARRAY_EXTRA))
 		{
-			hashtagList = getIntent().getStringArrayListExtra(Constants.HASHTAG_EXTRA);
+			hashtagList = getIntent().getStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA);
 		}
 		else
 		{
@@ -335,14 +278,6 @@ public class HashtagsActivity extends Activity
 			}
 		});
 		//##############################################################################################################
-
-
-
-
-
-		// Prepare the loader.  Either re-connect with an existing one,
-		// or start a new one.
-//		getLoaderManager().initLoader(0, null, this);
 	}
 
 	/**
@@ -352,7 +287,7 @@ public class HashtagsActivity extends Activity
 	 * @param list (ArrayList<String>) the list holding the hashtags
 	 * @return true if the item was inserted, otherwise false
 	 */
-	private boolean insertItem(String item, ArrayList<String> list)
+	protected boolean insertItem(String item, ArrayList<String> list)
 	{
 		boolean success = false;
 
@@ -389,40 +324,18 @@ public class HashtagsActivity extends Activity
 		}
 		else
 		{
-			Toast.makeText(getBaseContext(), "Please insert a hashtag.", Toast.LENGTH_SHORT);
+			Toast.makeText(getBaseContext(), "Please insert a hashtag.", Toast.LENGTH_SHORT).show();
 		}
 	}
 
-//	// Called when a new Loader needs to be created
-//	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//		// Now create and return a CursorLoader that will take care of
-//		// creating a Cursor for the data being displayed.
-//		return new CursorLoader(this, ,
-//				projection, null, null, null);
-//	}
-//
-//	// Called when a previously created loader has finished loading
-//	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//		// Swap the new cursor in.  (The framework will take care of closing the
-//		// old cursor once we return.)
-//		mScAdapter.swapCursor(data);
-//	}
-//
-//	// Called when a previously created loader is reset, making the data unavailable
-//	public void onLoaderReset(Loader<Cursor> loader) {
-//		// This is called when the last Cursor provided to onLoadFinished()
-//		// above is about to be closed.  We need to make sure we are no
-//		// longer using it.
-//		mScAdapter.swapCursor(null);
-//	}
+	/** Sends a list containing all selected hashtags back to the caller. */
+	private void saveHashtags()
+	{
+		Intent returnIntent = new Intent(getBaseContext(), MetaFormActivity.class);
 
-//	public void onItemClick(AdapterView parent, View view, int position, long id)
-//	{
-//		final String text = ((TextView)view).getText();
-//	}
+		returnIntent.putStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA, hashtagList);
 
-//	public void onListItemClick(ListView l, View v, int position, long id) {
-//		// Do something when a list item is clicked
-//		Log.e("lv", "clicked");
-//	}
+		setResult(RESULT_OK, returnIntent);
+		finish();
+	}
 }

@@ -23,7 +23,7 @@ public class SelectFileTypeActivity extends Activity
 		getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-	/** Called when the actionbar symbol is clicked.
+	/** Called when the entrydetail symbol is clicked.
 	 * Navigate back to the parent-activity.
 	 */
 	@Override

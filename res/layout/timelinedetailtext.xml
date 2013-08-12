@@ -6,7 +6,7 @@
 
     <FrameLayout
             android:id="@+id/textdetail_image_frame"
-            android:background="@color/green"
+            android:background="@color/lightgreen"
             android:layout_width="104dp"
             android:layout_height="104dp" >
 

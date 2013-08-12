@@ -27,6 +27,8 @@ import java.io.IOException;
  */
 public class UploadService extends IntentService
 {
+	public static final String TAG = "UploadService";
+
 	//TODO change the upload directory to AppData
 	/**Google Drive Scope for the AppData folder */
 	public static String APP_DATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
@@ -113,7 +115,7 @@ public class UploadService extends IntentService
 
 				// upload
 				File file = service.files().insert(body, mediaContent).execute();
-				Log.e("uploadservice", file.toString());
+				Log.d(TAG, file.toString());
 
 				// succeeded?
 				if (null != file)
@@ -128,8 +130,7 @@ public class UploadService extends IntentService
 						showToast("Video uploaded: " + file.getTitle());
 					}
 
-					Log.e("json", file.toString());
-					Log.e("downloadUrl", file.get("downloadUrl").toString());
+					Log.d(TAG, "json: " + file.toString());
 					sendDriveMetaData(file);
 				}
 			}
@@ -139,7 +140,7 @@ public class UploadService extends IntentService
 			}
 			catch(IOException e)
 			{
-				Log.e("ioerror", e.toString());
+				Log.e("IO Error", e.getMessage());
 				showToast("IO-Error. Please try again.");
 			}
 		}
@@ -156,7 +157,7 @@ public class UploadService extends IntentService
 	 * @param credential the login information
 	 * @return Drive instance
 	 */
-	private Drive getDriveService(GoogleAccountCredential credential)
+	protected Drive getDriveService(GoogleAccountCredential credential)
 	{
 		return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
 				.build();
@@ -200,7 +201,7 @@ public class UploadService extends IntentService
 		mHandler.post(new Runnable()
 		{
 			Context context = UploadService.this;
-			int duration = Toast.LENGTH_LONG;
+			int duration = Toast.LENGTH_SHORT;
 
 			@Override
 			public void run()

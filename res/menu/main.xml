@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/action_backupdb"
+          android:icon="@drawable/menu_database"
+          android:title="backup database"
+          android:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_filter"
+          android:icon="@drawable/menu_search"
+          android:title="filter timeline"
+          android:showAsAction="ifRoom"/>
+
+</menu>

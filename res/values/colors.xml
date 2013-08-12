@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="androidblue">#33B5E5</color>
+    <color name="gray">#A9A9A9</color>
+
     <color name="red">#ffff0000</color>
-    <color name="green">#90EE90</color>
-    <color name="blue">#6495ED</color>
+    <color name="lightgreen">#90EE90</color>
+    <color name="marineblue">#6495ED</color>
     <color name="yellow">#FFFF00</color>
     <color name="purple">#9932CC</color>
+
+    <color name="pink">#FF0D86</color>
+    <color name="violoet">#6F0CEB</color>
+    <color name="blue">#005AFF</color>
+    <color name="cyan">#0CEBC6</color>
+    <color name="green">#1DFF1B</color>
 </resources>

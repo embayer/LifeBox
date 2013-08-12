@@ -35,7 +35,7 @@
 
     <ImageView
             android:id="@+id/iv_thumbnail"
-            android:src="@drawable/button_hashtag_blue"
+            android:src="@drawable/button_hashtag"
             android:paddingTop="0dp"
             android:layout_below="@id/in_description"
             android:layout_width="96dp"

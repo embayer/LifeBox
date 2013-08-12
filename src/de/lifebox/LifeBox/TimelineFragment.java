@@ -318,7 +318,7 @@ public class TimelineFragment extends Fragment
 			{
 				if(currentEntry.getFiletype().equals(Constants.MIME_TYPE_IMAGE))
 				{
-					imageFrame.setBackgroundResource(R.color.blue);
+					imageFrame.setBackgroundResource(R.color.marineblue);
 				}
 				else if(currentEntry.getFiletype().equals(Constants.MIME_TYPE_VIDEO))
 				{
@@ -333,7 +333,7 @@ public class TimelineFragment extends Fragment
 			// type text
 			else if(type.equals(Constants.TYPE_TEXT))
 			{
-				imageFrame.setBackgroundResource(R.color.green);
+				imageFrame.setBackgroundResource(R.color.lightgreen);
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
 				imageView.setVisibility(View.VISIBLE);

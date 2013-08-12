@@ -412,7 +412,7 @@ public class SearchMovieActivity extends Activity
 
 					if(movieList.isEmpty())
 					{
-						Toast toast = Toast.makeText(getBaseContext(), "Sorry, nothing found", Toast.LENGTH_LONG);
+						Toast toast = Toast.makeText(getBaseContext(), "Sorry, nothing found", Toast.LENGTH_SHORT);
 						toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 120);
 						toast.show();
 					}

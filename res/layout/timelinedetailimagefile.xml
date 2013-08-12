@@ -7,7 +7,7 @@
 
     <FrameLayout
             android:id="@+id/imagefiledetail_image_frame"
-            android:background="@color/blue"
+            android:background="@color/marineblue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
