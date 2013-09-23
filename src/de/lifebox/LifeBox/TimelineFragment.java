@@ -37,12 +37,15 @@ public class TimelineFragment extends Fragment
 	// the list storing the entries on the timeline
 	private ArrayList<TimelineEntry> entryList;
 
-	private static final int ROWAMOUNT = 10;
-	private static final int COLUMNAMOUNT = 3;
-
+	// the current row position at the entries table
 	private int offset;
+	// the filter data
+	private Bundle conditions;
 
-	private boolean unprocessed;
+	// processed is true when the timeline is fully loaded
+	private boolean processed = false;
+
+	// flag to indicate if a filter is active
 
 	private DbHelper mDbHelper;
 
@@ -62,7 +65,7 @@ public class TimelineFragment extends Fragment
 	private TextView secondlineTV;
 
 	// Listener for the timeline items
-	ListView.OnItemClickListener timelineListener = new ListView.OnItemClickListener()
+	ListView.OnItemClickListener mOnItemClickListener = new ListView.OnItemClickListener()
 	{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -105,11 +108,48 @@ public class TimelineFragment extends Fragment
 				}
 			}
 
-
 			// get the entryId and set it as extra
 			intent.putExtra(Constants.ENTRY_ID_EXTRA, entryList.get(position).getEntryId());
 
 			startActivity(intent);
+		}
+	};
+
+	ListView.OnScrollListener mScrollListener = new ListView.OnScrollListener()
+	{
+		// unneeded method
+		@Override
+		public void onScrollStateChanged(AbsListView view, int scrollState)	{}
+
+		@Override
+		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+		{
+			// if there are more entries to fetch
+			if(processed == false)
+			{
+				Log.d(TAG, "firstVisibleItem: " + firstVisibleItem +
+						" visibleItemCount: " + visibleItemCount +
+						" entryList.size(): " + entryList.size());
+
+				// reached the end of the ListView?
+				if(!entryList.isEmpty() && (entryList.size() == (firstVisibleItem + visibleItemCount)))
+				{
+					// fetch the next 10 items
+					offset += 10;
+
+					// check for conditions
+					if(conditions.isEmpty())
+					{
+						// request entries without condition
+						requestEntries(offset);
+					}
+					else
+					{
+						// request entries with condition
+						requestFilteredEntries(offset, conditions);
+					}
+				}
+			}
 		}
 	};
 
@@ -129,6 +169,10 @@ public class TimelineFragment extends Fragment
 	{
 		super.onCreate(savedInstanceState);
 
+		entryList = new ArrayList<TimelineEntry>();
+
+//		mTimelilneAdapter = new TimelineAdapter();
+
 		// the filter
 		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_RELOADRESPONSE);
 		// Sets the filter's category to DEFAULT
@@ -141,11 +185,27 @@ public class TimelineFragment extends Fragment
 
 		mDbHelper = new DbHelper(getActivity().getBaseContext());
 
-		entryList = new ArrayList<TimelineEntry>();
-
 		// request data to fill the timeline
 		offset = 0;
-		requestEntries(offset);
+
+		// get the bundle of conditions
+		conditions = this.getArguments();
+
+		// if the timeline is not fully loaded
+		if(processed == false)
+		{
+			// no conditions
+			if(conditions.isEmpty())
+			{
+				// request entries without condition
+				requestEntries(offset);
+			}
+			else
+			{
+				// request entries with condition
+				requestFilteredEntries(offset, conditions);
+			}
+		}
 	}
 
 	/**
@@ -160,7 +220,8 @@ public class TimelineFragment extends Fragment
 
 		// initialize the ui elements
 		timelineLV = (ListView) view.findViewById(R.id.listview_timeline);
-		timelineLV.setOnItemClickListener(timelineListener);
+		timelineLV.setOnItemClickListener(mOnItemClickListener);
+		timelineLV.setOnScrollListener(mScrollListener);
 
 		imageFrame = (FrameLayout) view.findViewById(R.id.image_frame);
 		imageView = (ImageView) view.findViewById(R.id.thumbnail_imageview);
@@ -179,9 +240,12 @@ public class TimelineFragment extends Fragment
 	{
 		super.onResume();
 
-//		mTimelilneAdapter.notifyDataSetChanged();
-//		mTimelilneAdapter.notify();
-		Log.e("triggert", "onResume");
+		// re-set the adapter if the binding was lost in onStop()
+		if(null == timelineLV.getAdapter())
+		{
+			mTimelilneAdapter = new TimelineAdapter();
+			timelineLV.setAdapter(mTimelilneAdapter);
+		}
 	}
 
 	/**
@@ -195,8 +259,25 @@ public class TimelineFragment extends Fragment
 		intent.putExtra(Constants.OFFSET_EXTRA, offset);
 
 		getActivity().startService(intent);
-
 	}
+
+	/**
+	 * Passes the the offset and a bundle of conditions  TimelineReloadService in order to get entries for the timeline
+	 * @param offset (int) the rowamount of already retrieved timeline entries
+	 * @param args (Bundle) a bundle holding the conditions
+	 */
+	private void requestFilteredEntries(int offset, Bundle args)
+	{
+		Log.e("filtr", "on");
+		Intent intent = new Intent(getActivity(), TimelineFilteredReloadService.class);
+
+		intent.putExtra(Constants.OFFSET_EXTRA, offset);
+		intent.putExtra(Constants.FILTER_BUNDLE_EXTRA, args);
+
+		getActivity().startService(intent);
+	}
+
+
 
 	private BitmapDrawable downloadBitmap(String url)
 	{
@@ -206,7 +287,6 @@ public class TimelineFragment extends Fragment
 
 		try
 		{
-
 			in = new BufferedInputStream(new URL(url).openStream());
 
 
@@ -272,6 +352,11 @@ public class TimelineFragment extends Fragment
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
+			// save index and top position
+			int index = timelineLV.getFirstVisiblePosition();
+			View v = timelineLV.getChildAt(0);
+			int top = (v == null) ? 0 : v.getTop();
+
 			// ensure there is a view to work with (could be null)
 			View itemView = convertView;
 			if(null == itemView)
@@ -309,31 +394,32 @@ public class TimelineFragment extends Fragment
 
 			musicWebView = (WebView) itemView.findViewById(R.id.music_webview);
 
-//			image_view.getLayoutParams().height = 20;
-
-
 			// set the type specific values
 			// type file
 			if(type.equals(Constants.TYPE_FILE))
 			{
 				if(currentEntry.getFiletype().equals(Constants.MIME_TYPE_IMAGE))
 				{
-					imageFrame.setBackgroundResource(R.color.marineblue);
+					// set the type-specific color
+					imageFrame.setBackgroundResource(R.color.playgreen);
 				}
 				else if(currentEntry.getFiletype().equals(Constants.MIME_TYPE_VIDEO))
 				{
-					imageFrame.setBackgroundResource(R.color.red);
+					imageFrame.setBackgroundResource(R.color.playred);
 				}
 
+				// hide the unneeded elements
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
+				// show the required element
 				imageView.setVisibility(View.VISIBLE);
+				// set the image
 				imageView.setImageDrawable(Drawable.createFromPath(currentEntry.getThumbnail()));
 			}
 			// type text
 			else if(type.equals(Constants.TYPE_TEXT))
 			{
-				imageFrame.setBackgroundResource(R.color.lightgreen);
+				imageFrame.setBackgroundResource(R.color.playblue);
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
 				imageView.setVisibility(View.VISIBLE);
@@ -342,28 +428,39 @@ public class TimelineFragment extends Fragment
 			// type movie
 			else if(type.equals(Constants.TYPE_MOVIE))
 			{
-				imageFrame.setBackgroundResource(R.color.purple);
+				imageFrame.setBackgroundResource(R.color.playcyan);
 				imageView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.INVISIBLE);
 				movieWebView.setVisibility(View.VISIBLE);
 				movieWebView.loadUrl(currentEntry.getThumbnail());
-
-//				imageView.setImageDrawable(downloadBitmap(currentEntry.getThumbnail()));
 			}
 			// type music
 			else if(type.equals(Constants.TYPE_MUSIC))
 			{
-				imageFrame.setBackgroundResource(R.color.yellow);
+				imageFrame.setBackgroundResource(R.color.playorange);
 				imageView.setVisibility(View.INVISIBLE);
 				movieWebView.setVisibility(View.INVISIBLE);
 				musicWebView.setVisibility(View.VISIBLE);
 				musicWebView.loadUrl(currentEntry.getThumbnail());
-
-//				imageView.setImageDrawable(downloadBitmap(currentEntry.getThumbnail()));
 			}
 
+			// restore
+			timelineLV.setSelectionFromTop(index, top);
+			Log.e("position", "" + position);
+			timelineLV.setVerticalScrollbarPosition(position);
 
 			return itemView;
+		}
+
+		/**
+		 * Called when new entries where added.
+		 * Updates the ListView.
+		 * @param entries (ArrayList<TimelineEntry>) the new entries
+		 */
+		private void updateListView(ArrayList<TimelineEntry> entries)
+		{
+			entryList.addAll(entries);
+			notifyDataSetChanged();
 		}
 	}
 
@@ -377,18 +474,15 @@ public class TimelineFragment extends Fragment
 		/** Called when the BroadcastReceiver gets an Intent it's registered to receive */
 		public void onReceive(Context context, Intent intent)
 		{
-			mTimelilneAdapter = new TimelineAdapter();
 			// set the Adapter to the ListView
 			timelineLV.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//			timelineLV.setOnItemClickListener(searchresultOnClickListener);
-			timelineLV.setAdapter(mTimelilneAdapter);
+//			timelineLV.setAdapter(mTimelilneAdapter);
 
 			// get the extra
 			Bundle bundle = intent.getBundleExtra(Constants.TIMELINE_ENTRIES_BUNDLE_EXTRA);
 
 			String[][] reloadResultList = (String[][]) bundle.getSerializable(Constants.TIMELINE_ENTRIES_ARRAY_EXTRA);
 
-//			Log.e(TAG + " catched", reloadResultList[0][1]);
 			// save the fetched results
 
 			String type = null;
@@ -401,7 +495,11 @@ public class TimelineFragment extends Fragment
 			String firstText = null;
 			String secondText = null;
 
+			// type + filetype + entryId... = 9
 			final int resultAmount = 9;
+
+			// resultlist
+			ArrayList<TimelineEntry> fetchedEntries = new ArrayList<TimelineEntry>();
 
 			if(reloadResultList.length > 0)
 			{
@@ -460,16 +558,31 @@ public class TimelineFragment extends Fragment
 								break;
 						}
 					}
+
 					// save the entries
-					entryList.add
+					fetchedEntries.add
 							(
 									new TimelineEntry(type, filetype, entryId, thumbnail,date, time, title, firstText, secondText)
 							);
 				}
+			}
+			else
+			{
+				// no more entries to fetch
+				processed = true;
+			}
 
-				// request the next entries
-				offset += 10;
-				requestEntries(offset);
+			// commit the changes to the adapter
+			if(null == timelineLV.getAdapter())
+			{
+				// if there is no adapter create one and set it
+				mTimelilneAdapter = new TimelineAdapter();
+				timelineLV.setAdapter(mTimelilneAdapter);
+			}
+			else
+			{
+				// adapter already exists, update the ListView
+				((TimelineAdapter) timelineLV.getAdapter()).updateListView(fetchedEntries);
 			}
 		}
 	}

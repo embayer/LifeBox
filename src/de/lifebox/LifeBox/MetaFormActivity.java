@@ -8,10 +8,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -37,7 +34,7 @@ public class MetaFormActivity extends Activity
 	// the extra brought by all intents
 	private String mediaType;
 
-	// the extras brought by SelectTypeFragment
+	// the extras brought by InputFragment
 	private String fileUrl;
 	private String mimeType;
 	private String thumbnailUrl;
@@ -85,6 +82,9 @@ public class MetaFormActivity extends Activity
 	// the counters
 	private TextView tagsCount;
 	private TextView hashtagsCount;
+
+	ImageButton tagBtn;
+	ImageButton hashtagBtn;
 
 	Button.OnClickListener mTimePickerListener = new Button.OnClickListener()
 	{
@@ -167,6 +167,9 @@ public class MetaFormActivity extends Activity
 
 				// pass to MainActivity
 				Intent intent = new Intent(getBaseContext(), MainActivity.class);
+				// clear the backstack navigation
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_META_FORM_ACTIVITY);
 				startActivity(intent);
 			};
@@ -190,7 +193,7 @@ public class MetaFormActivity extends Activity
 
 		mDbHelper = new DbHelper(getBaseContext());
 
-		// Instantiates a new ResponseReceiver
+		// instantiates a new ResponseReceiver
 		mResponseReceiver = new ResponseReceiver();
 		// Registers the ResponseReceiver and its intent filters
 		LocalBroadcastManager.getInstance(this).registerReceiver(mResponseReceiver, mStatusIntentFilter);
@@ -245,7 +248,8 @@ public class MetaFormActivity extends Activity
 			movieGenre = intent.getStringExtra(Constants.MOVIE_GENRE_EXTRA);
 			movieReleaseDate = intent.getStringExtra(Constants.MOVIE_RELEASE_DATE_EXTRA);
 			// generate the timestamp
-			movieTimestamp = stringToTimestamp(movieReleaseDate).getTime();
+			// getTime() returns milliseconds, time is 22:00 so + 2h in seconds = 7200
+			movieTimestamp = stringToTimestamp(movieReleaseDate).getTime() / 1000 +7200;
 			movieThumbnailUrl = intent.getStringExtra(Constants.MOVIE_THUMBNAIL_URL_EXTRA);
 		}
 		else if(mediaType.equals(Constants.TYPE_MUSIC))
@@ -254,7 +258,8 @@ public class MetaFormActivity extends Activity
 			musicAlbum = intent.getStringExtra(Constants.MUSIC_ALBUM_EXTRA);
 			musicReleaseDate = intent.getStringExtra(Constants.MUSIC_REALEASE_DATE_EXTRA);
 			// generate the timestamp
-			musicTimestamp = stringToTimestamp(musicReleaseDate).getTime();
+			// getTime() returns milliseconds, time is 22:00 so + 2h in seconds = 7200
+			musicTimestamp = stringToTimestamp(musicReleaseDate).getTime() / 1000 +7200;
 			musicThumbnailUrl = intent.getStringExtra(Constants.MUSIC_THUMBNAIL_URL_EXTRA);
 			musicTrack = intent.getStringExtra(Constants.MUSIC_TRACK_EXTRA);
 			musicGenre = intent.getStringExtra(Constants.MUSIC_GENRE_EXTRA);
@@ -274,10 +279,10 @@ public class MetaFormActivity extends Activity
 		dpBtn.setOnClickListener(mDatePickerListener);
 		dpBtn.setText(date);
 
-		Button tagBtn = (Button) findViewById(R.id.button_tags);
+		tagBtn = (ImageButton) findViewById(R.id.button_tags);
 		tagBtn.setOnClickListener(mTagListener);
 
-		Button hashtagBtn = (Button) findViewById(R.id.button_hashtags);
+		hashtagBtn = (ImageButton) findViewById(R.id.button_hashtags);
 		hashtagBtn.setOnClickListener(mHashtagListener);
 
 		Button saveBtn = (Button) findViewById(R.id.save_meta_data);
@@ -307,6 +312,7 @@ public class MetaFormActivity extends Activity
 					if(!tagList.isEmpty())
 					{
 						tagsCount.setText(""+tagList.size());
+						tagBtn.setBackgroundResource(R.drawable.button_tag);
 					}
 				}
 				//TODO Fehlerbehandlung
@@ -323,6 +329,7 @@ public class MetaFormActivity extends Activity
 						if(!hashtagList.isEmpty())
 						{
 							hashtagsCount.setText(""+hashtagList.size());
+							hashtagBtn.setBackgroundResource(R.drawable.button_hashtag);
 						}
 					}
 				}
@@ -378,7 +385,7 @@ public class MetaFormActivity extends Activity
 		userTitle = titleET.getText().toString();
 
 		// title has to be set
-		if( ( userTitle.trim().equals("")) || (null == userTitle) )
+		if(userTitle.equals(""))
 		{
 			success = false;
 		}
@@ -410,6 +417,7 @@ public class MetaFormActivity extends Activity
 			Log.e("parse date error", e.getMessage());
 		}
 		Timestamp timestamp = new Timestamp(parsedDate.getTime());
+
 		userTimestamp = timestamp.getTime();
 
 		return success;
@@ -437,6 +445,7 @@ public class MetaFormActivity extends Activity
 		{
 			Log.e("parse date error", e.getMessage());
 		}
+
 		Timestamp timestamp = new Timestamp(parsedDate.getTime());
 
 		return timestamp;

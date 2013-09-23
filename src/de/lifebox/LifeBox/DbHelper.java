@@ -13,12 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Base-Class for all DbHelper classes
+ * Class for all database related actions.
  * @version 0.1 09.07.13
  * @autor Markus Bayer
  */
 public class DbHelper extends SQLiteOpenHelper
 {
+	private static final String TAG = "DbHelper";
 	// if the database schema has changed, the database version must be increased.
 	public static final int DATABASE_VERSION = 20;
 	public static final String DATABASE_NAME = "LifeBox.db";
@@ -1274,7 +1275,7 @@ public class DbHelper extends SQLiteOpenHelper
 				{
 					// insert NULL
 					values.putNull(kvp.getKey());
-					Log.d(kvp.getKey(), "null i am stfu joda");
+					Log.d(kvp.getKey(), "null");
 				}
 				else
 				{
@@ -1289,11 +1290,10 @@ public class DbHelper extends SQLiteOpenHelper
 				{
 					// insert NULL
 					values.putNull(kvp.getKey());
-					Log.d(kvp.getKey(), "null i am stfu joda");
+					Log.d(kvp.getKey(), "null");
 				}
 				else
 				{
-					Log.d(kvp.getKey(), ""+kvp.getLongValue());
 					values.put(kvp.getKey(), kvp.getLongValue());
 				}
 
@@ -1409,6 +1409,346 @@ public class DbHelper extends SQLiteOpenHelper
 	//##################################################################################################################
 	// SELECT ----------------------------------------------------------------------------------------------------------
 	//##################################################################################################################
+
+	/**
+	 * Select the total amount of entries.
+	 * @return (String) the total amount of entries
+	 */
+	public String selectCountEntries()
+	{
+		String result = "";
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT COUNT(_id) FROM entries;
+		 */
+		String query =
+				"SELECT COUNT(" + LifeBoxContract.Entries._ID + ") FROM " + LifeBoxContract.Entries.TABLE_NAME + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(" + LifeBoxContract.Entries._ID + ")")));
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select the total amount of files
+	 * @param filetype (String) ['image/jpg' || 'video/mp4']
+	 * @return (String) the total amount of (image or video) files
+	 */
+	public String selectCountFiles(String filetype)
+	{
+		String result = "";
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT COUNT(e._id) FROM entries  e
+		INNER JOIN (files f
+		INNER JOIN filetypes ft
+		ON ft._id = f.filetypes_id) AS ft
+		ON ft._id = e.media_id
+		WHERE filetype == 'image/jpeg';
+		 */
+		String query =
+				"SELECT COUNT(e." + LifeBoxContract.Entries._ID + ") FROM " + LifeBoxContract.Entries.TABLE_NAME + " e " +
+				"INNER JOIN (" + LifeBoxContract.Files.TABLE_NAME + " f " +
+				"INNER JOIN " + LifeBoxContract.Filetypes.TABLE_NAME + " ft " +
+				" ON ft." + LifeBoxContract.Filetypes._ID + " = f." + LifeBoxContract.Files.COLUMN_NAME_FILETYPES_ID +
+				") AS ft " +
+				"ON ft." + LifeBoxContract.Files._ID + " = e." + LifeBoxContract.Entries.COLUMN_NAME_MEDIA_ID +
+				" WHERE " + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE + " == '" + filetype + "';";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(e." + LifeBoxContract.Entries._ID + ")")));
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select the amount of mediatypes
+	 * @param mediatype (String) [music || movies]
+	 * @return (String) the total amount of (music or movie) mediatypes
+	 */
+	public String selectCountMedia(String mediatype)
+	{
+		String result = "";
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT COUNT(e._id) FROM entries  e
+		INNER JOIN types t ON t._id = e.types_id
+		WHERE t.type == 'music';
+		 */
+		String query =
+				"SELECT COUNT(e." + LifeBoxContract.Entries._ID + ") FROM " + LifeBoxContract.Entries.TABLE_NAME + " e " +
+						"INNER JOIN " + LifeBoxContract.Types.TABLE_NAME + " t " +
+						" ON t." + LifeBoxContract.Types._ID + " = e." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
+						" WHERE t" + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + mediatype + "';";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(e." + LifeBoxContract.Entries._ID + ")")));
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select the amount of a specific field.
+	 * @param field (String) the field-column to count
+	 * @param table (String) the table holding the field
+	 * @return (String) the amount of appearance
+	 */
+	public String selectCount(String field, String table)
+	{
+		String result = "";
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT COUNT(_id) FROM entry_tags;
+		 */
+		String query =
+				"SELECT COUNT(DISTINCT " + field + ") FROM " + table + ";";
+
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(" + LifeBoxContract.Entries._ID + ")")));
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select a List of tags in ordered by use.
+	 * @param limit (int) the amount of tags returned.
+	 * @return (ArrayList<HashMap<String, String>>) List of tags and their usage.
+	 */
+	public ArrayList<HashMap<String, String>> selectTagUsage(int limit)
+	{
+		ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT t.tag, COUNT(t._id) FROM entry_tags et
+		INNER JOIN tags t ON t._id = et.tags_id
+		GROUP BY t.tag
+		ORDER BY COUNT(t._id) DESC LIMIT 10;
+		 */
+
+		String query = "SELECT t." + LifeBoxContract.Tags.COLUMN_NAME_TAG + ", COUNT(t." + LifeBoxContract.Tags._ID +
+			") FROM " + LifeBoxContract.EntryTags.TABLE_NAME + " et " +
+			"INNER JOIN " + LifeBoxContract.Tags.TABLE_NAME + " t ON t." + LifeBoxContract.Tags._ID + " = et." +
+			LifeBoxContract.EntryTags.COLUMN_NAME_TAGS_ID +
+			" GROUP BY t." + LifeBoxContract.Tags.COLUMN_NAME_TAG +
+			" ORDER BY COUNT(t." + LifeBoxContract.Tags._ID + ") DESC LIMIT" + limit + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			// the keys
+			String tag = "tag";
+			String count = "count";
+
+			while(!c.isAfterLast())
+			{
+				HashMap<String, String> hm = new HashMap<String, String>();
+				hm.put
+						(
+								tag,
+								c.getString(c.getColumnIndexOrThrow("t." + LifeBoxContract.Tags.COLUMN_NAME_TAG))
+						);
+				hm.put
+						(
+								count,
+								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(t." + LifeBoxContract.Tags._ID + ")")))
+						);
+
+				result.add(hm);
+
+				c.moveToNext();
+			}
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select a List of hashtags in ordered by use.
+	 * @param limit (int) the amount of hashtags returned.
+	 * @return (ArrayList<HashMap<String, String>>) List of hashtags and their usage.
+	 */
+	public ArrayList<HashMap<String, String>> selectHashtagUsage(int limit)
+	{
+		ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT h.hashtag, COUNT(h._id) FROM entry_hashtags eh
+		INNER JOIN hashtags h ON h._id = eh.hashtags_id
+		GROUP BY h.hashtag
+		ORDER BY COUNT(h._id) DESC LIMIT 10;
+		 */
+
+		String query = "SELECT h." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG + ", COUNT(h." +
+				LifeBoxContract.Hashtags._ID +
+				") FROM " + LifeBoxContract.EntryHashtags.TABLE_NAME + " eh " +
+				"INNER JOIN " + LifeBoxContract.Hashtags.TABLE_NAME + " h ON h." + LifeBoxContract.Hashtags._ID + " = eh." +
+				LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID +
+				" GROUP BY t." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG +
+				" ORDER BY COUNT(t." + LifeBoxContract.Hashtags._ID + ") DESC LIMIT " + limit + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			// the keys
+			String hashtag = "hashtag";
+			String count = "count";
+
+			while(!c.isAfterLast())
+			{
+				HashMap<String, String> hm = new HashMap<String, String>();
+				hm.put
+						(
+								hashtag,
+								c.getString(c.getColumnIndexOrThrow("h." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG))
+						);
+				hm.put
+						(
+								count,
+								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(h." + LifeBoxContract.Hashtags._ID + ")")))
+						);
+
+				result.add(hm);
+
+				c.moveToNext();
+			}
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select a List of genres in ordered by use.
+	 * @param genreColumn (String) the column of the genre
+	 * @param table (String) the table holding the genreColumn
+	 * @param limit (int) the amount of genres returned.
+	 * @return (ArrayList<HashMap<String, String>>) List of genres and their usage.
+	 */
+	public ArrayList<HashMap<String, String>> selectGenreUsage(String genreColumn, String table, int limit)
+	{
+		ArrayList<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/* ~query
+		SELECT music_genre, COUNT(music_genre) FROM music_genres
+		GROUP BY music_genre
+		ORDER BY COUNT(music_genre) DESC LIMIT 10;
+		 */
+
+		String query = "SELECT " + genreColumn + ", COUNT(" + genreColumn + ") FROM " + table +
+				" GROUP BY " + table +
+				" ORDER BY COUNT(" + genreColumn + ") DESC LIMIT " + limit + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			// the keys
+			String genre = "genre";
+			String count = "count";
+
+			while(!c.isAfterLast())
+			{
+				HashMap<String, String> hm = new HashMap<String, String>();
+				hm.put
+						(
+								genre,
+								c.getString(c.getColumnIndexOrThrow(genreColumn))
+						);
+				hm.put
+						(
+								count,
+								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(" + genreColumn + ")")))
+						);
+
+				result.add(hm);
+
+				c.moveToNext();
+			}
+		}
+
+		db.close();
+
+		return result;
+	}
+
+	/**
+	 * Select a Map of the first or last entrytitle.
+	 * @param minOrMax (String) [MIN || MAX] if the first or last entry should be returned
+	 * @return (HashMap<String, String>) of the first or last title and user_date
+	 */
+	public HashMap<String, String> selectExtremeTitle(String minOrMax)
+	{
+		HashMap<String, String> result = new HashMap<String, String>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/*
+		SELECT title, MIN(user_date) FROM entries;
+		 */
+
+		String query = "SELECT " + LifeBoxContract.Entries.COlUMN_NAME_TITLE + ", " + minOrMax + "(" +
+				LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + ") FROM" + LifeBoxContract.Entries.TABLE_NAME + ";";
+
+		Cursor c = db.rawQuery(query, null);
+
+		if(c.moveToFirst())
+		{
+			result.put("title", c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_TITLE)));
+			result.put("user_date", String.valueOf(c.getLong(c.getColumnIndexOrThrow(
+					minOrMax + "(" + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE))));
+
+			c.moveToNext();
+		}
+
+		db.close();
+
+		return result;
+	}
 
 	/**
 	 * Select the first user_date from entries.
@@ -1818,6 +2158,8 @@ public class DbHelper extends SQLiteOpenHelper
 				c.moveToNext();
 			}
 		}
+
+		c.close();
 		db.close();
 
 		return tagList;
@@ -1863,14 +2205,244 @@ public class DbHelper extends SQLiteOpenHelper
 		return hashtagList;
 	}
 
+
+	/**
+	 * Select a list of entries._id(s) matchiing a set of conditions.
+	 * @param title (String) entries.title
+	 * @param fromDate (String) beginning of the timeinterval
+	 * @param toDate (String) end of the timeinterval
+	 * @param tagList (ArrayList<String>) list of tags
+	 * @param hashtagList (ArrayList<String>) list of hashtags
+	 * @param mediatypeList (ArrayList<String>) list of mediatypes
+	 * @return (ArrayList<String>) a list of entries._id(s) matching the parameter conditions
+	 */
+	public ArrayList<String> selectFilteredEntryList(String title, String fromDate, String toDate,
+													 ArrayList<String> tagList, ArrayList<String> hashtagList,
+													 ArrayList<String> mediatypeList)
+	{
+		// the result
+		ArrayList<String> entryIdList = new ArrayList<String>();
+
+		SQLiteDatabase db = getReadableDatabase();
+
+		/*
+		SQLite3 don't support full join but full joins can be built by:
+		table_a LEFT OUTER JOIN table_b
+		UNION
+		table_b LEFT OUTER JOIN table_a
+		*/
+
+		// view with a full join of (entries + types) and (entry_tags + tags)
+		String namedQueryeEntrytags =
+		"CREATE VIEW IF NOT EXISTS entrytags AS " +
+		"SELECT e._id, e.media_id, e.type, e.title, e.user_date, et.tag " +
+		"FROM (entries e " +
+		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
+		"LEFT OUTER JOIN (entry_tags et " +
+		"INNER JOIN tags ta ON ta._id = et.tags_id) AS et " +
+		"ON e._id = et.entries_id " +
+		"UNION " +
+		"SELECT e._id, e.media_id, e.type, e.title, e.user_date, et.tag " +
+		"FROM (entry_tags et " +
+		"INNER JOIN tags ta ON ta._id = et.tags_id) AS et " +
+		"LEFT OUTER JOIN (entries e " +
+		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
+		"ON et.entries_id = e._id;";
+
+		// view with a full join of (entries + types) and (entry_hashtag + hashtags)
+		String namedQueryEntryHashtags =
+		"CREATE VIEW IF NOT EXISTS entryhashtags AS " +
+		"SELECT e._id, eh.hashtag " +
+		"FROM (entries e " +
+		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
+		"LEFT OUTER JOIN (entry_hashtags eh " +
+		"INNER JOIN hashtags ht ON ht._id = eh.hashtags_id) AS eh " +
+		"ON e._id = eh.entries_id " +
+		"UNION " +
+		"SELECT e._id, eh.hashtag " +
+		"FROM (entry_hashtags eh " +
+		"INNER JOIN hashtags h ON h._id = eh.hashtags_id) AS eh " +
+		"LEFT OUTER JOIN (entries e " +
+		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
+		"ON eh.entries_id = e._id;";
+
+		// view with a full join of the view entrytags and the view entryhashtags
+		String namedQueryFullEntries =
+		"CREATE VIEW IF NOT EXISTS fullentries AS " +
+		"SELECT t._id, t.media_id, t.type, t.title, t.user_date, t.tag, h.hashtag " +
+		"FROM entrytags t " +
+		"LEFT OUTER JOIN entryhashtags h ON h._id = t._id " +
+		"UNION " +
+		"SELECT t._id, t.media_id, t.type, t.title, t.user_date, t.tag, h.hashtag " +
+		"FROM entryhashtags h " +
+		"LEFT OUTER JOIN entrytags t ON t._id = h._id; ";
+
+		// the base query without WHERE clause
+		String baseQuery =
+		"SELECT fe._id, fe.media_id, fe.type, fe.title, fe.user_date, fe.tag, fe.hashtag, f.filetype " +
+		"FROM fullentries fe " +
+		"LEFT OUTER JOIN (files f " +
+		"INNER JOIN filetypes ft ON ft._id = f.filetypes_id) AS f " +
+		"ON f._id = fe.media_id";
+
+		// the WHERE clause
+		String whereClause = " WHERE ";
+
+		// title (optional)
+		if(!title.equals(""))
+		{
+			whereClause += "fe." + LifeBoxContract.Entries.COlUMN_NAME_TITLE + " == '" + title + "' AND ";
+		}
+
+		// time interval
+		/* ~dateclause
+		datetime(user_date, 'unixepoch') BETWEEN datetime(1376376840000, 'unixepoch') AND datetime(1376390220000, 'unixepoch')
+		 */
+		whereClause += "fe." + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE +
+				" BETWEEN " + fromDate + " AND " + toDate;
+
+		// tags (optional)
+		// get the amount of tags to place the right amount of 'ORs'
+		int tagAmount = tagList.size();
+
+		if(tagAmount > 0)
+		{
+			int i = 1;
+
+			whereClause += " AND (";
+
+			for(String tag : tagList)
+			{
+
+				whereClause += "fe." + LifeBoxContract.Tags.COLUMN_NAME_TAG + " == '" + tag + "'";
+				// the amount of separators are n-1
+				if(i < tagAmount)
+				{
+					whereClause += " OR ";
+				}
+				else if(i == tagAmount)
+				{
+					whereClause += ") ";
+				}
+
+				i++;
+			}
+		}
+
+		// hashtags (optional)
+		// get the amount of hashtags to place the right amount of 'ORs'
+		int hashtagAmount = hashtagList.size();
+
+		if(hashtagAmount > 0)
+		{
+			whereClause += " AND (";
+
+			int j = 1;
+
+			for(String hashtag : hashtagList)
+			{
+
+				whereClause += "fe." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG + " == '" + hashtag + "'";
+				// the amount of separators are n-1
+				if(j < hashtagAmount)
+				{
+					whereClause += " OR ";
+				}
+				else if(j == tagAmount)
+				{
+					whereClause += ") ";
+				}
+
+				j++;
+			}
+		}
+
+		// mediatypes (optional)
+		// get the amount of mediatypes to place the right amount of 'ORs'
+		int mediatypesAmount = mediatypeList.size();
+
+		if(mediatypesAmount > 0)
+		{
+			whereClause += " AND ";
+
+			int k = 1;
+
+			for(String mediatype : mediatypeList)
+			{
+				// mediatype file needs distinction in image or video
+				if(mediatype.equals(Constants.TYPE_IMAGE_FILE))
+				{
+					whereClause +=
+							"fe." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + Constants.TYPE_FILE + "'";
+					whereClause +=
+							" AND f." + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE + " == '" + mediatype + "'";
+				}
+				else if(mediatype.equals(Constants.TYPE_VIDEO_FILE))
+				{
+					whereClause +=
+							"fe." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + Constants.TYPE_FILE + "'";
+					whereClause +=
+							" AND f." + LifeBoxContract.Filetypes.COLUMN_NAME_FILETYPE + " == '" + mediatype + "'";
+				}
+				else
+				{
+					whereClause += "fe." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + mediatype + "'";
+				}
+
+				// the amount of separators are n-1
+				if(k < mediatypesAmount)
+				{
+					whereClause += " OR ";
+				}
+
+				k++;
+			}
+		}
+
+		// remove duplicated rows
+		whereClause += " GROUP BY fe._id;";
+
+		// create the views
+		db.execSQL(namedQueryeEntrytags);
+		db.execSQL(namedQueryEntryHashtags);
+		db.execSQL(namedQueryFullEntries);
+
+		Log.d(TAG, "query: "+whereClause);
+
+		// select
+		String query = baseQuery + whereClause;
+
+		Log.d(TAG, "fullquery: "+query);
+
+		Cursor c = db.rawQuery(query, null);
+
+		// results?
+		if(c.moveToFirst())
+		{
+			while(!c.isAfterLast())
+			{
+				entryIdList.add(String.valueOf(c.getLong(c.getColumnIndexOrThrow(LifeBoxContract.Entries._ID))));
+
+				c.moveToNext();
+			}
+		}
+
+		db.close();
+
+		return entryIdList;
+	}
+
 	/**
 	 * Queries the entries table of the database in order to retrieve
 	 * _id, media_id, types_id, title, description and user_date,
 	 * which is the intersection of all timelineEntries.
+	 * @param whereClause (String) a condition including 'WHERE'
+	 * @param sortOrder (String) the sort order (DESC or ASC)
 	 * @param limit (int) the amount of rows, the function should return.
+	 * @param offset (int) the offset
 	 * @return a 2d array with the media_ids and the types_ids.
 	 */
-	public String[][] selectEntrySet(int limit, int offset)
+	public String[][] selectEntrySet(String whereClause, String sortOrder, int limit, int offset)
 	{
 		final int COLUMNAMOUNT = 6;
 		String entryList[][] = null;
@@ -1888,9 +2460,19 @@ public class DbHelper extends SQLiteOpenHelper
 				LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " FROM " +
 				LifeBoxContract.Entries.TABLE_NAME + " LEFT OUTER JOIN " + LifeBoxContract.Types.TABLE_NAME +
 				" ON " + LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
-				" = " + LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types._ID + " ORDER BY " +
+				" = " + LifeBoxContract.Types.TABLE_NAME + "." + LifeBoxContract.Types._ID;
+
+		// add the where clause if exists
+		if(null != whereClause && !whereClause.trim().equals(""))
+		{
+			query += " " + whereClause;
+		}
+
+		// add the limit and offset
+		query +=
+				" ORDER BY " +
 				LifeBoxContract.Entries.TABLE_NAME + "." + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE +
-				" DESC LIMIT " + limit + " OFFSET " + offset + ";";
+				" " + sortOrder + " LIMIT " + limit + " OFFSET " + offset + ";";
 
 		Cursor c = db.rawQuery(query, null);
 

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="11dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="11dp" >
+    <Button
+            android:id="@+id/picture"
+            android:drawableTop="@drawable/button_camera"
+            android:background="@color/playgreen"
+            android:paddingTop="20dp"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+    <Button
+            android:id="@+id/file"
+            android:drawableTop="@drawable/button_picture"
+            android:background="@color/playpurple"
+            android:paddingTop="80dp"
+            android:layout_width="114dp"
+            android:layout_height="220dp"
+            android:layout_toRightOf="@id/picture"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+
+    <Button
+            android:id="@+id/video"
+            android:drawableTop="@drawable/button_video"
+            android:background="@color/playred"
+            android:paddingTop="20dp"
+            android:layout_below="@id/picture"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+
+
+    <Button
+            android:id="@+id/text"
+            android:drawableTop="@drawable/button_text"
+            android:background="@color/playblue"
+            android:paddingTop="80dp"
+            android:layout_below="@id/video"
+            android:layout_width="114dp"
+            android:layout_height="220dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+
+    <Button
+            android:id="@+id/music"
+            android:drawableTop="@drawable/button_music"
+            android:background="@color/playorange"
+            android:paddingTop="20dp"
+            android:layout_below="@id/video"
+            android:layout_toRightOf="@id/text"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"/>
+    <Button
+            android:id="@+id/movie"
+            android:drawableTop="@drawable/button_movie"
+            android:background="@color/playcyan"
+            android:paddingTop="20dp"
+            android:layout_toRightOf="@id/text"
+            android:layout_below="@id/music"
+            android:layout_width="238dp"
+            android:layout_height="105dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp" />
+
+    <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="visible"
+            android:id="@+id/imageview" />
+
+    <VideoView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="invisible"
+            android:id="@+id/videoview" />
+
+</RelativeLayout>

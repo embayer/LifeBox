@@ -154,9 +154,9 @@ public class TagsActivity extends Activity
 	 */
 	private void bindStringToButton(boolean state, String tag)
 	{
-		if (state == true)
+		if(state == true)
 		{
-			// The tag is enabled
+			// enable tag
 			if(!tagList.contains(tag))
 			{
 				tagList.add(tag);
@@ -164,7 +164,7 @@ public class TagsActivity extends Activity
 		}
 		else
 		{
-			// The tag is disabled
+			// disabled tag
 			if(tagList.contains(tag))
 			{
 				tagList.remove(tag);

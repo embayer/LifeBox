@@ -74,13 +74,13 @@ public class UploadService extends IntentService
 		// thumbnail
 		isThumbnail = intent.getBooleanExtra(Constants.IS_THUMB_EXTRA, false);
 
-		// retrieve the users accountname from the sharedpreferences
+		// retrieve the user accountname from the sharedpreferences
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
-		String accountName = settings.getString("accountName", "");                    //TODO accountname default
+		String accountName = settings.getString("accountName", "");
 
-		credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE); 		//TODO OAuth2 ersetzen && APPDATA verwenden
+		credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
 
-		if(null != accountName)                                                        	//TODO accountname prüfen
+		if(!accountName.equals(""))
 		{
 			// pass the accountname to the authentification object
 			credential.setSelectedAccountName(accountName);
@@ -111,11 +111,10 @@ public class UploadService extends IntentService
 
 				body.setTitle(fileContent.getName());
 				body.setDescription("LifeBoxFile");
-//				body.setParents(Arrays.asList(new ParentReference().setId("appdata")));
 
-				// upload
+				// upload the file
 				File file = service.files().insert(body, mediaContent).execute();
-				Log.d(TAG, file.toString());
+				Log.d(TAG, "file uploaded: " + file.toString());
 
 				// succeeded?
 				if (null != file)
@@ -131,7 +130,7 @@ public class UploadService extends IntentService
 					}
 
 					Log.d(TAG, "json: " + file.toString());
-					sendDriveMetaData(file);
+					sendMeta(file);
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
@@ -168,7 +167,7 @@ public class UploadService extends IntentService
 	 * which started this service
 	 * @param file (File) the meta data of file stored on drive
 	 */
-	private void sendDriveMetaData(File file)
+	private void sendMeta(File file)
 	{
 		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_UPLOADRESPONSE);
 

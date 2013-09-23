@@ -103,6 +103,24 @@ public class MainActivity extends FragmentActivity
 			// display the timeline
 			mViewPager.setCurrentItem(2, true);
 		}
+		else if(callerId == Constants.CALLER_FILTER_ACTIVITY)
+		{
+			// get the extras and put them as bundle
+			Bundle args = new Bundle();
+			args.putString(Constants.CALLER_EXTRA, intent.getStringExtra(Constants.CALLER_EXTRA));
+			args.putStringArrayList(Constants.TAG_ARRAY_EXTRA, intent.getStringArrayListExtra(Constants.TAG_ARRAY_EXTRA));
+			args.putStringArrayList(Constants.HASHTAG_ARRAY_EXTRA, intent.getStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA));
+			args.putStringArrayList(Constants.MEDIATYPE_ARRAY_EXTRA, intent.getStringArrayListExtra(Constants.MEDIATYPE_ARRAY_EXTRA));
+			args.putString(Constants.FROM_DATE_EXTRA, intent.getStringExtra(Constants.FROM_DATE_EXTRA));
+			args.putString(Constants.TO_DATE_EXTRA, intent.getStringExtra(Constants.TO_DATE_EXTRA));
+			args.putString(Constants.ENTRY_TITLE_EXTRA, intent.getStringExtra(Constants.ENTRY_TITLE_EXTRA));
+
+			// set the bundle to TimelineFragment
+			fragments.get(2).setArguments(args);
+
+			// display the timeline
+			mViewPager.setCurrentItem(2, true);
+		}
 		else if(callerId == 100)
 		{
 			mViewPager.setCurrentItem(1, true);
@@ -118,7 +136,7 @@ public class MainActivity extends FragmentActivity
 	{
 		List<Fragment> fList = new ArrayList<Fragment>();
 		fList.add(ReportingFragment.newInstance());
-		fList.add(SelectTypeFragment.newInstance());
+		fList.add(InputFragment.newInstance());
 		fList.add(TimelineFragment.newInstance());
 
 		return fList;

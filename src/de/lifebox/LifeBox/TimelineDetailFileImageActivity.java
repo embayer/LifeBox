@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import com.google.api.services.drive.model.File;
 
@@ -41,8 +42,6 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			intent.setDataAndType(uri, image.getFiletype());
 			startActivity(intent);
-
-
 		}
 	};
 
@@ -68,6 +67,9 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 		landscapeImageIB = (ImageButton) childLayout.findViewById(R.id.imagefiledetail_landscape_imagebutton);
 		landscapeImageIB.setOnClickListener(mImageButtonListener);
 
+		FrameLayout portraitLayout = (FrameLayout) childLayout.findViewById((R.id.imagefiledetail_portrait_frame));
+		FrameLayout landscapeLayout = (FrameLayout) childLayout.findViewById((R.id.imagefiledetail_landscape_frame));
+
 		// check if the image orientation is portrait or landscape
 		Drawable drawable = Drawable.createFromPath(image.getOfflinePathFile());
 		int width = drawable.getIntrinsicWidth();
@@ -75,12 +77,14 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 
 		if(width < height)
 		{
+			landscapeLayout.setVisibility(View.INVISIBLE);
 			portraitImageIB.setVisibility(View.VISIBLE);
 			landscapeImageIB.setVisibility(View.INVISIBLE);
 			portraitImageIB.setImageDrawable(Drawable.createFromPath(image.getOfflinePathFile()));
 		}
 		else
 		{
+			portraitLayout.setVisibility(View.INVISIBLE);
 			landscapeImageIB.setVisibility(View.VISIBLE);
 			portraitImageIB.setVisibility(View.INVISIBLE);
 			landscapeImageIB.setImageDrawable(drawable);

@@ -1,7 +1,6 @@
 package de.lifebox.LifeBox;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,8 +29,10 @@ import java.util.List;
  * @author Markus Bayer
  * @version 0.1 21.06.2013
  */
-public class SelectTypeFragment extends Fragment
+public class InputFragment extends Fragment
 {
+	private static String TAG = "InputFragment";
+
 	// codes for onActivityResult
 	private static final int ACTION_TAKE_PHOTO = 1;
 	private static final int ACTION_TAKE_PHOTO_S = 2;
@@ -155,11 +156,11 @@ public class SelectTypeFragment extends Fragment
 
 	/**
 	 * Constructor
-	 * @return SelectTypeFragment instance
+	 * @return InputFragment instance
 	 */
-	public static final SelectTypeFragment newInstance()
+	public static final InputFragment newInstance()
 	{
-		SelectTypeFragment f = new SelectTypeFragment();
+		InputFragment f = new InputFragment();
 		Bundle bdl = new Bundle(1);
 		f.setArguments(bdl);
 		return f;
@@ -181,7 +182,7 @@ public class SelectTypeFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState)
 	{
-		View view = inflater.inflate(R.layout.selecttype, container, false);
+		View view = inflater.inflate(R.layout.input, container, false);
 
 		mImageView = (ImageView) view.findViewById(R.id.imageview);
 		mVideoView = (VideoView) view.findViewById(R.id.videoview);
@@ -220,9 +221,6 @@ public class SelectTypeFragment extends Fragment
 				mPickImageOnClickListener,
 				Intent.ACTION_PICK);
 
-		Button dbBackupBtn = (Button) view.findViewById(R.id.tvshow);
-		dbBackupBtn.setOnClickListener(mDbBackupOnClickListener);
-
 		return view;
 	}
 
@@ -248,11 +246,6 @@ public class SelectTypeFragment extends Fragment
 					// delete the temporary file
 					File file = new File(mPhotoToDeletePath);
 					boolean deleted = file.delete();
-
-					if(deleted == false)
-					{
-						// do nothing
-					}
 
 					// create a thumbnail of the image file
 					String imageThumbnail = createImageThumbnail(mCurrentPhotoPath);
@@ -688,9 +681,11 @@ public class SelectTypeFragment extends Fragment
 	/** Call the camera app. */
 	private void dispatchTakePictureIntent(int actionCode)
 	{
+		// setup the intent
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-		switch(actionCode) {
+		switch(actionCode)
+		{
 			case ACTION_TAKE_PHOTO:
 				File f = null;
 
@@ -700,9 +695,11 @@ public class SelectTypeFragment extends Fragment
 					mCurrentPhotoPath = f.getAbsolutePath();
 					takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 				}
-				catch (IOException e) {
-					//TODO makeToast
-					e.printStackTrace();
+				catch (IOException e)
+				{
+					Log.e(TAG, e.getMessage());
+
+					// free variables
 					f = null;
 					mCurrentPhotoPath = null;
 					mCurrentTimeStamp = null;
@@ -712,12 +709,15 @@ public class SelectTypeFragment extends Fragment
 			default:
 				break;
 		}
+
+		// call the camera app
 		startActivityForResult(takePictureIntent, actionCode);
 	}
 
 	/** Call the video app. */
 	private void dispatchTakeVideoIntent(int actionCode)
 	{
+
 		Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
 		switch(actionCode)
@@ -733,7 +733,8 @@ public class SelectTypeFragment extends Fragment
 				}
 				catch(IOException e)
 				{
-					e.printStackTrace();
+					Log.e(TAG, e.getMessage());
+					// free variables
 					f = null;
 					mCurrentVideoPath = null;
 					mCurrentTimeStamp = null;
@@ -743,6 +744,8 @@ public class SelectTypeFragment extends Fragment
 			default:
 				break;
 		}
+
+		// call the camera
 		startActivityForResult(takeVideoIntent, actionCode);
 	}
 

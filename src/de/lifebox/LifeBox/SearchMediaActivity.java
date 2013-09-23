@@ -69,7 +69,7 @@ public class SearchMediaActivity extends Activity
 			if( (null != query) && (!query.equals("") && (query.length() >= 0)) )
 			{
 				// put the extras, start the service
-				Intent intent = new Intent(getBaseContext(), FetchJsonService.class);
+				Intent intent = new Intent(getBaseContext(), SearchService.class);
 				intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, mediaType);
 				intent.putExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA, query);
 
@@ -159,7 +159,7 @@ public class SearchMediaActivity extends Activity
 
 	/**
 	 * Reads a JSON-String and stores the results in a List
-	 * @param json (String) returned by FetchJsonService
+	 * @param json (String) returned by SearchService
 	 * @return (ArrayList<Movie>) containing Movies objects
 	 * @throws IOException
 	 */
@@ -182,7 +182,7 @@ public class SearchMediaActivity extends Activity
 
 	/**
 	 * Reads a JSON-String and stores the results in a List
-	 * @param json (String) returned by FetchJsonService
+	 * @param json (String) returned by SearchService
 	 * @return (ArrayList<Music>) containing Music objects
 	 * @throws IOException
 	 */
@@ -424,7 +424,7 @@ public class SearchMediaActivity extends Activity
 	}
 
 	/**
-	 * BroadcastReceiver to catch the JSON Strings brought by FetchJsonService
+	 * BroadcastReceiver to catch the JSON Strings brought by SearchService
 	 * @author Markus Bayer
 	 * @version 0.1 29.06.13
 	 */

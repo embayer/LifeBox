@@ -31,6 +31,8 @@ public final class Constants
 	public static final int CALLER_META_FORM_ACTIVITY = 102;
 	public static final int CALLER_TIMELINE_DETAIL_ACTIVITY = 103;
 	public static final int CALLER_FILTER_ACTIVITY = 104;
+	public static final int CALLER_TIMELINE_RELOAD_SERVICE = 105;
+	public static final int CALLER_TIMELINE_FILTERED_RELOAD_SERVICE = 106;
 
 	// codes for the different MIME-Types
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
@@ -46,8 +48,8 @@ public final class Constants
 	public static final String TYPE_MUSIC = "music";
 	public static final String TYPE_TEXT = "text";
 
-	public static final String TYPE_IMAGE_FILE = "image";
-	public static final String TYPE_VIDEO_FILE = "video";
+	public static final String TYPE_IMAGE_FILE = MIME_TYPE_IMAGE;
+	public static final String TYPE_VIDEO_FILE = MIME_TYPE_VIDEO;
 
 	// the date format
 	public static final String SQL_DATEFORMAT = "yyyy-MM-dd";
@@ -59,7 +61,7 @@ public final class Constants
 	public static final String CALLER_EXTRA = PACKAGE_NAME_PREFIX + "callerExtra";
 	// mediatypes
 	public static final String MEDIA_TYPE_EXTRA = PACKAGE_NAME_PREFIX + "mediaTypeExtra";
-	// metadata of created files from SelectTypeFragment
+	// metadata of created files from InputFragment
 	public static final String FILE_URL_EXTRA = PACKAGE_NAME_PREFIX + "fileUriExtra";
 	public static final String MIME_TYPE_EXTRA = PACKAGE_NAME_PREFIX + "mimeTypeExtra";
 	public static final String TIME_STAMP_EXTRA = PACKAGE_NAME_PREFIX + "timeStampExtra";
@@ -72,7 +74,7 @@ public final class Constants
 	// search media extras from SearchMovieActivity || SearchMusicActivity
 	public static final String SEARCH_MEDIA_QUERY_EXTRA = PACKAGE_NAME_PREFIX + "searchMediaQueryExtra";
 	public static final String SEARCH_MEDIA_TYPE_EXTRA = PACKAGE_NAME_PREFIX + "searchMediaTypeExtra";
-	// from FetchJsonService
+	// from SearchService
 	public static final String MEDIA_RESULT_EXTRA = PACKAGE_NAME_PREFIX + "mediaResultExtra";
 	// movie from SearchMovieActivity
 	public static final String MOVIE_TITLE_EXTRA = PACKAGE_NAME_PREFIX + "movieTitleExtra";
@@ -93,45 +95,47 @@ public final class Constants
 	// hashtag from HashtagActivity
 	public static final String HASHTAG_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "hashtagArrayExtra";
 	// tags from TagsActivity
-	public static final String TAG_SMILEY1_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley1";
-	public static final String TAG_SMILEY2_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley2";
-	public static final String TAG_SMILEY3_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley3";
-	public static final String TAG_SMILEY4_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley4";
-	public static final String TAG_SMILEY5_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley5";
-	public static final String TAG_SMILEY6_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley6";
-	public static final String TAG_SMILEY7_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley7";
-	public static final String TAG_SMILEY8_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley8";
-	public static final String TAG_SMILEY9_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley9";
-	public static final String TAG_SMILEY10_EXTRA = PACKAGE_NAME_PREFIX + "tag_smiley10";
+	public static final String TAG_SMILEY1_EXTRA = "tag_smiley1";
+	public static final String TAG_SMILEY2_EXTRA = "tag_smiley2";
+	public static final String TAG_SMILEY3_EXTRA = "tag_smiley3";
+	public static final String TAG_SMILEY4_EXTRA = "tag_smiley4";
+	public static final String TAG_SMILEY5_EXTRA = "tag_smiley5";
+	public static final String TAG_SMILEY6_EXTRA = "tag_smiley6";
+	public static final String TAG_SMILEY7_EXTRA = "tag_smiley7";
+	public static final String TAG_SMILEY8_EXTRA = "tag_smiley8";
+	public static final String TAG_SMILEY9_EXTRA = "tag_smiley9";
+	public static final String TAG_SMILEY10_EXTRA = "tag_smiley10";
 
-	public static final String TAG_LOVE_EXTRA = PACKAGE_NAME_PREFIX + "tag_love";
-	public static final String TAG_STAR_EXTRA = PACKAGE_NAME_PREFIX + "tag_star";
-	public static final String TAG_DISLIKE_EXTRA = PACKAGE_NAME_PREFIX + "tag_dislike";
-	public static final String TAG_ACHIEVEMENT_EXTRA = PACKAGE_NAME_PREFIX + "tag_achievement";
-	public static final String TAG_WORK_EXTRA = PACKAGE_NAME_PREFIX + "tag_work";
-	public static final String TAG_FAMILY_EXTRA = PACKAGE_NAME_PREFIX + "tag_family";
-	public static final String TAG_CHILD_EXTRA = PACKAGE_NAME_PREFIX + "tag_child";
-	public static final String TAG_PET_EXTRA = PACKAGE_NAME_PREFIX + "tag_pet";
-	public static final String TAG_FRIENDS_EXTRA = PACKAGE_NAME_PREFIX + "tag_friends";
-	public static final String TAG_PARTY_EXTRA = PACKAGE_NAME_PREFIX + "tag_party";
-	public static final String TAG_OUTDOOR_EXTRA = PACKAGE_NAME_PREFIX + "tag_outdoor";
-	public static final String TAG_HOME_EXTRA = PACKAGE_NAME_PREFIX + "tag_home";
-	public static final String TAG_TRIP_EXTRA = PACKAGE_NAME_PREFIX + "tag_trip";
-	public static final String TAG_TRAVEL_EXTRA = PACKAGE_NAME_PREFIX + "tag_travel";
-	public static final String TAG_EVENT_EXTRA = PACKAGE_NAME_PREFIX + "tag_event";
-	public static final String TAG_HOBBY_EXTRA = PACKAGE_NAME_PREFIX + "tag_hobby";
-	public static final String TAG_SPORT_EXTRA = PACKAGE_NAME_PREFIX + "tag_sport";
-	public static final String TAG_FOOD_EXTRA = PACKAGE_NAME_PREFIX + "tag_food";
-	public static final String TAG_CLOTH_EXTRA = PACKAGE_NAME_PREFIX + "tag_cloth";
-	public static final String TAG_SHOPPING_EXTRA = PACKAGE_NAME_PREFIX + "tag_shopping";
+	public static final String TAG_LOVE_EXTRA = "tag_love";
+	public static final String TAG_STAR_EXTRA = "tag_star";
+	public static final String TAG_DISLIKE_EXTRA = "tag_dislike";
+	public static final String TAG_ACHIEVEMENT_EXTRA = "tag_achievement";
+	public static final String TAG_WORK_EXTRA = "tag_work";
+	public static final String TAG_FAMILY_EXTRA = "tag_family";
+	public static final String TAG_CHILD_EXTRA = "tag_child";
+	public static final String TAG_PET_EXTRA = "tag_pet";
+	public static final String TAG_FRIENDS_EXTRA = "tag_friends";
+	public static final String TAG_PARTY_EXTRA = "tag_party";
+	public static final String TAG_OUTDOOR_EXTRA = "tag_outdoor";
+	public static final String TAG_HOME_EXTRA = "tag_home";
+	public static final String TAG_TRIP_EXTRA = "tag_trip";
+	public static final String TAG_TRAVEL_EXTRA = "tag_travel";
+	public static final String TAG_EVENT_EXTRA = "tag_event";
+	public static final String TAG_HOBBY_EXTRA = "tag_hobby";
+	public static final String TAG_SPORT_EXTRA = "tag_sport";
+	public static final String TAG_FOOD_EXTRA = "tag_food";
+	public static final String TAG_CLOTH_EXTRA = "tag_cloth";
+	public static final String TAG_SHOPPING_EXTRA = "tag_shopping";
 
 	public static final String TAG_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "tagArrayExtra";
 	
 	// filters from FilterActivity
 	public static final String MEDIATYPE_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "mediatypeArrayExtra";
-	public static final String FROM_DATE = PACKAGE_NAME_PREFIX + "fromDateExtra";
-	public static final String TO_DATE = PACKAGE_NAME_PREFIX + "toDateExtra";
+	public static final String FROM_DATE_EXTRA = PACKAGE_NAME_PREFIX + "fromDateExtra";
+	public static final String TO_DATE_EXTRA = PACKAGE_NAME_PREFIX + "toDateExtra";
 	public static final String ENTRY_TITLE_EXTRA = PACKAGE_NAME_PREFIX + "entryTitleExtra";
+
+	public static final String FILTER_BUNDLE_EXTRA = PACKAGE_NAME_PREFIX + "filterBundleExtra";
 
 	// offset from TimelineFragment
 	public static final String OFFSET_EXTRA = PACKAGE_NAME_PREFIX + "offsetExtra";
@@ -147,5 +151,5 @@ public final class Constants
 	public static final String TIMELINE_ENTRIES_BUNDLE_EXTRA = PACKAGE_NAME_PREFIX + "timelineEntriesBundleExtra";
 
 	/** Constructor is empty to prevent instantiating the Constants class. */
-	public Constants() {}
+	private Constants() {}
 }

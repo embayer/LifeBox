@@ -9,9 +9,31 @@
                 android:layout_marginLeft="10dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/filterform_title_relativelayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
+        <EditText
+                android:id="@+id/filterform_in_title"
+                android:layout_width="364dp"
+                android:layout_height="60dp"
+                android:hint="Search for a title"
+                android:padding="6dp"
+                android:background="#FFFFFF"
+                android:textColor="#000000"
+                android:capitalize="sentences"
+                android:singleLine="true"
+                android:maxLength="25"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/filterform_time_relativelayout"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/filterform_title_relativelayout"
+                    android:layout_marginTop="30dp">
 
         <TextView
                 android:id="@+id/filterform_fromdate_textview"
@@ -21,6 +43,7 @@
 
         <Button
                 android:id="@+id/filterform_fromdate_button"
+                style="@android:style/Widget.DeviceDefault.Light.Spinner"
                 android:text=""
                 android:layout_width="130dp"
                 android:layout_height="43dp"
@@ -37,6 +60,7 @@
 
         <Button
                 android:id="@+id/filterform_todate_button"
+                style="@android:style/Widget.DeviceDefault.Light.Spinner"
                 android:text=""
                 android:layout_toRightOf="@id/filterform_todate_textview"
                 android:layout_width="130dp"
@@ -94,7 +118,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/filterform_time_relativelayout"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="30dp">
 
         <ToggleButton
             android:id="@+id/filterform_image_togglebutton"
@@ -147,32 +171,11 @@
     </RelativeLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/filterform_title_relativelayout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/filterform_mediatypes_relativelayout"
-                    android:layout_marginTop="10dp">
-
-        <EditText
-                android:id="@+id/filterform_in_title"
-                android:layout_width="364dp"
-                android:layout_height="60dp"
-                android:hint="Title"
-                android:padding="6dp"
-                android:background="#FFFFFF"
-                android:textColor="#000000"
-                android:capitalize="sentences"
-                android:singleLine="true"
-                android:maxLength="25"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/filterform_tags_relativelayout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/filterform_title_relativelayout"
-                    android:layout_marginTop="10dp">
+                    android:layout_below="@id/filterform_mediatypes_relativelayout"
+                    android:layout_marginTop="30dp">
 
         <ImageButton
                 android:id="@+id/filterform_tags_imagebutton"
@@ -196,11 +199,19 @@
                 android:paddingLeft="18dp"
                 android:paddingTop="12dp"/>
 
+        <ImageButton
+                android:id="@+id/filterform_hashtags_imagebutton"
+                android:background="@drawable/button_hashtag_gray"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_alignParentRight="true"
+                />
+
         <ImageView
                 android:id="@+id/filterform_iv_hashtagscountbubble"
                 android:background="@drawable/bubble_right"
                 android:layout_below="@id/filterform_textview_tagscount"
-                android:layout_toRightOf="@id/filterform_tags_imagebutton"
+                android:layout_toLeftOf="@id/filterform_hashtags_imagebutton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"/>
 
@@ -208,21 +219,12 @@
                 android:id="@+id/filterform_textview_hashtagscount"
                 android:text="0"
                 android:layout_below="@id/filterform_textview_tagscount"
-                android:layout_toRightOf="@id/filterform_tags_imagebutton"
+                android:layout_toLeftOf="@id/filterform_hashtags_imagebutton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginTop="6dp"
-
                 android:paddingLeft="18dp"
                 android:paddingTop="12dp"/>
-
-        <ImageButton
-                android:id="@+id/filterform_hashtags_imagebutton"
-                android:background="@drawable/button_hashtag_gray"
-                android:layout_toRightOf="@id/filterform_iv_tagscountbubble"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
- />
 
         <Button
                 android:id="@+id/filterform_save_meta_data"

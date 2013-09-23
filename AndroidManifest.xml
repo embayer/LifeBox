@@ -68,13 +68,16 @@
         <service android:name=".UploadService"
                  android:exported="false" />
 
-        <service android:name=".FetchJsonService"
+        <service android:name=".SearchService"
                  android:exported="false" />
 
         <service android:name=".TimelineReloadService"
                  android:exported="false" />
 
         <service android:name=".BackupDbService"
+                 android:exported="false" />
+
+        <service android:name=".TimelineFilteredReloadService"
                  android:exported="false" />
 
     </application>

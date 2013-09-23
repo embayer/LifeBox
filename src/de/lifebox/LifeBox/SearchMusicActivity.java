@@ -195,22 +195,24 @@ public class SearchMusicActivity extends Activity
 	}
 
 	/**
-	 * Fetches the user input and redirects it to the FetchJsonService.
+	 * Fetches the user input and redirects it to the SearchService.
 	 */
 	private void searchMedia()
 	{
 		// hide the ListView show the ProgressBar
 		searchResultListView.setVisibility(View.INVISIBLE);
 		mProgressBar.setVisibility(View.VISIBLE);
-		// get the search query from the edit-text field
-		String query =  queryEditText.getText().toString();
-		query = query.trim();
 
-		//check if there is a user input to fetch
-		if(!query.equals(""))
+		String query = "";
+
+		if(queryEditText.getText().toString().length() > 0)
 		{
+			// get the search query from the edit-text field
+			query =  queryEditText.getText().toString();
+			query = query.trim();
+
 			// put the extras, start the service
-			Intent intent = new Intent(getBaseContext(), FetchJsonService.class);
+			Intent intent = new Intent(getBaseContext(), SearchService.class);
 			intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, mediaType);
 			intent.putExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA, query);
 
@@ -225,17 +227,22 @@ public class SearchMusicActivity extends Activity
 		}
 		else
 		{
-			Toast.makeText(getBaseContext(), "Please insert a search term.", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(getBaseContext(), "Please enter a song.", Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 120);
+			toast.show();
+
+			// hide the ProgressBar
+			mProgressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 
 	/**
 	 * Reads a JSON-String and stores the results in a List
-	 * @param json (String) returned by FetchJsonService
+	 * @param json (String) returned by SearchService
 	 * @return (ArrayList<Music>) containing Music objects
 	 * @throws IOException
 	 */
-	private ArrayList<Music> parseMusicJsonString(String json) throws IOException
+	private ArrayList<Music> parseJSON(String json) throws IOException
 	{
 		// convert the String into an InputStream
 		InputStream in = new ByteArrayInputStream(json.getBytes());
@@ -391,7 +398,7 @@ public class SearchMusicActivity extends Activity
 	}
 
 	/**
-	 * BroadcastReceiver to catch the JSON Strings brought by FetchJsonService
+	 * BroadcastReceiver to catch the JSON Strings brought by SearchService
 	 * @author Markus Bayer
 	 * @version 0.1 29.06.13
 	 */
@@ -413,7 +420,7 @@ public class SearchMusicActivity extends Activity
 				try
 				{
 					// parse the result and store the movies in the specific ArrayList
-					musicList = parseMusicJsonString(result);
+					musicList = parseJSON(result);
 
 					// set the Adapter to the ListView
 					mMusicAdapter = new MusicAdapter();
@@ -430,7 +437,7 @@ public class SearchMusicActivity extends Activity
 				}
 				catch (IOException e)
 				{
-					Log.e("parseMusicJsonString: IOException", e.getMessage());
+					Log.e("parseJSON: IOException", e.getMessage());
 				}
 			}
 		}

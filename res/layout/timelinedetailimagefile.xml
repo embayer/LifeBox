@@ -6,20 +6,34 @@
                 android:layout_margin="10dp">
 
     <FrameLayout
-            android:id="@+id/imagefiledetail_image_frame"
-            android:background="@color/marineblue"
+            android:id="@+id/imagefiledetail_portrait_frame"
+            android:background="@color/playgreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
 
         <ImageButton
                 android:id="@+id/imagefiledetail_portrait_imagebutton"
-                android:layout_width="364dp"
-                android:layout_height="485dp" />
+                android:layout_width="273dp"
+                android:layout_height="364dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="46dp"
+                android:layout_marginRight="45dp"
+                android:layout_marginBottom="10dp"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+            android:id="@+id/imagefiledetail_landscape_frame"
+            android:background="@color/playgreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
 
         <ImageButton
                 android:id="@+id/imagefiledetail_landscape_imagebutton"
                 android:layout_width="364dp"
-                android:layout_height="273dp" />
+                android:layout_height="273dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
 
     </FrameLayout>
 

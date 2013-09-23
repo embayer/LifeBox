@@ -40,7 +40,7 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	{
 		super.onCreate(savedInstanceState);
 
-		// check if ethernet is available
+		// check if ethernet connection is available
 		if(isOnline())
 		{
 			// initialize the client
@@ -55,6 +55,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 		{
 			// navigate to the noconnection activity
 			Intent intent = new Intent(this, NoConnectionActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		}
 
@@ -74,6 +76,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 		{
 			// navigate to the noconnection activity
 			Intent intent = new Intent(this, NoConnectionActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
 		}
 
@@ -103,6 +107,7 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 				mPlusClient.connect();
 			}
 		}
+
 		// Save the result and resolve the connection failure upon a user click.
 		mConnectionResult = result;
 	}
@@ -123,20 +128,27 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	@Override
 	public void onConnected(Bundle connectionHint)
 	{
-		// accountname (the gmail email adress)
+		// accountname == gmail email adress
 		String account = mPlusClient.getAccountName();
 
 		// notify the user that his account is connected
 		Toast.makeText(this, account + " is connected.", Toast.LENGTH_LONG).show();
 
-		// save the users accountname persistent to the sharedpreferences
+		// save the users accountname persistent to the sharedpreferences if no exists
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("accountName", account);
-		editor.commit();
+
+		if(settings.getString("accountName", "").equals(""))
+		{
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString("accountName", account);
+			editor.commit();
+		}
+
 
 		// Logged in successfully, call MainActivity
 		Intent callSelectTypeActivity = new Intent(this, MainActivity.class);
+		callSelectTypeActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		callSelectTypeActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		callSelectTypeActivity.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_SIGN_IN_ACTIVITY);
 		startActivity(callSelectTypeActivity);
 	}

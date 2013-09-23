@@ -2,6 +2,7 @@
 <resources>
     <color name="androidblue">#33B5E5</color>
     <color name="gray">#A9A9A9</color>
+    <color name="white">#FFFFFF</color>
 
     <color name="red">#ffff0000</color>
     <color name="lightgreen">#90EE90</color>
@@ -14,4 +15,15 @@
     <color name="blue">#005AFF</color>
     <color name="cyan">#0CEBC6</color>
     <color name="green">#1DFF1B</color>
+
+    <color name="playwhite">#f7f7f7</color>
+    <color name="playcyan">#4ed5c7</color>
+    <color name="playorange">#f7a67b</color>
+    <color name="playred">#d44865</color>
+    <color name="playgreen">#b8da8d</color>
+    <color name="playpurple">#B271FF</color>
+    <color name="playblue">#4C8AFC</color>
+
+    <color name="filegreen">#CEE5B3</color>
+
 </resources>

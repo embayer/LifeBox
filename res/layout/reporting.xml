@@ -1,11 +1,440 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-    <Button
-            android:text="REPORTING"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/ScrollView01"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" >
 
-</RelativeLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="10dp">
+
+        <TextView
+                android:id="@+id/reporting_entries_total_key"
+                android:text="Entries total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content" />
+
+        <TextView
+                android:id="@+id/reporting_entries_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_entries_total_key"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_images_total_key"
+                android:text="images total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_entries_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_images_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_images_total_key"
+                android:layout_below="@id/reporting_entries_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_videos_total_key"
+                android:text="videos total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_images_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_videos_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_videos_total_key"
+                android:layout_below="@id/reporting_images_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_songs_total_key"
+                android:text="songs total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_videos_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_songs_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_songs_total_key"
+                android:layout_below="@id/reporting_videos_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_movies_total_key"
+                android:text="movies total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_songs_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_movies_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_movies_total_key"
+                android:layout_below="@id/reporting_songs_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_text_total_key"
+                android:text="text total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_movies_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_text_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_text_total_key"
+                android:layout_below="@id/reporting_movies_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tags_total_key"
+                android:text="tags total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_text_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tags_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_tags_total_key"
+                android:layout_below="@id/reporting_text_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_hashtags_total_key"
+                android:text="hashtags total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_tags_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_hashtags_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_hashtags_total_key"
+                android:layout_below="@id/reporting_tags_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tag_mostpopular_key"
+                android:text="most popular tag:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_hashtags_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tag_mostpopular_value"
+                android:text="-no tags-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_tag_mostpopular_key"
+                android:layout_below="@id/reporting_hashtags_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tag_mostpopular_count_key"
+                android:text="count:"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_tag_mostpopular_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+        <TextView
+                android:id="@+id/reporting_tag_mostpopular_count_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_tag_mostpopular_count_key"
+                android:layout_below="@id/reporting_tag_mostpopular_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_hashtag_mostpopular_key"
+                android:text="most popular hashtag:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_tag_mostpopular_count_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_hashtag_mostpopular_value"
+                android:text="-no hashtags-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_hashtag_mostpopular_key"
+                android:layout_below="@id/reporting_tag_mostpopular_count_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_hashtag_mostpopular_count_key"
+                android:text="count:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_hashtag_mostpopular_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_tag_mostpopular_count_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_hashtag_mostpopular_count_key"
+                android:layout_below="@id/reporting_hashtag_mostpopular_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_total_key"
+                android:text="music genres total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_hashtag_mostpopular_count_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_musicgenres_total_key"
+                android:layout_below="@id/reporting_hashtag_mostpopular_count_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_moviegenres_total_key"
+                android:text="movie genres total:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_musicgenres_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_moviegenres_total_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_moviegenres_total_key"
+                android:layout_below="@id/reporting_musicgenres_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_mostpopular_key"
+                android:text="most popular music genre:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_moviegenres_total_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_mostpopular_value"
+                android:text="-no songs-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_musicgenres_mostpopular_key"
+                android:layout_below="@id/reporting_moviegenres_total_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_mostpopular_count_key"
+                android:text="count:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_musicgenres_mostpopular_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_mostpopular_count_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_musicgenres_mostpopular_count_key"
+                android:layout_below="@id/reporting_musicgenres_mostpopular_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_moviegenres_mostpopular_key"
+                android:text="most popular movie genre:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_musicgenres_mostpopular_count_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_moviegenres_mostpopular_value"
+                android:text="-no movies-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_moviegenres_mostpopular_key"
+                android:layout_below="@id/reporting_musicgenres_mostpopular_count_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_moviegenres_mostpopular_count_key"
+                android:text="count:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_moviegenres_mostpopular_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_musicgenres_mostpopular_count_value"
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_moviegenres_mostpopular_count_key"
+                android:layout_below="@id/reporting_moviegenres_mostpopular_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_first_key"
+                android:text="first entry:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_moviegenres_mostpopular_count_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_first_value"
+                android:text="-no entries-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_entry_first_key"
+                android:layout_below="@id/reporting_moviegenres_mostpopular_count_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_first_date_key"
+                android:text="date:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_entry_first_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_first_date_value"
+                android:text="-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_entry_first_date_key"
+                android:layout_below="@id/reporting_entry_first_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_last_key"
+                android:text="last entry:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_entry_first_date_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_last_value"
+                android:text="-no entries-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_entry_last_key"
+                android:layout_below="@id/reporting_entry_first_date_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_last_date_key"
+                android:text="date:"
+                android:textStyle="bold"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/reporting_entry_last_key"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/reporting_entry_last_date_value"
+                android:text="-"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/reporting_entry_last_date_key"
+                android:layout_below="@id/reporting_entry_last_key"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"/>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_below="@id/reporting_entry_last_date_value"
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="10dp"/>
+
+    </RelativeLayout>
+
+</ScrollView>

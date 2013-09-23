@@ -31,7 +31,7 @@ public class FilterActivity extends Activity
 	private final int THIS_MONTH = mCalendar.get(Calendar.MONTH);
 	private final int THIS_DAY = mCalendar.get(Calendar.DAY_OF_MONTH);
 
-	DbHelper mDbHelper;// = new DbHelper(this);
+	DbHelper mDbHelper;
 	// the entry with the oldest and latest user_date
 	private long firstEntryLong;
 	private long lastEntryLong;
@@ -266,14 +266,17 @@ public class FilterActivity extends Activity
 			{
 				// determine 1st day of this week
 				Calendar from = Calendar.getInstance();
-				// set the first day of a week to monday (sunday is default)
-				from.setFirstDayOfWeek(1);
-				from.set(THIS_DAY, mCalendar.getFirstDayOfWeek());
+
+				// set the first day of a week
+				Calendar firstDayOfWeek = Calendar.getInstance();
+				firstDayOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+				from.set(THIS_YEAR, THIS_MONTH, firstDayOfWeek.get(Calendar.DATE));
 
 				// determine last day of this week
 				Calendar to = Calendar.getInstance();
 				to.setFirstDayOfWeek(1);
-				to.set(THIS_DAY, mCalendar.getFirstDayOfWeek() +6);
+				to.set(THIS_YEAR, THIS_MONTH, firstDayOfWeek.get(Calendar.DATE) +6);
 
 				// set the dates
 				setDates(from, to);
@@ -364,19 +367,25 @@ public class FilterActivity extends Activity
 		public void onClick(View v)
 		{
 			// get the date strings from the buttons
-			String fromExtra = fromDateButton.getText().toString();
-			String toExtra = toDateButton.getText().toString();
+			String fromExtra = String.valueOf(stringToTimestamp(fromDateButton.getText().toString()).getTime());
+			Log.e("timestmp from",  fromDateButton.getText().toString()+" "+dateStrToTimeStr(fromDateButton.getText().toString()));
+			String toExtra = String.valueOf(stringToTimestamp(toDateButton.getText().toString()).getTime());
+			Log.e("timestmp to", toDateButton.getText().toString()+" "+dateStrToTimeStr(toDateButton.getText().toString()));
 
 			// get the title from the edit text
 			String titleExtra =  titleET.getText().toString();
 
 			Intent intent = new Intent(getBaseContext(), MainActivity.class);
+			intent.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_FILTER_ACTIVITY);
 			intent.putStringArrayListExtra(Constants.TAG_ARRAY_EXTRA, tagList);
 			intent.putStringArrayListExtra(Constants.HASHTAG_ARRAY_EXTRA, hashtagList);
 			intent.putStringArrayListExtra(Constants.MEDIATYPE_ARRAY_EXTRA, mediaTypeList);
-			intent.putExtra(Constants.FROM_DATE, fromExtra);
-			intent.putExtra(Constants.TO_DATE, toExtra);
+			intent.putExtra(Constants.FROM_DATE_EXTRA, fromExtra);
+			intent.putExtra(Constants.TO_DATE_EXTRA, toExtra);
 			intent.putExtra(Constants.ENTRY_TITLE_EXTRA, titleExtra);
+
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 			startActivity(intent);
 		}
@@ -455,6 +464,10 @@ public class FilterActivity extends Activity
 
 		textTB = (ToggleButton) findViewById(R.id.filterform_text_togglebutton);
 		setupButton(textTB, Constants.TYPE_TEXT);
+
+		// the save button
+		Button saveBtn = (Button) findViewById(R.id.filterform_save_meta_data);
+		saveBtn.setOnClickListener(saveListener);
 	}
 
 	/**
@@ -597,6 +610,32 @@ public class FilterActivity extends Activity
 		Timestamp timestamp = new Timestamp(parsedDate.getTime());
 
 		return timestamp;
+	}
+
+	/**
+	 * Parses a String and tries to get the timestamp from.
+	 * @param dateString (String) String in the format that is specified in Constants.DATEFORMAT
+	 * @return (String) the unix timestamp as string
+	 */
+	private String dateStrToTimeStr(String dateString)
+	{
+
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATEFORMAT);
+
+		Date parsedDate = null;
+		try
+		{
+			parsedDate = sdf.parse(dateString);
+		}
+		catch (ParseException e)
+		{
+			Log.e("parse date error", e.getMessage());
+		}
+
+		Timestamp timestamp = new Timestamp(parsedDate.getTime());
+
+		// getTime() returns milliseconds -> / 1000, datestring = date at 22:00 so add to hours in seconds = 7200
+		return String.valueOf(timestamp.getTime() / 1000 + 7200);
 	}
 
 	/**

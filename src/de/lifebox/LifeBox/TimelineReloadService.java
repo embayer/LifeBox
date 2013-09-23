@@ -22,10 +22,10 @@ public class TimelineReloadService extends IntentService
 {
 	private static final String TAG = "TimelineReloadService";
 
-	private final int ROWAMOUNT = 10;
+	protected final int ROWAMOUNT = 10;
 	private final int COLUMNAMOUNT = 6;
 
-	private DbHelper mDbHelper;
+	protected DbHelper mDbHelper;
 
 	private ArrayList<String> typesList;
 	private ArrayList<String> filetypesList;
@@ -52,13 +52,13 @@ public class TimelineReloadService extends IntentService
 		// get the extra
 		int offset = intent.getIntExtra(Constants.OFFSET_EXTRA, 0);
 
-		String[][] dbEntryList = mDbHelper.selectEntrySet(ROWAMOUNT, offset);
+		String[][] dbEntryList = mDbHelper.selectEntrySet(null, "DESC", ROWAMOUNT, offset);
 		String[][] timelineEntryList = null;
 
 		if(null == dbEntryList)
 		{
 			timelineEntryList = new String[0][];
-			Log.e(TAG, "No entries where fetched.");
+			Log.d(TAG, "No entries where fetched.");
 		}
 		else
 		{
@@ -83,7 +83,7 @@ public class TimelineReloadService extends IntentService
 	 * @param entrySetList (String[][]) a list of db field which is the overlap of all items.
 	 * @return (String[][]) the result set as array (because an array can be passed via intent extra).
 	 */
-	private String[][] generateTimelineEntries(String[][] entrySetList)
+	protected String[][] generateTimelineEntries(String[][] entrySetList)
 	{
 		// the result list same amount of rows as the entrySetList containing db results
 		final int resultAmount = 9;
@@ -107,7 +107,7 @@ public class TimelineReloadService extends IntentService
 		// iterate the given string array in order to read the fetched values
 		for(int r = 0; r < entrySetList.length; r++)
 		{
-			Log.e("entry", "**************************************************************************");
+			Log.d(TAG, "new entry");
 			for(int c = 0; c < COLUMNAMOUNT; c++)
 			{
 				switch(c)
@@ -115,39 +115,39 @@ public class TimelineReloadService extends IntentService
 					// _id
 					case 0:
 						entryId = entrySetList[r][c];
-						Log.e(TAG, "id "+entrySetList[r][c]);
+						Log.d(TAG, "id "+entrySetList[r][c]);
 						break;
 
 					// media_id
 					case 1:
 						mediaId = entrySetList[r][c];
-						Log.e(TAG, "media_id "+entrySetList[r][c]);
+						Log.d(TAG, "media_id "+entrySetList[r][c]);
 						break;
 
 					// type
 					case 2:
 						type = entrySetList[r][c];
-						Log.e(TAG, "type "+entrySetList[r][c]);
+						Log.d(TAG, "type "+entrySetList[r][c]);
 						break;
 
 					// title
 					case 3:
 						title = entrySetList[r][c];
-						Log.e(TAG, "title: "+entrySetList[r][c]);
+						Log.d(TAG, "title: "+entrySetList[r][c]);
 						break;
 
 					// description
 					case 4:
 						description = entrySetList[r][c];
-						Log.e(TAG, "description "+entrySetList[r][c]);
+						Log.d(TAG, "description "+entrySetList[r][c]);
 						break;
 
 					// user_date
 					case 5:
 						date = getDate(entrySetList[r][c]);
 						time = getTime(entrySetList[r][c]);
-						Log.e(TAG, "date "+date);
-						Log.e(TAG, "time "+time);
+						Log.d(TAG, "date "+date);
+						Log.d(TAG, "time "+time);
 						break;
 
 					default:
@@ -195,7 +195,7 @@ public class TimelineReloadService extends IntentService
 
 				thumbnail = "";
 				filetype = "";
-				Log.e(TAG, "text "+firstText);
+				Log.d(TAG, "text "+firstText);
 			}
 			else if(type.equals(Constants.TYPE_MUSIC))
 			{
@@ -208,9 +208,9 @@ public class TimelineReloadService extends IntentService
 				thumbnail = musicList.get("Music Thumbnail");
 				filetype = "";
 
-				Log.e(TAG, "track "+firstText);
-				Log.e(TAG, "artist "+secondText);
-				Log.e(TAG, "musicThumbnail "+thumbnail);
+				Log.d(TAG, "track "+firstText);
+				Log.d(TAG, "artist "+secondText);
+				Log.d(TAG, "musicThumbnail "+thumbnail);
 			}
 			else if(type.equals((Constants.TYPE_MOVIE)))
 			{
@@ -223,9 +223,9 @@ public class TimelineReloadService extends IntentService
 				thumbnail = movieList.get("Movie Thumbnail");
 				filetype = "";
 
-				Log.e(TAG, "movieTitle "+firstText);
-				Log.e(TAG, "director "+secondText);
-				Log.e(TAG, "movieThumbnail "+thumbnail);
+				Log.d(TAG, "movieTitle "+firstText);
+				Log.d(TAG, "director "+secondText);
+				Log.d(TAG, "movieThumbnail "+thumbnail);
 			}
 
 			// save the fetched results

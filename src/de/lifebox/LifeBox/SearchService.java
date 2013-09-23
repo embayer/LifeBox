@@ -25,14 +25,14 @@ import java.util.List;
  * @autor Markus Bayer
  * https://itunes.apple.com/search?term=pulp+fiction&limit=10&country=de&entity=movie
  */
-public class FetchJsonService extends IntentService
+public class SearchService extends IntentService
 {
-	private String TAG = "FetchJsonService";
+	private String TAG = "SearchService";
 
 	/** Creates an IntentService.  Invoked by your subclass's constructor. */
-	public FetchJsonService()
+	public SearchService()
 	{
-		super("FetchJsonService");
+		super("SearchService");
 	}
 
 	/** Called when the service is first created. */
@@ -51,14 +51,18 @@ public class FetchJsonService extends IntentService
 		String query = intent.getStringExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA);
 		String mediaType = intent.getStringExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA);
 
+		String entity = "";
+
 		// the Apple-REST-Entity for music is song
 		if(mediaType.equals(Constants.TYPE_MUSIC))
 		{
 			mediaType = "song";
+			entity = "musicTrack";
 		}
 		else if(mediaType.equals(Constants.TYPE_MOVIE))
 		{
 			mediaType = "movie";
+			entity = "movie";
 		}
 
 		// encode the query using the format required by application/x-www-form-urlencoded MIME content type
@@ -74,8 +78,9 @@ public class FetchJsonService extends IntentService
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("term", query));
 		postParameters.add(new BasicNameValuePair("limit", "10"));
-		postParameters.add(new BasicNameValuePair("country", "de"));
-		postParameters.add(new BasicNameValuePair("entity", mediaType));
+//		postParameters.add(new BasicNameValuePair("country", "de"));
+		postParameters.add(new BasicNameValuePair("media", mediaType));
+		postParameters.add(new BasicNameValuePair("entity", entity));
 
 		String result = loadURL(baseURL, postParameters);
 
@@ -106,7 +111,7 @@ public class FetchJsonService extends IntentService
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			Log.e("unsupported encoding", e.getMessage());
+			Log.e(TAG, "unsupported encoding " + e.getMessage());
 		}
 
 		// load the site
@@ -123,11 +128,11 @@ public class FetchJsonService extends IntentService
 		}
 		catch (MalformedURLException e)
 		{
-			Log.e("malformed url", e.getMessage());
+			Log.e(TAG, "malformed url " + e.getMessage());
 		}
 		catch (IOException e)
 		{
-			Log.e("io exception", e.getMessage());
+			Log.e(TAG, "io exception " + e.getMessage());
 		}
 		// clean up
 		finally
@@ -169,6 +174,8 @@ public class FetchJsonService extends IntentService
 			result.append("=");
 			result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
 		}
+
+		Log.d(TAG, "mediaurl"+result.toString());
 
 		return result.toString();
 	}
