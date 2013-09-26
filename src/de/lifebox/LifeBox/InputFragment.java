@@ -245,7 +245,7 @@ public class InputFragment extends Fragment
 
 					// delete the temporary file
 					File file = new File(mPhotoToDeletePath);
-					boolean deleted = file.delete();
+					file.delete();
 
 					// create a thumbnail of the image file
 					String imageThumbnail = createImageThumbnail(mCurrentPhotoPath);
@@ -621,9 +621,7 @@ public class InputFragment extends Fragment
 		// create the new file
 		File file = new File(albumF, imageFileName);
 
-		Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-		Bitmap bitmap;// = Bitmap.createBitmap(96, 96, conf);
-		bitmap = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MICRO_KIND);
+		Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Video.Thumbnails.MICRO_KIND);
 
 		// wright the file
 		String resultPath = bitmapToJPEG(bitmap, file);

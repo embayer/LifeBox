@@ -186,7 +186,7 @@ public class MetaFormActivity extends Activity
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_META_FORM_ACTIVITY);
 				startActivity(intent);
-			};
+			}
 		}
 	};
 
@@ -474,8 +474,14 @@ public class MetaFormActivity extends Activity
 		userTitle = "";
 		userDescription = "";
 		userTimestamp = 0;
-		String time = "";
-		String date = "";
+
+		// get the time
+		Button timeBtn = (Button) findViewById(R.id.timepicker);
+		String time = timeBtn.getText().toString();
+
+		// get the date
+		Button dateBtn = (Button) findViewById(R.id.datepicker);
+		String date = dateBtn.getText().toString();
 
 		// get the title
 		userTitle = titleET.getText().toString();
@@ -500,14 +506,6 @@ public class MetaFormActivity extends Activity
 		// get the description
 		EditText descriptionET = (EditText) findViewById(R.id.in_description);
 		userDescription = descriptionET.getText().toString();
-
-		// get the time
-		Button timeBtn = (Button) findViewById(R.id.timepicker);
-		time = timeBtn.getText().toString();
-
-		// get the date
-		Button dateBtn = (Button) findViewById(R.id.datepicker);
-		date = dateBtn.getText().toString();
 
 		// date and time string
 		String dts = date + " " + time;

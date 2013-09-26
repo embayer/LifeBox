@@ -72,11 +72,7 @@ public class SearchMovieActivity extends Activity
 			{
 
 				// to prevent default behavior do nothing on down but on up
-				if(event.getAction() == KeyEvent.ACTION_DOWN)
-				{
-					// do nothing
-				}
-				else if(event.getAction() == KeyEvent.ACTION_UP)
+				if(event.getAction() == KeyEvent.ACTION_UP)
 				{
 					searchMedia();
 				}
@@ -284,30 +280,6 @@ public class SearchMovieActivity extends Activity
 			// hide the ProgressBar
 			mProgressBar.setVisibility(View.INVISIBLE);
 		}
-
-		//check if there is a user input to fetch
-//		if(!query.equals("") || query != null)
-//		{
-//			Log.e("damn suck", query);
-//			// put the extras, start the service
-//			Intent intent = new Intent(getBaseContext(), SearchService.class);
-//			intent.putExtra(Constants.SEARCH_MEDIA_TYPE_EXTRA, mediaType);
-//			intent.putExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA, query);
-//
-//			startService(intent);
-//
-//			// clear the input field
-//			queryEditText.setText("");
-//
-//			// remove the soft keyboard
-//			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-//			imm.hideSoftInputFromWindow(queryEditText.getWindowToken(), 0);
-//		}
-//		else if(query.equals("") || query == null)
-//		{
-//			Log.e("damn fuck", query);
-//			Toast.makeText(getBaseContext(), "Please insert a search term.", Toast.LENGTH_SHORT);
-//		}
 	}
 
 	/**

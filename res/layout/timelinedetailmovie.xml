@@ -20,7 +20,7 @@
     </FrameLayout>
 
     <RelativeLayout
-            android:id="@+id/moviedetail_text_frame"
+            android:id="@+id/moviedetail_description_frame"
             android:background="@color/playcyan"
             android:layout_toRightOf="@id/moviedetail_image_frame"
             android:layout_width="fill_parent"
@@ -62,7 +62,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-            android:id="@+id/moviedetail_text_frame"
+            android:id="@+id/moviedetail_description_frame"
             android:background="@color/white"
             android:layout_below="@id/moviedetail_image_frame"
             android:layout_width="fill_parent"

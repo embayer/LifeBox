@@ -663,7 +663,7 @@ public class FilterActivity extends Activity
 		}
 		catch (ParseException e)
 		{
-			Log.e("parse date error", e.getMessage());
+			Log.e(TAG, "parse date error: " + e.getMessage());
 		}
 
 		Timestamp timestamp = new Timestamp(parsedDate.getTime());

@@ -26,7 +26,7 @@ public class TimelineDetailFileVideoActivity extends TimelineDetailActivity
 	private MediaFile video;
 
 	// the ui elements
-	private ImageView thumbnailIV;;
+	private ImageView thumbnailIV;
 	private ImageButton playIB;
 
 	// play Button

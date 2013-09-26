@@ -956,7 +956,7 @@ public class DbHelper extends SQLiteOpenHelper
 		db.close();
 
 		// insert (file) into file_offline_files -----------------------------------------------------------------------
-		long fileOfflineFilesId = insertRegular
+		insertRegular
 				(
 						LifeBoxContract.FileOfflineFiles.TABLE_NAME,
 						false,
@@ -965,7 +965,7 @@ public class DbHelper extends SQLiteOpenHelper
 				);
 
 		// insert (thumbnail) into file_offline_files ------------------------------------------------------------------
-		long fileOfflineFilesTmbId = insertRegular
+		insertRegular
 				(
 						LifeBoxContract.FileOfflineFiles.TABLE_NAME,
 						false,
@@ -974,7 +974,7 @@ public class DbHelper extends SQLiteOpenHelper
 				);
 
 		// insert (file) into file_online_files ------------------------------------------------------------------------
-		long fileOnlineFilesId = insertRegular
+		insertRegular
 				(
 						LifeBoxContract.FileOnlineFiles.TABLE_NAME,
 						false,
@@ -983,7 +983,7 @@ public class DbHelper extends SQLiteOpenHelper
 				);
 
 		// insert (thumbnail) into file_online_files -------------------------------------------------------------------
-		long fileOnlineFilesTmbId = insertRegular
+		insertRegular
 				(
 						LifeBoxContract.FileOnlineFiles.TABLE_NAME,
 						false,
@@ -1135,7 +1135,7 @@ public class DbHelper extends SQLiteOpenHelper
 				);
 
 		// insert into music_genres ------------------------------------------------------------------------------------
-		long musicGenresId = insertRegular
+		insertRegular
 				(
 						LifeBoxContract.MusicGenres.TABLE_NAME,
 						false,
@@ -1185,7 +1185,7 @@ public class DbHelper extends SQLiteOpenHelper
 		c.moveToFirst();
 
 		// get the key
-		long id = -1;
+		long id;
 		try
 		{
 			id = c.getLong(c.getColumnIndexOrThrow(keyColumn));
@@ -1360,7 +1360,7 @@ public class DbHelper extends SQLiteOpenHelper
 				}
 
 				// always insert the hashtag in enty_hashtags
-				long entryHashtagsId = insertRegular
+				insertRegular
 						(
 								LifeBoxContract.EntryHashtags.TABLE_NAME,
 								false,
@@ -1401,7 +1401,7 @@ public class DbHelper extends SQLiteOpenHelper
 
 				SQLiteDatabase db = getWritableDatabase();
 
-				long id = db.insertOrThrow(LifeBoxContract.EntryTags.TABLE_NAME, null, values);
+				db.insertOrThrow(LifeBoxContract.EntryTags.TABLE_NAME, null, values);
 				db.close();
 			}
 		}
@@ -2009,15 +2009,13 @@ public class DbHelper extends SQLiteOpenHelper
 
 		if(c.moveToFirst())
 		{
-			String title = "";
-			String director = "";
+			String title = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_TITLE));
+			String director = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DIRECTOR));
+
 			String description = "";
 			String movieGenre = "";
 			String releaseDate = "";
 			String thumbnailUrl = "";
-
-			title = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_TITLE));
-			director = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DIRECTOR));
 
 			// could be null
 			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Movies.COLUMN_NAME_DESCRIPTION)))
@@ -2091,16 +2089,12 @@ public class DbHelper extends SQLiteOpenHelper
 
 		if(c.moveToFirst())
 		{
-			String track = "";
-			String artist = "";
-			String album = "";
+			String track = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Music.COLUMN_NAME_TRACK));
+			String artist = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Artists.COLUMN_NAME_ARTIST));
+			String album = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_ALBUM));
 			String releaseDate = "";
 			String thumbnailUrl = "";
-			String musicGenre = "";
-
-			track = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Music.COLUMN_NAME_TRACK));
-			artist = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Artists.COLUMN_NAME_ARTIST));
-			album = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_ALBUM));
+			String musicGenre = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_GENRE));
 
 			// could be null
 			if(!c.isNull(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_RELEASE_DATE)))
@@ -2113,8 +2107,6 @@ public class DbHelper extends SQLiteOpenHelper
 			{
 				thumbnailUrl = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Albums.COLUMN_NAME_THUMBNAIL_URL));
 			}
-
-			musicGenre = c.getString(c.getColumnIndexOrThrow(LifeBoxContract.MusicGenres.COLUMN_NAME_MUSIC_GENRE));
 
 			music = new Music(artist, album, releaseDate, thumbnailUrl, track, musicGenre);
 		}
@@ -2591,8 +2583,8 @@ public class DbHelper extends SQLiteOpenHelper
 		if(c.moveToFirst())
 		{
 			long id;
-			String query = null;
-			Cursor cThumb = null;
+			String query;
+			Cursor cThumb;
 
 			while(!c.isAfterLast())
 			{

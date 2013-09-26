@@ -40,8 +40,6 @@ public class HashtagsActivity extends Activity
 	private SQLiteDatabase db;
 	// pointer to the selected db content
 	private Cursor mCursor;
-	// db-columns
-	private String[] projection = {LifeBoxContract.Hashtags._ID, LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
 
 	protected ArrayList<String> hashtagList;
 	protected ArrayList<String> hashtagHistoryList;
@@ -60,11 +58,7 @@ public class HashtagsActivity extends Activity
 			{
 
 				// to prevent default behavior do nothing on down but on up
-				if(event.getAction() == KeyEvent.ACTION_DOWN)
-				{
-					// do nothing
-				}
-				else if(event.getAction() == KeyEvent.ACTION_UP)
+				if(event.getAction() == KeyEvent.ACTION_UP)
 				{
 					fetchHashtag();
 				}

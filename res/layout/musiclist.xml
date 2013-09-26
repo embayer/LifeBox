@@ -5,7 +5,7 @@
                 android:layout_height="wrap_content"
                 android:selectable="true"
                 android:background="?android:attr/activatedBackgroundIndicator"
-                android:descendantFocusability="blocksDescendants"> >
+                android:descendantFocusability="blocksDescendants">
 
     <WebView
             android:id="@+id/musiclist_thumbnail"

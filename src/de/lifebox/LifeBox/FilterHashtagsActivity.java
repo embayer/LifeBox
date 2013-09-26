@@ -51,11 +51,7 @@ public class FilterHashtagsActivity extends HashtagsActivity
 				{
 
 					// to prevent default behavior do nothing on down but on up
-					if(event.getAction() == KeyEvent.ACTION_DOWN)
-					{
-						// do nothing
-					}
-					else if(event.getAction() == KeyEvent.ACTION_UP)
+					if(event.getAction() == KeyEvent.ACTION_UP)
 					{
 						fetchHashtag();
 					}

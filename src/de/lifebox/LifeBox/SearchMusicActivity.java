@@ -74,11 +74,7 @@ public class SearchMusicActivity extends Activity
 			{
 
 				// to prevent default behavior do nothing on down but on up
-				if(event.getAction() == KeyEvent.ACTION_DOWN)
-				{
-					// do nothing
-				}
-				else if(event.getAction() == KeyEvent.ACTION_UP)
+				if(event.getAction() == KeyEvent.ACTION_UP)
 				{
 					searchMedia();
 				}
