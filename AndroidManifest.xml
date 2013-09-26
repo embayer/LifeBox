@@ -22,7 +22,7 @@
                  android:theme="@style/LifeBoxTheme">
 
         <activity
-                android:name=".SignInActivity"
+                android:name="de.neungrad.lifebox.ui.SignInActivity"
                 android:noHistory="true"
                 android:theme="@android:style/Theme.Holo.Wallpaper.NoTitleBar" >
             <intent-filter>
@@ -31,48 +31,48 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" />
+        <activity android:name="de.neungrad.lifebox.ui.MainActivity" />
 
         <activity
-                android:name=".NoConnectionActivity"
+                android:name="de.neungrad.lifebox.ui.NoConnectionActivity"
                 android:noHistory="true" />
 
-        <activity android:name=".MetaFormActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.MetaFormActivity"/>
 
-        <activity android:name=".TagsActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TagsActivity"/>
 
-        <activity android:name=".HashtagsActivity"
+        <activity android:name="de.neungrad.lifebox.ui.HashtagsActivity"
                   android:windowSoftInputMode="stateVisible|adjustPan"/>
-        <activity android:name=".SearchMovieActivity"/>
-        <activity android:name=".SearchMusicActivity"/>
-        <activity android:name=".TextFormActivity"
+        <activity android:name="de.neungrad.lifebox.ui.SearchMovieActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.SearchMusicActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TextFormActivity"
                   android:windowSoftInputMode="stateVisible|adjustResize"/>
-        <activity android:name=".TimelineDetailActivity"/>
-        <activity android:name=".TimelineDetailTextActivity"/>
-        <activity android:name=".TimelineDetailFileImageActivity"/>
-        <activity android:name=".TimelineDetailMovieActivity"/>
-        <activity android:name=".TimelineDetailMusicActivity"/>
-        <activity android:name=".TimelineDetailFileVideoActivity"/>
-        <activity android:name=".FilterActivity"/>
-        <activity android:name=".FilterHashtagsActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailTextActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailFileImageActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailMovieActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailMusicActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.TimelineDetailFileVideoActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.FilterActivity"/>
+        <activity android:name="de.neungrad.lifebox.ui.FilterHashtagsActivity"/>
 
         <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="SelectTypeActivity" />
 
-        <service android:name=".UploadService"
+        <service android:name="de.neungrad.lifebox.service.UploadService"
                  android:exported="false" />
 
-        <service android:name=".SearchService"
+        <service android:name="de.neungrad.lifebox.service.SearchService"
                  android:exported="false" />
 
-        <service android:name=".TimelineReloadService"
+        <service android:name="de.neungrad.lifebox.service.TimelineReloadService"
                  android:exported="false" />
 
-        <service android:name=".BackupDbService"
+        <service android:name="de.neungrad.lifebox.service.BackupDbService"
                  android:exported="false" />
 
-        <service android:name=".TimelineFilteredReloadService"
+        <service android:name="de.neungrad.lifebox.service.TimelineFilteredReloadService"
                  android:exported="false" />
 
     </application>
