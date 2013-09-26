@@ -24,7 +24,8 @@
             android:background="@color/playorange"
             android:layout_toRightOf="@id/musicdetail_image_frame"
             android:layout_width="fill_parent"
-            android:layout_height="104dp" >
+            android:layout_height="104dp"
+            android:padding="6dp">
 
         <TextView
                 android:id="@+id/musicdetail_track_textview"

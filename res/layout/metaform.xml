@@ -40,18 +40,35 @@
                     android:layout_marginTop="10dp"
                     android:layout_below="@id/in_description" >
 
-    <ImageView
-            android:id="@+id/iv_thumbnail"
-            android:src="@drawable/button_hashtag"
-            android:paddingTop="0dp"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_marginTop="10dp"/>
+        <FrameLayout
+                android:id="@+id/if_thumb"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:id="@+id/iv_thumbnail"
+                    android:src="@drawable/button_picture"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"/>
+
+                <WebView
+                        android:id="@+id/wv_movie"
+                        android:layout_width="64dp"
+                        android:layout_height="96dp"
+                        android:layout_marginLeft="21dp"/>
+
+                <WebView
+                        android:id="@+id/wv_music"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"/>
+
+        </FrameLayout>
 
     <ImageButton
             android:id="@+id/button_tags"
             android:background="@drawable/button_tag_gray"
-            android:layout_toRightOf="@id/iv_thumbnail"
+            android:layout_toRightOf="@id/if_thumb"
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_marginTop="10dp"
@@ -110,7 +127,7 @@
             style="@android:style/Widget.DeviceDefault.Light.Spinner"
             android:text=""
             android:layout_below="@id/button_hashtags"
-            android:layout_toRightOf="@id/iv_thumbnail"
+            android:layout_toRightOf="@id/if_thumb"
             android:layout_width="119dp"
             android:layout_height="43dp"
             android:layout_marginTop="10dp"
@@ -130,14 +147,14 @@
         <TextView
                 android:id="@+id/header_upload"
                 android:text="Upload: "
-                android:layout_below="@id/iv_thumbnail"
+                android:layout_below="@id/if_thumb"
                 android:layout_width="96dp"
-                android:layout_height="43dp"
-                android:layout_marginTop="52dp"
+                android:layout_height="33dp"
+                android:layout_marginTop="62dp"
                 android:paddingTop="4dp"
                 android:paddingLeft="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="#33B5E5"
+                android:background="@color/gray"
                 android:textColor="#FFFFFF" />
 
         <ProgressBar

@@ -287,6 +287,11 @@ public class TimelineReloadService extends IntentService
 		return resultList;
 	}
 
+	/**
+	 * Gets the date from a timestamp string
+	 * @param timestampString (String) the timestamp
+	 * @return (String) the date.
+	 */
 	private String getDate(String timestampString)
 	{
 		Timestamp timestamp = new Timestamp(Long.parseLong(timestampString));
@@ -297,6 +302,11 @@ public class TimelineReloadService extends IntentService
 		return dateString;
 	}
 
+	/**
+	 * Gets the time from a timestamp string
+	 * @param timestampString (String) the timestamp
+	 * @return (String) the time.
+	 */
 	private String getTime(String timestampString)
 	{
 		Timestamp timestamp = new Timestamp(Long.parseLong(timestampString));

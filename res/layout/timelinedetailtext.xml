@@ -23,6 +23,8 @@
             android:text="textdetail"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_toRightOf="@id/textdetail_image_frame"/>
+            android:layout_toRightOf="@id/textdetail_image_frame"
+            android:background="@color/playblue"
+            android:padding="6dp"/>
 
 </RelativeLayout>

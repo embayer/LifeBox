@@ -2,21 +2,21 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="500dp"
                 android:layout_margin="10dp">
 
     <FrameLayout
             android:id="@+id/imagefiledetail_portrait_frame"
             android:background="@color/playgreen"
-            android:layout_width="wrap_content"
+            android:layout_width="364dp"
             android:layout_height="wrap_content" >
 
         <ImageButton
                 android:id="@+id/imagefiledetail_portrait_imagebutton"
-                android:layout_width="273dp"
-                android:layout_height="364dp"
+                android:layout_width="204dp"
+                android:layout_height="273dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="46dp"
+                android:layout_marginLeft="80dp"
                 android:layout_marginRight="45dp"
                 android:layout_marginBottom="10dp"/>
 

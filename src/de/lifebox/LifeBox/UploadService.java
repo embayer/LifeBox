@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -63,6 +64,15 @@ public class UploadService extends IntentService
 	/** Invoke the worker thread that runs independently from other application logic. */
 	@Override
 	protected void onHandleIntent(Intent intent)
+	{
+		upload(intent);
+	}
+
+	/**
+	 * Upload a file to Google Drive
+	 * @param intent (Intent) the file parameters
+	 */
+	private void upload(Intent intent)
 	{
 		showToast("Begin upload");
 
@@ -133,20 +143,25 @@ public class UploadService extends IntentService
 					sendMeta(file);
 				}
 			}
+			// inform the user about the error and try it again
 			catch(UserRecoverableAuthIOException e)
 			{
-				showToast("Authentication-Error. Please try again.");
+				Log.e(TAG, "Authentication-Error: " + e.getMessage());
+				showToast("Authentication-Error. Trying to restart.");
+				upload(intent);
 			}
 			catch(IOException e)
 			{
-				Log.e("IO Error", e.getMessage());
+				Log.e(TAG, "IO Error: " + e.getMessage());
 				showToast("IO-Error. Please try again.");
+				upload(intent);
 			}
 		}
 		else
 		{
-			//TODO Fehlerbehandlung
-			showToast("Log in Error. Please try again.");
+			Log.e(TAG, "Login Error");
+			showToast("Login Error. Trying to restart.");
+			upload(intent);
 //			startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 		}
 	}
@@ -205,7 +220,9 @@ public class UploadService extends IntentService
 			@Override
 			public void run()
 			{
-				Toast.makeText(context, text, duration).show();
+				Toast toast = Toast.makeText(context, text, duration);
+				toast.setGravity(Gravity.RIGHT, 0, 380);
+				toast.show();
 			}
 		});
 	}

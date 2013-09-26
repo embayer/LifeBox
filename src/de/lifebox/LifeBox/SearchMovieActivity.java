@@ -5,14 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.JsonReader;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.*;
@@ -187,6 +187,61 @@ public class SearchMovieActivity extends Activity
 		queryEditText = (EditText) findViewById(R.id.in_search_media);
 		queryEditText.setHint("Search for a movie");
 		queryEditText.setOnKeyListener(queryKeyListener);
+
+		// provide clear functionality by the "x" icon within the input field
+		String value = "";    // pre-fill the input field
+
+		// icon
+		final Drawable x = getResources().getDrawable(R.drawable.x);
+		// place it
+		x.setBounds(0, 0, x.getIntrinsicWidth(), x.getIntrinsicHeight());
+		queryEditText.setCompoundDrawables(null, null, value.equals("") ? null : x, null);
+
+		queryEditText.setOnTouchListener(new View.OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event)
+			{
+				if (queryEditText.getCompoundDrawables()[2] == null)
+				{
+					return false;
+				}
+				if (event.getAction() != MotionEvent.ACTION_UP)
+				{
+					return false;
+				}
+				// when clicked
+				if (event.getX() > queryEditText.getWidth() - queryEditText.getPaddingRight() - x.getIntrinsicWidth())
+				{
+					// clear text
+					queryEditText.setText("");
+					// remove icon
+					queryEditText.setCompoundDrawables(null, null, null, null);
+				}
+				return false;
+			}
+		});
+
+		// show icon when there is an input
+		queryEditText.addTextChangedListener(new TextWatcher()
+		{
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+				queryEditText.setCompoundDrawables(null, null, queryEditText.getText().toString().equals("") ? null : x, null);
+			}
+
+			// unneeded methods
+			@Override
+			public void afterTextChanged(Editable arg0)
+			{
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+			}
+		});
 	}
 
 	/**

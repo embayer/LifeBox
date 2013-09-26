@@ -44,6 +44,7 @@ public class TimelineFragment extends Fragment
 
 	// processed is true when the timeline is fully loaded
 	private boolean processed = false;
+	private boolean noResult = false;
 
 	// flag to indicate if a filter is active
 
@@ -53,6 +54,7 @@ public class TimelineFragment extends Fragment
 
 	// the ui elements
 	private ListView timelineLV;
+	private RelativeLayout noEtnriesRL;
 
 	private FrameLayout imageFrame;
 	private ImageView imageView;
@@ -63,6 +65,27 @@ public class TimelineFragment extends Fragment
 	private TextView titleTV;
 	private TextView firstlineTV;
 	private TextView secondlineTV;
+
+	Button disableFilterBtn;
+
+	// Buttonlistener
+	Button.OnClickListener mDisableFilterListener = new Button.OnClickListener()
+	{
+		@Override
+		public void onClick(View v)
+		{
+			// clear all parameters
+			noEtnriesRL.setVisibility(View.INVISIBLE);
+			timelineLV.setVisibility(View.VISIBLE);
+			noResult = false;
+			processed = false;
+			offset = 0;
+			conditions.clear();
+
+			// and request unfiltered entries
+			requestEntries(offset);
+		}
+	};
 
 	// Listener for the timeline items
 	ListView.OnItemClickListener mOnItemClickListener = new ListView.OnItemClickListener()
@@ -171,8 +194,6 @@ public class TimelineFragment extends Fragment
 
 		entryList = new ArrayList<TimelineEntry>();
 
-//		mTimelilneAdapter = new TimelineAdapter();
-
 		// the filter
 		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_RELOADRESPONSE);
 		// Sets the filter's category to DEFAULT
@@ -219,6 +240,12 @@ public class TimelineFragment extends Fragment
         View view = inflater.inflate(R.layout.timeline, container, false);
 
 		// initialize the ui elements
+
+		noEtnriesRL = (RelativeLayout) view.findViewById(R.id.timeline_noentries);
+		noEtnriesRL.setVisibility(View.INVISIBLE);
+		disableFilterBtn = (Button) view.findViewById(R.id.timeline_disablefilter);
+		disableFilterBtn.setOnClickListener(mDisableFilterListener);
+
 		timelineLV = (ListView) view.findViewById(R.id.listview_timeline);
 		timelineLV.setOnItemClickListener(mOnItemClickListener);
 		timelineLV.setOnScrollListener(mScrollListener);
@@ -240,9 +267,17 @@ public class TimelineFragment extends Fragment
 	{
 		super.onResume();
 
-		// re-set the adapter if the binding was lost in onStop()
 		if(null == timelineLV.getAdapter())
 		{
+			// restore the no result view if necessary
+			if(noResult)
+			{
+				noEtnriesRL.refreshDrawableState();
+				noEtnriesRL.setVisibility(View.VISIBLE);
+				timelineLV.setVisibility(View.INVISIBLE);
+			}
+
+			// re-set the adapter if the binding was lost in onStop()
 			mTimelilneAdapter = new TimelineAdapter();
 			timelineLV.setAdapter(mTimelilneAdapter);
 		}
@@ -268,7 +303,7 @@ public class TimelineFragment extends Fragment
 	 */
 	private void requestFilteredEntries(int offset, Bundle args)
 	{
-		Log.e("filtr", "on");
+		Log.d(TAG, "request filtered");
 		Intent intent = new Intent(getActivity(), TimelineFilteredReloadService.class);
 
 		intent.putExtra(Constants.OFFSET_EXTRA, offset);
@@ -276,8 +311,6 @@ public class TimelineFragment extends Fragment
 
 		getActivity().startService(intent);
 	}
-
-
 
 	private BitmapDrawable downloadBitmap(String url)
 	{
@@ -483,6 +516,8 @@ public class TimelineFragment extends Fragment
 
 			String[][] reloadResultList = (String[][]) bundle.getSerializable(Constants.TIMELINE_ENTRIES_ARRAY_EXTRA);
 
+//			Log.d(TAG, "received: " + reloadResultList.length);
+
 			// save the fetched results
 
 			String type = null;
@@ -570,6 +605,14 @@ public class TimelineFragment extends Fragment
 			{
 				// no more entries to fetch
 				processed = true;
+
+				if(entryList.isEmpty())
+				{
+					noResult = true;
+					noEtnriesRL.setVisibility(View.VISIBLE);
+					timelineLV.setVisibility(View.INVISIBLE);
+					disableFilterBtn.setOnClickListener(mDisableFilterListener);
+				}
 			}
 
 			// commit the changes to the adapter

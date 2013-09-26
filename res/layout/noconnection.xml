@@ -4,18 +4,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/nocontext"
-            android:text="There is no network connection right now. Please try again later."
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/timeline_noentries"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="140dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp">
 
-    <Button
-            android:id="@+id/retry"
-            android:text="retry"
-            android:layout_below="@id/nocontext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"/>
+        <TextView
+                android:id="@+id/nocontext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:layout_centerHorizontal="true"
+                android:text="There is no network connection right now. Please try again later."
+                android:textStyle="bold"
+                android:textSize="30dp"/>
+
+        <ImageView
+                android:id="@+id/nocon_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/nocontext"
+                android:src="@drawable/tag_smiley9_gray"/>
+
+        <Button
+                android:id="@+id/retry"
+                android:text="Retry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/nocon_image"
+                android:layout_marginTop="20dp" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

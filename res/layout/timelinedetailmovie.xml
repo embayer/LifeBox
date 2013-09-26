@@ -24,7 +24,8 @@
             android:background="@color/playcyan"
             android:layout_toRightOf="@id/moviedetail_image_frame"
             android:layout_width="fill_parent"
-            android:layout_height="104dp" >
+            android:layout_height="104dp"
+            android:padding="6dp">
 
         <TextView
                 android:id="@+id/moviedetail_title_textview"
@@ -72,6 +73,7 @@
                 android:text="description"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:padding="6dp"
                 android:layout_below="@id/moviedetail_image_frame"/>
 
     </RelativeLayout>

@@ -1470,7 +1470,8 @@ public class DbHelper extends SQLiteOpenHelper
 
 		if(c.moveToFirst())
 		{
-			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(e." + LifeBoxContract.Entries._ID + ")")));
+			Log.e("errso", c.getColumnNames()[0]);
+			result = String.valueOf(c.getInt(0));
 		}
 
 		db.close();
@@ -1497,14 +1498,14 @@ public class DbHelper extends SQLiteOpenHelper
 		String query =
 				"SELECT COUNT(e." + LifeBoxContract.Entries._ID + ") FROM " + LifeBoxContract.Entries.TABLE_NAME + " e " +
 						"INNER JOIN " + LifeBoxContract.Types.TABLE_NAME + " t " +
-						" ON t." + LifeBoxContract.Types._ID + " = e." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
-						" WHERE t" + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + mediatype + "';";
+						"ON t." + LifeBoxContract.Types._ID + " = e." + LifeBoxContract.Entries.COLUMN_NAME_TYPES_ID +
+						" WHERE t." + LifeBoxContract.Types.COLUMN_NAME_TYPE + " == '" + mediatype + "';";
 
 		Cursor c = db.rawQuery(query, null);
 
 		if(c.moveToFirst())
 		{
-			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(e." + LifeBoxContract.Entries._ID + ")")));
+			result = String.valueOf(c.getInt(0));
 		}
 
 		db.close();
@@ -1535,7 +1536,7 @@ public class DbHelper extends SQLiteOpenHelper
 
 		if(c.moveToFirst())
 		{
-			result = String.valueOf(c.getInt(c.getColumnIndexOrThrow("COUNT(" + LifeBoxContract.Entries._ID + ")")));
+			result = String.valueOf(c.getInt(0));
 		}
 
 		db.close();
@@ -1566,7 +1567,7 @@ public class DbHelper extends SQLiteOpenHelper
 			"INNER JOIN " + LifeBoxContract.Tags.TABLE_NAME + " t ON t." + LifeBoxContract.Tags._ID + " = et." +
 			LifeBoxContract.EntryTags.COLUMN_NAME_TAGS_ID +
 			" GROUP BY t." + LifeBoxContract.Tags.COLUMN_NAME_TAG +
-			" ORDER BY COUNT(t." + LifeBoxContract.Tags._ID + ") DESC LIMIT" + limit + ";";
+			" ORDER BY COUNT(t." + LifeBoxContract.Tags._ID + ") DESC LIMIT " + limit + ";";
 
 		Cursor c = db.rawQuery(query, null);
 
@@ -1587,7 +1588,7 @@ public class DbHelper extends SQLiteOpenHelper
 				hm.put
 						(
 								count,
-								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(t." + LifeBoxContract.Tags._ID + ")")))
+								String.valueOf(c.getInt(1))
 						);
 
 				result.add(hm);
@@ -1624,8 +1625,8 @@ public class DbHelper extends SQLiteOpenHelper
 				") FROM " + LifeBoxContract.EntryHashtags.TABLE_NAME + " eh " +
 				"INNER JOIN " + LifeBoxContract.Hashtags.TABLE_NAME + " h ON h." + LifeBoxContract.Hashtags._ID + " = eh." +
 				LifeBoxContract.EntryHashtags.COLUMN_NAME_HASHTAGS_ID +
-				" GROUP BY t." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG +
-				" ORDER BY COUNT(t." + LifeBoxContract.Hashtags._ID + ") DESC LIMIT " + limit + ";";
+				" GROUP BY h." + LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG +
+				" ORDER BY COUNT(h." + LifeBoxContract.Hashtags._ID + ") DESC LIMIT " + limit + ";";
 
 		Cursor c = db.rawQuery(query, null);
 
@@ -1646,7 +1647,7 @@ public class DbHelper extends SQLiteOpenHelper
 				hm.put
 						(
 								count,
-								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(h." + LifeBoxContract.Hashtags._ID + ")")))
+								String.valueOf(c.getInt(1))
 						);
 
 				result.add(hm);
@@ -1680,7 +1681,7 @@ public class DbHelper extends SQLiteOpenHelper
 		 */
 
 		String query = "SELECT " + genreColumn + ", COUNT(" + genreColumn + ") FROM " + table +
-				" GROUP BY " + table +
+				" GROUP BY " + genreColumn +
 				" ORDER BY COUNT(" + genreColumn + ") DESC LIMIT " + limit + ";";
 
 		Cursor c = db.rawQuery(query, null);
@@ -1702,7 +1703,7 @@ public class DbHelper extends SQLiteOpenHelper
 				hm.put
 						(
 								count,
-								String.valueOf(c.getLong(c.getColumnIndexOrThrow("COUNT(" + genreColumn + ")")))
+								String.valueOf(c.getInt(1))
 						);
 
 				result.add(hm);
@@ -1732,15 +1733,14 @@ public class DbHelper extends SQLiteOpenHelper
 		 */
 
 		String query = "SELECT " + LifeBoxContract.Entries.COlUMN_NAME_TITLE + ", " + minOrMax + "(" +
-				LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + ") FROM" + LifeBoxContract.Entries.TABLE_NAME + ";";
+				LifeBoxContract.Entries.COlUMN_NAME_USER_DATE + ") FROM " + LifeBoxContract.Entries.TABLE_NAME + ";";
 
 		Cursor c = db.rawQuery(query, null);
 
 		if(c.moveToFirst())
 		{
 			result.put("title", c.getString(c.getColumnIndexOrThrow(LifeBoxContract.Entries.COlUMN_NAME_TITLE)));
-			result.put("user_date", String.valueOf(c.getLong(c.getColumnIndexOrThrow(
-					minOrMax + "(" + LifeBoxContract.Entries.COlUMN_NAME_USER_DATE))));
+			result.put("user_date", String.valueOf(c.getInt(1)));
 
 			c.moveToNext();
 		}
@@ -2225,65 +2225,18 @@ public class DbHelper extends SQLiteOpenHelper
 
 		SQLiteDatabase db = getReadableDatabase();
 
-		/*
-		SQLite3 don't support full join but full joins can be built by:
-		table_a LEFT OUTER JOIN table_b
-		UNION
-		table_b LEFT OUTER JOIN table_a
-		*/
-
-		// view with a full join of (entries + types) and (entry_tags + tags)
-		String namedQueryeEntrytags =
-		"CREATE VIEW IF NOT EXISTS entrytags AS " +
-		"SELECT e._id, e.media_id, e.type, e.title, e.user_date, et.tag " +
-		"FROM (entries e " +
-		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
-		"LEFT OUTER JOIN (entry_tags et " +
-		"INNER JOIN tags ta ON ta._id = et.tags_id) AS et " +
-		"ON e._id = et.entries_id " +
-		"UNION " +
-		"SELECT e._id, e.media_id, e.type, e.title, e.user_date, et.tag " +
-		"FROM (entry_tags et " +
-		"INNER JOIN tags ta ON ta._id = et.tags_id) AS et " +
-		"LEFT OUTER JOIN (entries e " +
-		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
-		"ON et.entries_id = e._id;";
-
-		// view with a full join of (entries + types) and (entry_hashtag + hashtags)
-		String namedQueryEntryHashtags =
-		"CREATE VIEW IF NOT EXISTS entryhashtags AS " +
-		"SELECT e._id, eh.hashtag " +
-		"FROM (entries e " +
-		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
-		"LEFT OUTER JOIN (entry_hashtags eh " +
-		"INNER JOIN hashtags ht ON ht._id = eh.hashtags_id) AS eh " +
-		"ON e._id = eh.entries_id " +
-		"UNION " +
-		"SELECT e._id, eh.hashtag " +
-		"FROM (entry_hashtags eh " +
-		"INNER JOIN hashtags h ON h._id = eh.hashtags_id) AS eh " +
-		"LEFT OUTER JOIN (entries e " +
-		"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
-		"ON eh.entries_id = e._id;";
-
-		// view with a full join of the view entrytags and the view entryhashtags
-		String namedQueryFullEntries =
-		"CREATE VIEW IF NOT EXISTS fullentries AS " +
-		"SELECT t._id, t.media_id, t.type, t.title, t.user_date, t.tag, h.hashtag " +
-		"FROM entrytags t " +
-		"LEFT OUTER JOIN entryhashtags h ON h._id = t._id " +
-		"UNION " +
-		"SELECT t._id, t.media_id, t.type, t.title, t.user_date, t.tag, h.hashtag " +
-		"FROM entryhashtags h " +
-		"LEFT OUTER JOIN entrytags t ON t._id = h._id; ";
-
-		// the base query without WHERE clause
-		String baseQuery =
-		"SELECT fe._id, fe.media_id, fe.type, fe.title, fe.user_date, fe.tag, fe.hashtag, f.filetype " +
-		"FROM fullentries fe " +
-		"LEFT OUTER JOIN (files f " +
-		"INNER JOIN filetypes ft ON ft._id = f.filetypes_id) AS f " +
-		"ON f._id = fe.media_id";
+		String namedQueryeFullEntries =
+				"CREATE VIEW IF NOT EXISTS fullentries AS " +
+				"SELECT e._id, e.media_id, e.type, e.title, e.user_date, et.tag, eh.hashtag " +
+				"FROM (entries e " +
+				"INNER JOIN types ty ON ty._id = e.types_id) AS e " +
+				"LEFT OUTER JOIN (entry_tags et " +
+				"INNER JOIN tags ta ON ta._id = et.tags_id) AS et " +
+				"ON e._id = et.entries_id " +
+				"INNER JOIN tags " +
+				"LEFT OUTER JOIN (entry_hashtags eh " +
+				"INNER JOIN hashtags ht ON ht._id = eh.hashtags_id) AS eh " +
+				"ON e._id = eh.entries_id";
 
 		// the WHERE clause
 		String whereClause = " WHERE ";
@@ -2348,7 +2301,7 @@ public class DbHelper extends SQLiteOpenHelper
 				{
 					whereClause += " OR ";
 				}
-				else if(j == tagAmount)
+				else if(j == hashtagAmount)
 				{
 					whereClause += ") ";
 				}
@@ -2402,10 +2355,15 @@ public class DbHelper extends SQLiteOpenHelper
 		// remove duplicated rows
 		whereClause += " GROUP BY fe._id;";
 
-		// create the views
-		db.execSQL(namedQueryeEntrytags);
-		db.execSQL(namedQueryEntryHashtags);
-		db.execSQL(namedQueryFullEntries);
+		// create the view if not exists
+		db.execSQL(namedQueryeFullEntries);
+
+		String baseQuery =
+				"SELECT fe._id, fe.media_id, fe.type, fe.title, fe.user_date, fe.tag, fe.hashtag, f.filetype " +
+				"FROM fullentries fe " +
+				"LEFT OUTER JOIN (files f " +
+				"INNER JOIN filetypes ft ON ft._id = f.filetypes_id) AS f " +
+				"ON f._id = fe.media_id";
 
 		Log.d(TAG, "query: "+whereClause);
 

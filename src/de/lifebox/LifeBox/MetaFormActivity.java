@@ -6,8 +6,12 @@ import android.content.*;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.*;
 
 import java.sql.Timestamp;
@@ -79,12 +83,22 @@ public class MetaFormActivity extends Activity
 
 	private ResponseReceiver mResponseReceiver;
 
+	// the ui elements
+	EditText titleET;
+	
 	// the counters
 	private TextView tagsCount;
 	private TextView hashtagsCount;
 
-	ImageButton tagBtn;
-	ImageButton hashtagBtn;
+	private ProgressBar progressBar;
+	private WebView musicView;
+	private WebView movieView;
+	private ImageView imageView;
+
+	private TextView uploadText;
+
+	private ImageButton tagBtn;
+	private ImageButton hashtagBtn;
 
 	Button.OnClickListener mTimePickerListener = new Button.OnClickListener()
 	{
@@ -199,9 +213,21 @@ public class MetaFormActivity extends Activity
 		LocalBroadcastManager.getInstance(this).registerReceiver(mResponseReceiver, mStatusIntentFilter);
 
 		// initialize the variables
-		uploadComplete = false;
+		uploadComplete = true; 						// only needed by files
 		hashtagList = new ArrayList<String>();
 		tagList = new ArrayList<String>();
+
+		// init ui elements
+		progressBar = (ProgressBar) findViewById(R.id.progress_bar_upload);
+		progressBar.setVisibility(View.INVISIBLE);
+
+		uploadText = (TextView) findViewById(R.id.header_upload);
+
+		movieView = (WebView) findViewById(R.id.wv_movie);
+		movieView.setVisibility(View.INVISIBLE);
+		musicView = (WebView) findViewById(R.id.wv_music);
+		musicView.setVisibility(View.INVISIBLE);
+		imageView = (ImageView) findViewById(R.id.iv_thumbnail);
 
 		// the current system time
 		// TODO init with the creationdate
@@ -224,6 +250,10 @@ public class MetaFormActivity extends Activity
 		// get the extras, upload the file if neccessary
 		if(mediaType.equals(Constants.TYPE_FILE))
 		{
+			// show the upload process
+			progressBar.setVisibility(View.VISIBLE);
+			uploadText.setBackgroundResource(R.color.androidblue);
+
 			// path to the local file
 			fileUrl = intent.getStringExtra(Constants.FILE_URL_EXTRA);
 			// MIME-Type of file
@@ -234,11 +264,15 @@ public class MetaFormActivity extends Activity
 			creationDate = intent.getStringExtra(Constants.CREATION_DATE_EXTRA);
 
 			// upoad the thumbnail
+			uploadComplete = false;
 			upload(thumbnailUrl, Constants.MIME_TYPE_IMAGE, true);
 		}
 		else if(mediaType.equals(Constants.TYPE_TEXT))
 		{
 			text = intent.getStringExtra(Constants.TEXT_EXTRA);
+
+			// show preview
+			imageView.setImageResource(R.drawable.button_text);
 		}
 		else if(mediaType.equals(Constants.TYPE_MOVIE))
 		{
@@ -249,8 +283,13 @@ public class MetaFormActivity extends Activity
 			movieReleaseDate = intent.getStringExtra(Constants.MOVIE_RELEASE_DATE_EXTRA);
 			// generate the timestamp
 			// getTime() returns milliseconds, time is 22:00 so + 2h in seconds = 7200
-			movieTimestamp = stringToTimestamp(movieReleaseDate).getTime() / 1000 +7200;
+			movieTimestamp = stringToTimestamp(movieReleaseDate).getTime();
 			movieThumbnailUrl = intent.getStringExtra(Constants.MOVIE_THUMBNAIL_URL_EXTRA);
+
+			// show preview
+			imageView.setVisibility(View.INVISIBLE);
+			movieView.setVisibility(View.VISIBLE);
+			movieView.loadUrl(movieThumbnailUrl);
 		}
 		else if(mediaType.equals(Constants.TYPE_MUSIC))
 		{
@@ -259,16 +298,22 @@ public class MetaFormActivity extends Activity
 			musicReleaseDate = intent.getStringExtra(Constants.MUSIC_REALEASE_DATE_EXTRA);
 			// generate the timestamp
 			// getTime() returns milliseconds, time is 22:00 so + 2h in seconds = 7200
-			musicTimestamp = stringToTimestamp(musicReleaseDate).getTime() / 1000 +7200;
+			musicTimestamp = stringToTimestamp(musicReleaseDate).getTime();
 			musicThumbnailUrl = intent.getStringExtra(Constants.MUSIC_THUMBNAIL_URL_EXTRA);
 			musicTrack = intent.getStringExtra(Constants.MUSIC_TRACK_EXTRA);
 			musicGenre = intent.getStringExtra(Constants.MUSIC_GENRE_EXTRA);
+
+			// show preview
+			imageView.setVisibility(View.INVISIBLE);
+			musicView.setVisibility(View.VISIBLE);
+			musicView.loadUrl(musicThumbnailUrl);
 		}
 
 		// the counters
 		tagsCount = (TextView) findViewById(R.id.textview_tagscount);
 		hashtagsCount = (TextView) findViewById(R.id.textview_hashtagscount);
 
+		titleET = (EditText) findViewById(R.id.in_title);
 
 		// set the listeners to the buttons
 		Button tpBtn = (Button) findViewById(R.id.timepicker);
@@ -288,8 +333,60 @@ public class MetaFormActivity extends Activity
 		Button saveBtn = (Button) findViewById(R.id.save_meta_data);
 		saveBtn.setOnClickListener(mSaveListener);
 
-//		Button locationBtn = (Button) findViewById(R.id.button_location);
-//		locationBtn.setOnClickListener(mLocationListener);
+		// provide clear functionality by the "x" icon within the input field
+		String value = "";    // pre-fill the input field
+
+		// icon
+		final Drawable x = getResources().getDrawable(R.drawable.x);
+		// place it
+		x.setBounds(0, 0, x.getIntrinsicWidth(), x.getIntrinsicHeight());
+		titleET.setCompoundDrawables(null, null, value.equals("") ? null : x, null);
+
+		titleET.setOnTouchListener(new View.OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event)
+			{
+				if (titleET.getCompoundDrawables()[2] == null)
+				{
+					return false;
+				}
+				if (event.getAction() != MotionEvent.ACTION_UP)
+				{
+					return false;
+				}
+				// when clicked
+				if (event.getX() > titleET.getWidth() - titleET.getPaddingRight() - x.getIntrinsicWidth())
+				{
+					// clear text
+					titleET.setText("");
+					// remove icon
+					titleET.setCompoundDrawables(null, null, null, null);
+				}
+				return false;
+			}
+		});
+
+		// show icon when there is an input
+		titleET.addTextChangedListener(new TextWatcher()
+		{
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+				titleET.setCompoundDrawables(null, null, titleET.getText().toString().equals("") ? null : x, null);
+			}
+
+			// unneeded methods
+			@Override
+			public void afterTextChanged(Editable arg0)
+			{
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+			}
+		});
 	}
 
 	/**
@@ -372,7 +469,7 @@ public class MetaFormActivity extends Activity
 	 */
 	private boolean saveUserStatements()
 	{
-		boolean success = true;
+		boolean success = uploadComplete;
 
 		userTitle = "";
 		userDescription = "";
@@ -381,13 +478,23 @@ public class MetaFormActivity extends Activity
 		String date = "";
 
 		// get the title
-		EditText titleET = (EditText) findViewById(R.id.in_title);
 		userTitle = titleET.getText().toString();
 
 		// title has to be set
 		if(userTitle.equals(""))
 		{
 			success = false;
+
+			// inform the user
+			Toast.makeText(getBaseContext(), "Insert a title to continue.", Toast.LENGTH_SHORT).show();
+		}
+		else
+		{
+			if(uploadComplete == false)
+			{
+				// inform the user
+				Toast.makeText(getBaseContext(), "Upload in progress.", Toast.LENGTH_SHORT).show();
+			}
 		}
 
 		// get the description
@@ -468,14 +575,14 @@ public class MetaFormActivity extends Activity
 				upload(fileUrl, mimeType, false);
 
 				// show the thumbnail
-				ImageView mImageView = (ImageView) findViewById(R.id.iv_thumbnail);
-				mImageView.setImageDrawable(Drawable.createFromPath(thumbnailUrl));
+				imageView.setImageDrawable(Drawable.createFromPath(thumbnailUrl));
 				//todo show in the beginning
 
 				// get the extras
 				thumbDriveId = intent.getStringExtra(Constants.DRIVE_ID_EXTRA);
 				thumbDownloadUrl = intent.getStringExtra(Constants.DOWNLOAD_URL_EXTRA);
 			}
+			// if the upload was the file itself -> done
 			else
 			{
 				// get the extras
@@ -484,6 +591,10 @@ public class MetaFormActivity extends Activity
 
 				// commit the upload by setting the complete flag
 				uploadComplete = true;
+
+				// hide the upload progress bar
+				progressBar.setVisibility(View.INVISIBLE);
+				uploadText.setBackgroundResource(R.color.gray);
 			}
 
 			//todo zwischen thumb und file unterscheiden

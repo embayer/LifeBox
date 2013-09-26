@@ -78,15 +78,17 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 		if(width < height)
 		{
 			landscapeLayout.setVisibility(View.INVISIBLE);
-			portraitImageIB.setVisibility(View.VISIBLE);
 			landscapeImageIB.setVisibility(View.INVISIBLE);
+			landscapeLayout.removeAllViews();
+			portraitImageIB.setVisibility(View.VISIBLE);
 			portraitImageIB.setImageDrawable(Drawable.createFromPath(image.getOfflinePathFile()));
 		}
 		else
 		{
 			portraitLayout.setVisibility(View.INVISIBLE);
-			landscapeImageIB.setVisibility(View.VISIBLE);
 			portraitImageIB.setVisibility(View.INVISIBLE);
+			portraitLayout.removeAllViews();
+			landscapeImageIB.setVisibility(View.VISIBLE);
 			landscapeImageIB.setImageDrawable(drawable);
 		}
 	}

@@ -3,8 +3,12 @@ package de.lifebox.LifeBox;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 
@@ -468,6 +472,61 @@ public class FilterActivity extends Activity
 		// the save button
 		Button saveBtn = (Button) findViewById(R.id.filterform_save_meta_data);
 		saveBtn.setOnClickListener(saveListener);
+
+		// provide clear functionality by the "x" icon within the input field
+		String value = "";    // pre-fill the input field
+
+		// icon
+		final Drawable x = getResources().getDrawable(R.drawable.x);
+		// place it
+		x.setBounds(0, 0, x.getIntrinsicWidth(), x.getIntrinsicHeight());
+		titleET.setCompoundDrawables(null, null, value.equals("") ? null : x, null);
+
+		titleET.setOnTouchListener(new View.OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View v, MotionEvent event)
+			{
+				if (titleET.getCompoundDrawables()[2] == null)
+				{
+					return false;
+				}
+				if (event.getAction() != MotionEvent.ACTION_UP)
+				{
+					return false;
+				}
+				// when clicked
+				if (event.getX() > titleET.getWidth() - titleET.getPaddingRight() - x.getIntrinsicWidth())
+				{
+					// clear text
+					titleET.setText("");
+					// remove icon
+					titleET.setCompoundDrawables(null, null, null, null);
+				}
+				return false;
+			}
+		});
+
+		// show icon when there is an input
+		titleET.addTextChangedListener(new TextWatcher()
+		{
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
+				titleET.setCompoundDrawables(null, null, titleET.getText().toString().equals("") ? null : x, null);
+			}
+
+			// unneeded methods
+			@Override
+			public void afterTextChanged(Editable arg0)
+			{
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
+			}
+		});
 	}
 
 	/**

@@ -26,12 +26,17 @@ public class TimelineFilteredReloadService extends TimelineReloadService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
+		// the result
+		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_RELOADRESPONSE);
+		String[][] timelineEntryList = null;
+
 		// get the extra
 		int offset = intent.getIntExtra(Constants.OFFSET_EXTRA, 0);
 
 		// generate the where clause
 		Bundle args = intent.getBundleExtra(Constants.FILTER_BUNDLE_EXTRA);
 
+		// request a set of filtered entries
 		ArrayList<String> entryIdList = super.mDbHelper.selectFilteredEntryList
 				(
 						args.getString(Constants.ENTRY_TITLE_EXTRA),
@@ -65,21 +70,28 @@ public class TimelineFilteredReloadService extends TimelineReloadService
 				i++;
 			}
 		}
-
-		String[][] dbEntryList = super.mDbHelper.selectEntrySet(whereClause, "DESC", super.ROWAMOUNT, offset);
-		String[][] timelineEntryList = null;
-
-		if(null == dbEntryList)
+		else
 		{
 			timelineEntryList = new String[0][];
 			Log.d(TAG, "No entries where fetched.");
 		}
-		else
+
+		String[][] dbEntryList = super.mDbHelper.selectEntrySet(whereClause, "DESC", super.ROWAMOUNT, offset);
+
+		if(null == timelineEntryList)
 		{
-			timelineEntryList = super.generateTimelineEntries(dbEntryList);
+			if(null != dbEntryList)
+			{
+				timelineEntryList = super.generateTimelineEntries(dbEntryList);
+			}
+			else
+			{
+				timelineEntryList = new String[0][];
+			}
+
 		}
 
-		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_RELOADRESPONSE);
+
 
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(Constants.TIMELINE_ENTRIES_ARRAY_EXTRA, timelineEntryList);

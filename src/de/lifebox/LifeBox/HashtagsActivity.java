@@ -166,16 +166,14 @@ public class HashtagsActivity extends Activity
 		// query the db
 		mDbHelper = new DbHelper(getBaseContext());
 		db = mDbHelper.getReadableDatabase();
-		mCursor = db.query(
-				LifeBoxContract.Hashtags.TABLE_NAME,
-				projection,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null
-		);
+
+		String query =
+				"SELECT h._id, h.hashtag FROM entry_hashtags eh " +
+				"INNER JOIN hashtags h ON h._id = eh.hashtags_id " +
+				"GROUP BY h.hashtag " +
+				"ORDER BY COUNT(h._id) DESC;";
+
+		mCursor = db.rawQuery(query, null);
 
 		// for the cursor adapter, specify which columns go into which views
 		String[] fromColumns = {LifeBoxContract.Hashtags.COLUMN_NAME_HASHTAG};
@@ -221,7 +219,6 @@ public class HashtagsActivity extends Activity
 		hashtagListView.setAdapter(mAadapter);
 		// )
 
-		//##############################################################################################################
 		hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
 		// provide clear functionality by the "x" icon within the input field
 		String value = "";    // pre-fill the input field
@@ -277,7 +274,6 @@ public class HashtagsActivity extends Activity
 			{
 			}
 		});
-		//##############################################################################################################
 	}
 
 	/**

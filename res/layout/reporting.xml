@@ -183,11 +183,11 @@
         <TextView
                 android:id="@+id/reporting_tag_mostpopular_count_key"
                 android:text="count:"
-                android:layout_width="170dp"
+                android:textStyle="bold"
+                android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/reporting_tag_mostpopular_key"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginTop="10dp"/>
         <TextView
                 android:id="@+id/reporting_tag_mostpopular_count_value"
                 android:text="0"
@@ -227,7 +227,7 @@
                 android:layout_marginTop="10dp"/>
 
         <TextView
-                android:id="@+id/reporting_tag_mostpopular_count_value"
+                android:id="@+id/reporting_hashtag_mostpopular_count_value"
                 android:text="0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -238,7 +238,7 @@
 
         <TextView
                 android:id="@+id/reporting_musicgenres_total_key"
-                android:text="music genres total:"
+                android:text="different music genres:"
                 android:textStyle="bold"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
@@ -257,7 +257,7 @@
 
         <TextView
                 android:id="@+id/reporting_moviegenres_total_key"
-                android:text="movie genres total:"
+                android:text="different movie genres:"
                 android:textStyle="bold"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
@@ -341,7 +341,7 @@
                 android:layout_marginTop="10dp"/>
 
         <TextView
-                android:id="@+id/reporting_musicgenres_mostpopular_count_value"
+                android:id="@+id/reporting_moviegenres_mostpopular_count_value"
                 android:text="0"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -429,7 +429,7 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_below="@id/reporting_entry_last_date_value"
                     android:layout_width="fill_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="20dp"
