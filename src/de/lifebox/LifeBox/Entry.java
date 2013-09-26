@@ -11,12 +11,19 @@ import java.util.Date;
  */
 public class Entry
 {
+	// mediatype public key
 	private final long mediaId;
+	// mediatype
 	private final long typesId;
+	// user specified title
 	private final String title;
+	// user specified description
 	private final String description;
+	// user specified date
 	private final long userDate;
+	// date of creatiion
 	private final long creationDate;
+	// date of the last edit
 	private final long modificationDate;
 
 	private String type = "";

@@ -17,8 +17,7 @@ import java.util.ArrayList;
  */
 public class TagsActivity extends Activity
 {
-	//todo delete unneeded code
-	// tag button states
+	// list for the picked tags
 	private ArrayList<String> tagList;
 
 	// listener for the save button
@@ -193,7 +192,7 @@ public class TagsActivity extends Activity
 		});
 	}
 
-	/** Sends a list containing all selected hashtags back to the caller. */
+	/** Sends a list containing all selected tags back to the caller. */
 	private void saveTags()
 	{
 		Intent returnIntent = new Intent(getBaseContext(), MetaFormActivity.class);

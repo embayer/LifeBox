@@ -11,11 +11,11 @@ import java.io.File;
  */
 public class AlbumStorageDirFactory
 {
+	// constant folders
 	private static final String LIFEBOX_DIR = "LifeBox";		// base folder
-	private static final String IMAGES_DIR = "Images";        // image folder
+	private static final String IMAGES_DIR = "Images";        	// image folder
 	private static final String VIDEOS_DIR = "Videos";          // video folder
 	private static final String THUMBNAILS_DIR = "Thumbnails";
-
 	private static final String DATABASE_DIR = ".Database";
 
 	/**

@@ -20,6 +20,7 @@ public class TimelineDetailFileVideoActivity extends TimelineDetailActivity
 {
 	private final static String TAG = "TimelineDetailFileVideoActivity";
 
+	// databasehelper
 	private DbHelper mDbHelper;
 
 	// the mediafile
@@ -37,12 +38,15 @@ public class TimelineDetailFileVideoActivity extends TimelineDetailActivity
 		{
 			// the gallery activity expects the prefix 'file://'
 			Uri uri = Uri.parse("file://" + video.getOfflinePathFile());
+
+			// let the user decide what program should play the video
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			intent.setDataAndType(uri, video.getFiletype());
 			startActivity(intent);
 		}
 	};
 
+	/** Called when the Activity is first created. */
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);

@@ -4,16 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.text.format.DateUtils;
 import android.widget.Button;
 import android.widget.DatePicker;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Fragment-Dialog that lets the user select a time
@@ -52,14 +48,13 @@ public class DatePickerFragment extends DialogFragment
 
 	public void onDateSet(DatePicker view, int year, int month, int day)
 	{
-
+		// calculate the date
 		c.set(year, month, day, hour, minute);
 		Date d = c.getTime();
-		String date = new SimpleDateFormat("yyyy-MM-dd").format(d);
+		String date = new SimpleDateFormat(Constants.SQL_DATEFORMAT).format(d);
 
 		// set the selected date as button text
 		Button mDatePickerBtn = (Button) getActivity().findViewById(R.id.datepicker);
 		mDatePickerBtn.setText(date);
-		//TODO provide other date formats
 	}
 }

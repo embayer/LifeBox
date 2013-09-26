@@ -31,6 +31,8 @@ import java.util.ArrayList;
  */
 public class SearchMusicActivity extends Activity
 {
+	public static final String TAG = "SearchMusicActivity";
+
 	private ResponseReceiver mResponseReceiver;
 
 	// the adapter intermediate between view and data
@@ -47,6 +49,7 @@ public class SearchMusicActivity extends Activity
 	// the type of media to search for
 	private String mediaType;
 
+	// ui elements
 	// the EditText search query
 	private EditText queryEditText;
 	// the listviews to display the searchresult
@@ -92,6 +95,7 @@ public class SearchMusicActivity extends Activity
 	};
 
 	// the buttonlisteners
+	// start search button
 	Button.OnClickListener mSearchListener = new Button.OnClickListener()
 	{
 		@Override
@@ -129,6 +133,7 @@ public class SearchMusicActivity extends Activity
 					}
 				}
 
+				// pass to MetaFormActivity
 				startActivity(intent);
 			}
 		}
@@ -159,6 +164,7 @@ public class SearchMusicActivity extends Activity
 
 		searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
 
+		// initialize the ui elements
 		// the progress bar
 		mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_search_media);
 		mProgressBar.setVisibility(View.INVISIBLE);
@@ -278,6 +284,7 @@ public class SearchMusicActivity extends Activity
 		}
 		else
 		{
+			// inform the user
 			Toast toast = Toast.makeText(getBaseContext(), "Please enter a song.", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 120);
 			toast.show();
@@ -393,6 +400,7 @@ public class SearchMusicActivity extends Activity
 			}
 			else
 			{
+				// the JSON starts with the unneeded key-value pair 'resultCount'
 				reader.skipValue();
 			}
 		}
@@ -466,7 +474,7 @@ public class SearchMusicActivity extends Activity
 			{
 				String result = intent.getStringExtra(Constants.MEDIA_RESULT_EXTRA);
 
-				Log.e("restresult", result);
+				Log.d(TAG, "JSON: " + result);
 
 				try
 				{
@@ -488,7 +496,7 @@ public class SearchMusicActivity extends Activity
 				}
 				catch (IOException e)
 				{
-					Log.e("parseJSON: IOException", e.getMessage());
+					Log.e(TAG, "parseJSON: IOException" + e.getMessage());
 				}
 			}
 		}

@@ -36,7 +36,7 @@ public class TimelineFilteredReloadService extends TimelineReloadService
 		// generate the where clause
 		Bundle args = intent.getBundleExtra(Constants.FILTER_BUNDLE_EXTRA);
 
-		// request a set of filtered entries
+		// request a set of filtered entries (referenced by _id)
 		ArrayList<String> entryIdList = super.mDbHelper.selectFilteredEntryList
 				(
 						args.getString(Constants.ENTRY_TITLE_EXTRA),
@@ -47,12 +47,12 @@ public class TimelineFilteredReloadService extends TimelineReloadService
 						args.getStringArrayList(Constants.MEDIATYPE_ARRAY_EXTRA)
 				);
 
-		Log.e("querycnt", ""+entryIdList.size());
-
 		String whereClause = "";
 
+		// if there are results
 		if(!entryIdList.isEmpty())
 		{
+			// build a WHERE-clause from the _ids
 			whereClause = " WHERE ";
 
 			int entryAmount = entryIdList.size();
@@ -72,27 +72,32 @@ public class TimelineFilteredReloadService extends TimelineReloadService
 		}
 		else
 		{
+			// create a empty list to show TimelineFragment that there are no results
 			timelineEntryList = new String[0][];
 			Log.d(TAG, "No entries where fetched.");
 		}
 
+		// let the superclass select the right _ids
 		String[][] dbEntryList = super.mDbHelper.selectEntrySet(whereClause, "DESC", super.ROWAMOUNT, offset);
 
+		// if there where fetched filtered _ids ...
 		if(null == timelineEntryList)
 		{
+			// ... and a actual result
 			if(null != dbEntryList)
 			{
+				// load the data
 				timelineEntryList = super.generateTimelineEntries(dbEntryList);
 			}
 			else
 			{
+				// create a empty list to show TimelineActivity that there are no results
 				timelineEntryList = new String[0][];
 			}
 
 		}
 
-
-
+		// pack the results in a bundle and return it to TimelineFragment
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(Constants.TIMELINE_ENTRIES_ARRAY_EXTRA, timelineEntryList);
 

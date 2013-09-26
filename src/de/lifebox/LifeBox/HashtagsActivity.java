@@ -23,8 +23,6 @@ import java.util.ArrayList;
  */
 public class HashtagsActivity extends Activity
 {
-	private DbHelper mDbHelper;
-
 	// the listviews to hold the hashtags
 	private ListView historyListView;            	// previous created hashtags
 	private ListView hashtagListView;               // hashtags for the entry
@@ -38,9 +36,11 @@ public class HashtagsActivity extends Activity
 
 	// db-instance
 	private SQLiteDatabase db;
-	// pointer to the selected db content
+	private DbHelper mDbHelper;
+	// cursor to the selected db content
 	private Cursor mCursor;
 
+	// Lists for the hashtags
 	protected ArrayList<String> hashtagList;
 	protected ArrayList<String> hashtagHistoryList;
 
@@ -214,6 +214,7 @@ public class HashtagsActivity extends Activity
 		// )
 
 		hashtagEditText = (EditText) findViewById(R.id.in_hashtag);
+
 		// provide clear functionality by the "x" icon within the input field
 		String value = "";    // pre-fill the input field
 

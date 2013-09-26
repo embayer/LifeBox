@@ -16,8 +16,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -35,7 +41,6 @@ public class InputFragment extends Fragment
 
 	// codes for onActivityResult
 	private static final int ACTION_TAKE_PHOTO = 1;
-	private static final int ACTION_TAKE_PHOTO_S = 2;
 	private static final int ACTION_TAKE_VIDEO = 3;
 	private static final int ACTION_PICK_PHOTO = 4;
 
@@ -73,6 +78,7 @@ public class InputFragment extends Fragment
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
 
 	// OnClickListeners for the buttons
+	// take photo listener
 	Button.OnClickListener mTakePicOnClickListener = new Button.OnClickListener()
 	{
 		@Override
@@ -81,7 +87,7 @@ public class InputFragment extends Fragment
 			dispatchTakePictureIntent(ACTION_TAKE_PHOTO);
 		}
 	};
-
+	// take video listener
 	Button.OnClickListener mTakeVidOnClickListener = new Button.OnClickListener()
 	{
 		@Override
@@ -101,16 +107,7 @@ public class InputFragment extends Fragment
 		}
 	};
 
-	Button.OnClickListener mListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-			Intent intent = new Intent(getActivity(), MetaFormActivity.class);
-			startActivity(intent);
-		}
-	};
-
+	// search movie listener
 	Button.OnClickListener mSearchMoviesListener = new Button.OnClickListener()
 	{
 		@Override
@@ -123,6 +120,7 @@ public class InputFragment extends Fragment
 		}
 	};
 
+	// search music listener
 	Button.OnClickListener mSearchMusicListener = new Button.OnClickListener()
 	{
 		@Override
@@ -135,6 +133,7 @@ public class InputFragment extends Fragment
 		}
 	};
 
+	// pick photo listener
 	Button.OnClickListener mPickImageOnClickListener = new Button.OnClickListener()
 	{
 		@Override
@@ -179,17 +178,20 @@ public class InputFragment extends Fragment
 	 * Creates and returns the view hierarchy associated with the fragment.
 	 */
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View view = inflater.inflate(R.layout.input, container, false);
 
+		// ui elements
 		mImageView = (ImageView) view.findViewById(R.id.imageview);
 		mVideoView = (VideoView) view.findViewById(R.id.videoview);
+
+		// media parameters
 		mImageBitmap = null;
 		mVideoUri = null;
 
 		// add the listeners to the buttons
+		// take photo button
 		Button picBtn = (Button) view.findViewById(R.id.picture);
 		setBtnListenerOrDisable(
 				picBtn,
@@ -197,6 +199,7 @@ public class InputFragment extends Fragment
 				MediaStore.ACTION_IMAGE_CAPTURE
 		);
 
+		// take video button
 		Button vidBtn = (Button) view.findViewById(R.id.video);
 		setBtnListenerOrDisable(
 				vidBtn,
@@ -204,18 +207,19 @@ public class InputFragment extends Fragment
 				MediaStore.ACTION_VIDEO_CAPTURE
 		);
 
+		// input text button
 		Button textBtn = (Button) view.findViewById(R.id.text);
 		textBtn.setOnClickListener(mTextFormOnClickListener);
 
-//		Button fileBtn = (Button) view.findViewById(R.id.file);
-//		fileBtn.setOnClickListener(mListener);
-
+		// search movie button
 		Button movieBtn = (Button) view.findViewById(R.id.movie);
 		movieBtn.setOnClickListener(mSearchMoviesListener);
 
+		// search music button
 		Button musicBtn = (Button) view.findViewById(R.id.music);
 		musicBtn.setOnClickListener(mSearchMusicListener);
 
+		// pick photo button
 		Button fileBtn = (Button) view.findViewById(R.id.file);
 		setBtnListenerOrDisable(fileBtn,
 				mPickImageOnClickListener,
@@ -234,6 +238,7 @@ public class InputFragment extends Fragment
 		// decide by request code what to do
 		switch(requestCode)
 		{
+			// return from taking a photo
 			case ACTION_TAKE_PHOTO:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -252,7 +257,7 @@ public class InputFragment extends Fragment
 
 					// start an intent to navigate to the MetaFormActivity
 					Intent intent = new Intent(getActivity(), MetaFormActivity.class);
-					Log.e("path", mCurrentPhotoPath);
+					Log.d(TAG, "path: " + mCurrentPhotoPath);
 					intent.putExtra(Constants.MEDIA_TYPE_EXTRA, Constants.TYPE_FILE);
 					intent.putExtra(Constants.FILE_URL_EXTRA, mCurrentPhotoPath);
 					intent.putExtra(Constants.MIME_TYPE_EXTRA, Constants.MIME_TYPE_IMAGE);
@@ -260,8 +265,8 @@ public class InputFragment extends Fragment
 					intent.putExtra(Constants.THUMBNAIL_URL_EXTRA, imageThumbnail);
 					getActivity().startActivity(intent);
 				}
-				//TODO Fehlerbehandlung
 				break;
+			// return from taking a video
 			case ACTION_TAKE_VIDEO:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -278,6 +283,7 @@ public class InputFragment extends Fragment
 					getActivity().startActivity(intent);
 				}
 				break;
+			// return from picking a photo
 			case ACTION_PICK_PHOTO:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -298,7 +304,7 @@ public class InputFragment extends Fragment
 					String creationDate = picturePath.substring(picturePath.length() - 19, picturePath.length() - 4);
 
 					// set the current timestamp
-					String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+					String timeStamp = new SimpleDateFormat(Constants.FILE_PREFIX_DATEFORMAT).format(new Date());
 					mCurrentTimeStamp = timeStamp;
 
 					// scale the selected image
@@ -320,7 +326,7 @@ public class InputFragment extends Fragment
 					getActivity().startActivity(intent);
 				}
 			default:
-				//TODO default case
+				break;
 		}
 	}
 
@@ -334,23 +340,6 @@ public class InputFragment extends Fragment
 		super.onSaveInstanceState(outState);
 	}
 
-//	@Override
-//	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//		super.onRestoreInstanceState(savedInstanceState);
-//		mImageBitmap = savedInstanceState.getParcelable(BITMAP_STORAGE_KEY);
-//		mVideoUri = savedInstanceState.getParcelable(VIDEO_STORAGE_KEY);
-//		mImageView.setImageBitmap(mImageBitmap);
-//		mImageView.setVisibility(
-//				savedInstanceState.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ?
-//						ImageView.VISIBLE : ImageView.INVISIBLE
-//		);
-//		mVideoView.setVideoURI(mVideoUri);
-//		mVideoView.setVisibility(
-//				savedInstanceState.getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ?
-//						ImageView.VISIBLE : ImageView.INVISIBLE
-//		);
-//	}
-
 	/**
 	 * Set a buttonlistener or disable the button.
 	 * @param btn (Button) the button to setup
@@ -362,11 +351,15 @@ public class InputFragment extends Fragment
 			Button.OnClickListener onClickListener,
 			String intentName)
 	{
-		if (isIntentAvailable(getActivity(), intentName)) {
+		if (isIntentAvailable(getActivity(), intentName))
+		{
+			// set the listener
 			btn.setOnClickListener(onClickListener);
-		} else {
-			btn.setText(
-					getText(R.string.cannot).toString() + " " + btn.getText());
+		}
+		else
+		{
+			// disable
+			btn.setText(getText(R.string.cannot).toString() + " " + btn.getText());
 			btn.setClickable(false);
 		}
 	}
@@ -408,9 +401,9 @@ public class InputFragment extends Fragment
 				if (! storageDir.mkdirs())
 				{
 					// success?
-					if (! storageDir.exists()){
-						Log.e("LifeBox", "failed to create directory");
-						//TODO makeToast
+					if (! storageDir.exists())
+					{
+						Log.e(TAG, "failed to create directory");
 						return null;
 					}
 				}
@@ -419,8 +412,7 @@ public class InputFragment extends Fragment
 		}
 		else
 		{
-			//TODO makeToast
-			Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
+			Log.d(TAG, "External storage is not mounted READ/WRITE.");
 		}
 
 		return storageDir;
@@ -433,7 +425,7 @@ public class InputFragment extends Fragment
 	private File createImageFile() throws IOException
 	{
 		// create a timestamp
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String timeStamp = new SimpleDateFormat(Constants.FILE_PREFIX_DATEFORMAT).format(new Date());
 		mCurrentTimeStamp = timeStamp;
 
 		// Create an image file name
@@ -465,7 +457,7 @@ public class InputFragment extends Fragment
 	private File createVideoFile() throws IOException
 	{
 		// create a timestamp
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String timeStamp = new SimpleDateFormat(Constants.FILE_PREFIX_DATEFORMAT).format(new Date());
 		mCurrentTimeStamp = timeStamp;
 
 		// Create a video file name
@@ -506,7 +498,7 @@ public class InputFragment extends Fragment
 		}
 		catch(IOException e)
 		{
-			Toast.makeText(getActivity(), "An error occured while creating the image file. Please try again.", Toast.LENGTH_LONG);
+			Toast.makeText(getActivity(), "An error occurred while creating the image file. Please try again.", Toast.LENGTH_LONG);
 		}
 		finally
 		{
@@ -629,12 +621,9 @@ public class InputFragment extends Fragment
 		return resultPath;
 	}
 
-	/** Scale down the picture to devices screen resolution in order to save ram. */
-	private void setPic() {
-
-		// There isn't enough memory to open up more than a couple camera photos
-		// So pre-scale the target bitmap into which the file is decoded
-
+	/** Scale down the picture to devices screen resolution in order to save ram and ease the Google Drive upload. */
+	private void setPic()
+	{
 		/* Get the size of the ImageView */
 		int targetW = mImageView.getWidth();
 		int targetH = mImageView.getHeight();
@@ -648,7 +637,8 @@ public class InputFragment extends Fragment
 
 		// Figure out which way needs to be reduced less
 		int scaleFactor = 1;
-		if ((targetW > 0) || (targetH > 0)) {
+		if ((targetW > 0) || (targetH > 0))
+		{
 			scaleFactor = Math.min(photoW/targetW, photoH/targetH);
 		}
 
@@ -695,7 +685,7 @@ public class InputFragment extends Fragment
 				}
 				catch (IOException e)
 				{
-					Log.e(TAG, e.getMessage());
+					Log.e(TAG, "I/O-Error: " + e.getMessage());
 
 					// free variables
 					f = null;
@@ -715,7 +705,6 @@ public class InputFragment extends Fragment
 	/** Call the video app. */
 	private void dispatchTakeVideoIntent(int actionCode)
 	{
-
 		Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
 		switch(actionCode)
@@ -731,7 +720,7 @@ public class InputFragment extends Fragment
 				}
 				catch(IOException e)
 				{
-					Log.e(TAG, e.getMessage());
+					Log.e(TAG, "I/O-Error: " + e.getMessage());
 					// free variables
 					f = null;
 					mCurrentVideoPath = null;
@@ -753,34 +742,4 @@ public class InputFragment extends Fragment
 		Intent pickImageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		startActivityForResult(pickImageIntent, actionCode);
 	}
-
-	//START unused methods----------------------------------------------------------------------------------------------
-	private void handleSmallCameraPhoto(Intent intent) {
-		Bundle extras = intent.getExtras();
-		mImageBitmap = (Bitmap) extras.get("data");
-		mImageView.setImageBitmap(mImageBitmap);
-		mVideoUri = null;
-		mImageView.setVisibility(View.VISIBLE);
-		mVideoView.setVisibility(View.INVISIBLE);
-	}
-
-	private void handleCameraPhoto() {
-
-		if (mCurrentPhotoPath != null) {
-			setPic();
-			galleryAddPic();
-			mCurrentPhotoPath = null;
-		}
-
-	}
-
-	private void handleCameraVideo(Intent intent) {
-		mVideoUri = intent.getData();
-		mVideoView.setVideoURI(mVideoUri);
-
-		mImageBitmap = null;
-		mVideoView.setVisibility(View.VISIBLE);
-		mImageView.setVisibility(View.INVISIBLE);
-	}
-	//END unused methods------------------------------------------------------------------------------------------------
 }

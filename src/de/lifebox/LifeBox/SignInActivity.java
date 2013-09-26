@@ -9,12 +9,12 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import com.google.android.gms.common.*;
-import com.google.android.gms.common.GooglePlayServicesClient.*;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.PlusClient;
 
 /**
@@ -31,8 +31,6 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	private ProgressDialog mConnectionProgressDialog;
 	private PlusClient mPlusClient;
 	private ConnectionResult mConnectionResult;
-
-	//TODO add progress symbol
 
 	/** Called when the Activity is first created. */
 	@Override
@@ -55,6 +53,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 		{
 			// navigate to the noconnection activity
 			Intent intent = new Intent(this, NoConnectionActivity.class);
+
+			// clear the backstack navigation
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(intent);
@@ -68,6 +68,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	protected void onStart()
 	{
 		super.onStart();
+
+		// check for connectivity
 		if(isOnline())
 		{
 			mPlusClient.connect();
@@ -87,6 +89,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 	protected void onStop()
 	{
 		super.onStop();
+
+		// check for connectivity
 		if(isOnline())
 		{
 			mPlusClient.disconnect();
@@ -147,6 +151,8 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 
 		// Logged in successfully, call MainActivity
 		Intent callSelectTypeActivity = new Intent(this, MainActivity.class);
+
+		// clear the backstack navigation
 		callSelectTypeActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		callSelectTypeActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		callSelectTypeActivity.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_SIGN_IN_ACTIVITY);
@@ -160,7 +166,6 @@ public class SignInActivity extends Activity implements View.OnClickListener,
 		Log.d(TAG, "disconnected");
 	}
 
-	// TODO Fehlerbehandlung für die Verbindung
 	/** Called when the Google+ sign in button is clicked. */
 	@Override
 	public void onClick(View view)

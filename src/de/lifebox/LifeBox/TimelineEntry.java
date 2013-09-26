@@ -1,7 +1,5 @@
 package de.lifebox.LifeBox;
 
-import android.graphics.Bitmap;
-
 /**
  * Class for the entries on TimelineFragment.
  * @version 0.1 31.07.13

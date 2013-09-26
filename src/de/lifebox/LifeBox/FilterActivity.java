@@ -33,27 +33,24 @@ public class FilterActivity extends Activity
 	private Calendar mCalendar = Calendar.getInstance();
 	private final int THIS_YEAR = mCalendar.get(Calendar.YEAR);
 	private final int THIS_MONTH = mCalendar.get(Calendar.MONTH);
-	private final int THIS_DAY = mCalendar.get(Calendar.DAY_OF_MONTH);
 
 	DbHelper mDbHelper;
-	// the entry with the oldest and latest user_date
+
+	// the entry with the oldest and latest user_date ...
 	private long firstEntryLong;
 	private long lastEntryLong;
 
+	// ... and the String representations of them
 	private String FIRST_ENTRY;
 	private String LAST_ENTRY;
 
+	// user date or system specified date
 	private boolean ownDate = false;
 
 	// variables to hold the filter settings
 	private ArrayList<String> mediaTypeList;
 	private ArrayList<String> tagList;
 	private ArrayList<String> hashtagList;
-
-	private String fromDate;
-	private String toDate;
-
-	private String title;
 
 	// ui elements
 	private Button fromDateButton;
@@ -78,6 +75,8 @@ public class FilterActivity extends Activity
 
 	private EditText titleET;
 
+	// Pickers for date
+	// beginning
 	DatePickerDialog.OnDateSetListener fromSetListener = new DatePickerDialog.OnDateSetListener()
 	{
 
@@ -102,6 +101,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// end
 	DatePickerDialog.OnDateSetListener toSetListener = new DatePickerDialog.OnDateSetListener()
 	{
 
@@ -127,6 +127,7 @@ public class FilterActivity extends Activity
 	};
 
 	// the buttonlisteners
+	// beginning
 	Button.OnClickListener fromDateListener = new Button.OnClickListener()
 	{
 		@Override
@@ -148,6 +149,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// end
 	Button.OnClickListener toDateListener = new Button.OnClickListener()
 	{
 		@Override
@@ -163,12 +165,14 @@ public class FilterActivity extends Activity
 			int m = Integer.parseInt(new SimpleDateFormat("MM").format(date));
 			int d = Integer.parseInt(new SimpleDateFormat("dd").format(date));
 
-			// the month is zero based -> -1
+			// the month is zero based -> month -1
 			DatePickerDialog dpd = new DatePickerDialog(FilterActivity.this, toSetListener, y, m -1, d);
 			dpd.show();
 		}
 	};
 
+	// the date constants
+	// all time
 	ToggleButton.OnCheckedChangeListener allTimeListener = new ToggleButton.OnCheckedChangeListener()
 	{
 		@Override
@@ -197,6 +201,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// current year
 	ToggleButton.OnCheckedChangeListener thisYearListener = new ToggleButton.OnCheckedChangeListener()
 	{
 		@Override
@@ -229,6 +234,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// current month
 	ToggleButton.OnCheckedChangeListener thisMonthListener = new ToggleButton.OnCheckedChangeListener()
 	{
 		@Override
@@ -261,6 +267,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// current week
 	ToggleButton.OnCheckedChangeListener thisWeekListener = new ToggleButton.OnCheckedChangeListener()
 	{
 		@Override
@@ -299,46 +306,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
-	Button.OnClickListener imageListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-		}
-	};
-
-	Button.OnClickListener videoListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-		}
-	};
-
-	Button.OnClickListener musicListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-		}
-	};
-
-	Button.OnClickListener movieListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-		}
-	};
-
-	Button.OnClickListener textListener = new Button.OnClickListener()
-	{
-		@Override
-		public void onClick(View v)
-		{
-		}
-	};
-
+	// tag button
 	Button.OnClickListener tagsListener = new Button.OnClickListener()
 	{
 		@Override
@@ -352,6 +320,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// hashtag button
 	Button.OnClickListener hashtagsListener = new Button.OnClickListener()
 	{
 		@Override
@@ -365,6 +334,7 @@ public class FilterActivity extends Activity
 		}
 	};
 
+	// save button
 	Button.OnClickListener saveListener = new Button.OnClickListener()
 	{
 		@Override
@@ -372,13 +342,14 @@ public class FilterActivity extends Activity
 		{
 			// get the date strings from the buttons
 			String fromExtra = String.valueOf(stringToTimestamp(fromDateButton.getText().toString()).getTime());
-			Log.e("timestmp from",  fromDateButton.getText().toString()+" "+dateStrToTimeStr(fromDateButton.getText().toString()));
+			Log.d(TAG, "timestmp from: " +  fromDateButton.getText().toString());
 			String toExtra = String.valueOf(stringToTimestamp(toDateButton.getText().toString()).getTime());
-			Log.e("timestmp to", toDateButton.getText().toString()+" "+dateStrToTimeStr(toDateButton.getText().toString()));
+			Log.d(TAG, "timestmp to: " + toDateButton.getText().toString());
 
 			// get the title from the edit text
 			String titleExtra =  titleET.getText().toString();
 
+			// setup the intent
 			Intent intent = new Intent(getBaseContext(), MainActivity.class);
 			intent.putExtra(Constants.CALLER_EXTRA, Constants.CALLER_FILTER_ACTIVITY);
 			intent.putStringArrayListExtra(Constants.TAG_ARRAY_EXTRA, tagList);
@@ -539,6 +510,7 @@ public class FilterActivity extends Activity
 		// decide by request code what to do
 		switch(requestCode)
 		{
+			// return from tag activity
 			case Constants.ACTION_GATHER_TAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -556,6 +528,7 @@ public class FilterActivity extends Activity
 				}
 				break;
 
+			// return from hashtag activity
 			case Constants.ACTION_GATHER_HASHTAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -672,32 +645,6 @@ public class FilterActivity extends Activity
 	}
 
 	/**
-	 * Parses a String and tries to get the timestamp from.
-	 * @param dateString (String) String in the format that is specified in Constants.DATEFORMAT
-	 * @return (String) the unix timestamp as string
-	 */
-	private String dateStrToTimeStr(String dateString)
-	{
-
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATEFORMAT);
-
-		Date parsedDate = null;
-		try
-		{
-			parsedDate = sdf.parse(dateString);
-		}
-		catch (ParseException e)
-		{
-			Log.e("parse date error", e.getMessage());
-		}
-
-		Timestamp timestamp = new Timestamp(parsedDate.getTime());
-
-		// getTime() returns milliseconds -> / 1000, datestring = date at 22:00 so add to hours in seconds = 7200
-		return String.valueOf(timestamp.getTime() / 1000 + 7200);
-	}
-
-	/**
 	 * Converts a timestamp given as long to a date string.
 	 * @return (String) the date
 	 */
@@ -707,15 +654,6 @@ public class FilterActivity extends Activity
 		Date date = new Date(timestamp.getTime());
 
 		return new SimpleDateFormat(Constants.DATEFORMAT).format(date);
-	}
-
-	/**
-	 * Set the fromDate and toDate to default.
-	 */
-	private void setDatesDefault()
-	{
-		fromDate = timestampToDateString(firstEntryLong);
-		toDate = timestampToDateString(lastEntryLong);
 	}
 
 	/**

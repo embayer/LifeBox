@@ -7,7 +7,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,8 +21,8 @@ public class TimelineReloadService extends IntentService
 {
 	private static final String TAG = "TimelineReloadService";
 
-	protected final int ROWAMOUNT = 10;
-	private final int COLUMNAMOUNT = 6;
+	protected final int ROWAMOUNT = Constants.LIMIT; 		// 10 results is a set
+	private final int COLUMNAMOUNT = 6;						// each entry has 6 (View) elements
 
 	protected DbHelper mDbHelper;
 
@@ -42,6 +41,7 @@ public class TimelineReloadService extends IntentService
 	{
 		super.onCreate();
 
+		// databasehelper
 		mDbHelper = new DbHelper(getBaseContext());
 	}
 
@@ -52,19 +52,25 @@ public class TimelineReloadService extends IntentService
 		// get the extra
 		int offset = intent.getIntExtra(Constants.OFFSET_EXTRA, 0);
 
+		// array of _ids
 		String[][] dbEntryList = mDbHelper.selectEntrySet(null, "DESC", ROWAMOUNT, offset);
+		// result array with all data
 		String[][] timelineEntryList = null;
 
+		// no results
 		if(null == dbEntryList)
 		{
+			// return an empty array to TimelineFragment to show that there is no result
 			timelineEntryList = new String[0][];
 			Log.d(TAG, "No entries where fetched.");
 		}
 		else
 		{
+			// fetch the data
 			timelineEntryList = generateTimelineEntries(dbEntryList);
 		}
 
+		// return to TimelineFragment
 		Intent localIntent = new Intent(Constants.BROADCAST_ACTION_RELOADRESPONSE);
 
 		Bundle bundle = new Bundle();
@@ -107,7 +113,7 @@ public class TimelineReloadService extends IntentService
 		// iterate the given string array in order to read the fetched values
 		for(int r = 0; r < entrySetList.length; r++)
 		{
-			Log.d(TAG, "new entry");
+			Log.d(TAG, "new entry ->");
 			for(int c = 0; c < COLUMNAMOUNT; c++)
 			{
 				switch(c)
@@ -115,13 +121,13 @@ public class TimelineReloadService extends IntentService
 					// _id
 					case 0:
 						entryId = entrySetList[r][c];
-						Log.d(TAG, "id "+entrySetList[r][c]);
+						Log.d(TAG, "id: "+entrySetList[r][c]);
 						break;
 
 					// media_id
 					case 1:
 						mediaId = entrySetList[r][c];
-						Log.d(TAG, "media_id "+entrySetList[r][c]);
+						Log.d(TAG, "media_id: "+entrySetList[r][c]);
 						break;
 
 					// type
@@ -139,23 +145,25 @@ public class TimelineReloadService extends IntentService
 					// description
 					case 4:
 						description = entrySetList[r][c];
-						Log.d(TAG, "description "+entrySetList[r][c]);
+						Log.d(TAG, "description: "+entrySetList[r][c]);
 						break;
 
 					// user_date
 					case 5:
 						date = getDate(entrySetList[r][c]);
 						time = getTime(entrySetList[r][c]);
-						Log.d(TAG, "date "+date);
-						Log.d(TAG, "time "+time);
+						Log.d(TAG, "date: "+date);
+						Log.d(TAG, "time: "+time);
 						break;
 
 					default:
 						break;
 				}
 			}
+
 			// get the missing fields
 			// lookup what (media)type the entry is of
+			// mediatype file
 			if(type.equals(Constants.TYPE_FILE))
 			{
 				String filetypesId = mDbHelper.selectSingleField
@@ -176,10 +184,11 @@ public class TimelineReloadService extends IntentService
 				secondText = "";
 
 
-				Log.e(TAG, "filetypes_id " + filetypesId);
-				Log.e(TAG, "filetype " + filetype);
-				Log.e(TAG, "thumbnail path " + thumbnail);
+				Log.d(TAG, "filetypes_id: " + filetypesId);
+				Log.d(TAG, "filetype: " + filetype);
+				Log.d(TAG, "thumbnail path: " + thumbnail);
 			}
+			// mediatype text
 			else if(type.equals(Constants.TYPE_TEXT))
 			{
 				// the text
@@ -195,8 +204,9 @@ public class TimelineReloadService extends IntentService
 
 				thumbnail = "";
 				filetype = "";
-				Log.d(TAG, "text "+firstText);
+				Log.d(TAG, "text: "+firstText);
 			}
+			// mediatype music
 			else if(type.equals(Constants.TYPE_MUSIC))
 			{
 				Map<String, String> musicList = mDbHelper.selectMusicMap(mediaId);
@@ -208,10 +218,11 @@ public class TimelineReloadService extends IntentService
 				thumbnail = musicList.get("Music Thumbnail");
 				filetype = "";
 
-				Log.d(TAG, "track "+firstText);
-				Log.d(TAG, "artist "+secondText);
-				Log.d(TAG, "musicThumbnail "+thumbnail);
+				Log.d(TAG, "track: "+firstText);
+				Log.d(TAG, "artist: "+secondText);
+				Log.d(TAG, "musicThumbnail: "+thumbnail);
 			}
+			// mediatype movie
 			else if(type.equals((Constants.TYPE_MOVIE)))
 			{
 				Map<String, String> movieList = mDbHelper.selectMovieMap(mediaId);
@@ -223,9 +234,9 @@ public class TimelineReloadService extends IntentService
 				thumbnail = movieList.get("Movie Thumbnail");
 				filetype = "";
 
-				Log.d(TAG, "movieTitle "+firstText);
-				Log.d(TAG, "director "+secondText);
-				Log.d(TAG, "movieThumbnail "+thumbnail);
+				Log.d(TAG, "movieTitle: "+firstText);
+				Log.d(TAG, "director: "+secondText);
+				Log.d(TAG, "movieThumbnail: "+thumbnail);
 			}
 
 			// save the fetched results

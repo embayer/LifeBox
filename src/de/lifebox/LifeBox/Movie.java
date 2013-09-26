@@ -12,6 +12,7 @@ import java.util.Date;
  */
 public class Movie
 {
+	// members of the mediatype movie
 	private final String title;
 	private final String description;
 	private final String director;

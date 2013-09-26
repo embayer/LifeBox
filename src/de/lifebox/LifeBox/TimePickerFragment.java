@@ -54,7 +54,6 @@ public class TimePickerFragment extends DialogFragment
 		String time = new SimpleDateFormat("HH:mm").format(d);
 		// set the selected time as button text
 		Button mTimePickerBtn = (Button) getActivity().findViewById(R.id.timepicker);
-//		mTimePickerBtn.setText(hourOfDay  + ":" + minute);
 		mTimePickerBtn.setText(time);
 	}
 }

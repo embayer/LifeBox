@@ -2,11 +2,8 @@ package de.lifebox.LifeBox;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.JsonReader;
 import android.util.Log;
-import com.google.api.services.drive.model.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -46,6 +43,7 @@ public class SearchService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
+		// base url
 		String baseURL = "https://itunes.apple.com/search";
 		// get the extras
 		String query = intent.getStringExtra(Constants.SEARCH_MEDIA_QUERY_EXTRA);
@@ -53,7 +51,7 @@ public class SearchService extends IntentService
 
 		String entity = "";
 
-		// the Apple-REST-Entity for music is song
+		// set the url parameters by mediatype
 		if(mediaType.equals(Constants.TYPE_MUSIC))
 		{
 			mediaType = "song";
@@ -69,31 +67,31 @@ public class SearchService extends IntentService
 		try
 		{
 			URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e)
+		}
+		catch (UnsupportedEncodingException e)
 		{
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "URL encoding error: " + e.getMessage());
 		}
 
 		// set up a key-value list with the parameter entities
 		ArrayList<NameValuePair> postParameters = new ArrayList<NameValuePair>();
 		postParameters.add(new BasicNameValuePair("term", query));
 		postParameters.add(new BasicNameValuePair("limit", "10"));
-//		postParameters.add(new BasicNameValuePair("country", "de"));
 		postParameters.add(new BasicNameValuePair("media", mediaType));
 		postParameters.add(new BasicNameValuePair("entity", entity));
 
+		// get the result
 		String result = loadURL(baseURL, postParameters);
 
 		if(null != result)
 		{
+			// pass back to SearchMusicActivity OR SearchMovieActivity
 			Intent localIntent = new Intent(Constants.BROADCAST_ACTION_SEARCHRESPONSE);
 			localIntent.putExtra(Constants.MEDIA_RESULT_EXTRA, result);
 			localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
 			// broadcasts the Intent to receivers in this app
 			LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-
-			Log.d(TAG, result);
 		}
 	}
 
@@ -104,18 +102,19 @@ public class SearchService extends IntentService
 	 */
 	private String loadURL(String baseUrl, ArrayList<NameValuePair> postParameters)
 	{
-		// append the post parameters to the baseurl
+		// append the post parameters to the base url
 		try
 		{
 			baseUrl += getQuery(postParameters);
 		}
 		catch (UnsupportedEncodingException e)
 		{
-			Log.e(TAG, "unsupported encoding " + e.getMessage());
+			Log.e(TAG, "unsupported encoding: " + e.getMessage());
 		}
 
 		// load the site
 		HttpURLConnection urlConnection = null;
+
 		try
 		{
 			URL url = new URL(baseUrl);
@@ -128,22 +127,22 @@ public class SearchService extends IntentService
 		}
 		catch (MalformedURLException e)
 		{
-			Log.e(TAG, "malformed url " + e.getMessage());
+			Log.e(TAG, "malformed url: " + e.getMessage());
 		}
 		catch (IOException e)
 		{
-			Log.e(TAG, "io exception " + e.getMessage());
+			Log.e(TAG, "io exception: " + e.getMessage());
 		}
 		// clean up
 		finally
 		{
-		if( null != urlConnection )
-		{
-			urlConnection.disconnect();
+			if( null != urlConnection )
+			{
+				urlConnection.disconnect();
+			}
 		}
-	}
 
-	return null;
+		return null;
 	}
 
 	/**
@@ -192,10 +191,11 @@ public class SearchService extends IntentService
 		StringBuilder result = new StringBuilder();
 
 		String line;
-		while ((line = reader.readLine()) != null)
+		while(null !=(line = reader.readLine()))
 		{
 			result.append(line);
 		}
+
 		reader.close();
 
 		return result.toString();

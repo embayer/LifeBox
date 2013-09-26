@@ -30,7 +30,6 @@ public class UploadService extends IntentService
 {
 	public static final String TAG = "UploadService";
 
-	//TODO change the upload directory to AppData
 	/**Google Drive Scope for the AppData folder */
 	public static String APP_DATA_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
 	/** Drive service object */
@@ -42,10 +41,6 @@ public class UploadService extends IntentService
 
 	// thumbnail flag (extra from MetaFormActivity)
 	private boolean isThumbnail;
-
-	// metadata of the uploaded file
-	private String driveId;
-	private String downloadUrl;
 
 	/** Constructor */
 	public UploadService()
@@ -74,6 +69,7 @@ public class UploadService extends IntentService
 	 */
 	private void upload(Intent intent)
 	{
+		// inform the user
 		showToast("Begin upload");
 
 		// get the extras
@@ -88,6 +84,7 @@ public class UploadService extends IntentService
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
 		String accountName = settings.getString("accountName", "");
 
+		// login with OAuth2.0, full rights on Google Drive
 		credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
 
 		if(!accountName.equals(""))
@@ -96,6 +93,7 @@ public class UploadService extends IntentService
 			credential.setSelectedAccountName(accountName);
 			// initialize the Google Drive service
 			service = getDriveService(credential);
+
 			try
 			{
 				// assemble the file
@@ -108,15 +106,15 @@ public class UploadService extends IntentService
 
 				if(mimeType.equals(Constants.MIME_TYPE_IMAGE))
 				{
-					mediaContent = new FileContent("image/jpeg", fileContent);
+					mediaContent = new FileContent(Constants.MIME_TYPE_IMAGE, fileContent);
 					body = new File();
-					body.setMimeType("image/jpeg");
+					body.setMimeType(Constants.MIME_TYPE_IMAGE);
 				}
 				else if(mimeType.equals(Constants.MIME_TYPE_VIDEO))
 				{
-					mediaContent = new FileContent("video/mp4", fileContent);
+					mediaContent = new FileContent(Constants.MIME_TYPE_VIDEO, fileContent);
 					body = new File();
-					body.setMimeType("video/mp4");
+					body.setMimeType(Constants.MIME_TYPE_VIDEO);
 				}
 
 				body.setTitle(fileContent.getName());
@@ -139,29 +137,33 @@ public class UploadService extends IntentService
 						showToast("Video uploaded: " + file.getTitle());
 					}
 
-					Log.d(TAG, "json: " + file.toString());
+					Log.d(TAG, "Google Drive JSON: " + file.toString());
+
+					// send the meta information back to MetaFormActivity
 					sendMeta(file);
 				}
 			}
 			// inform the user about the error and try it again
 			catch(UserRecoverableAuthIOException e)
 			{
+				// inform user and try again
 				Log.e(TAG, "Authentication-Error: " + e.getMessage());
 				showToast("Authentication-Error. Trying to restart.");
 				upload(intent);
 			}
 			catch(IOException e)
 			{
+				// inform user and try again
 				Log.e(TAG, "IO Error: " + e.getMessage());
-				showToast("IO-Error. Please try again.");
+				showToast("IO-Error. Trying to restart.");
 				upload(intent);
 			}
 		}
 		else
 		{
+			// inform user
 			Log.e(TAG, "Login Error");
-			showToast("Login Error. Trying to restart.");
-			upload(intent);
+			showToast("Login Error. Please login again.");
 //			startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 		}
 	}
@@ -202,7 +204,7 @@ public class UploadService extends IntentService
 
 		localIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
-		// broadcasts the Intent to receivers in this app
+		// broadcasts the Intent to receivers in MetaFormActivity
 		LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
 	}
 

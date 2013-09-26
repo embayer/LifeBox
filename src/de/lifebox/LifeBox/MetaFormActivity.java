@@ -2,7 +2,10 @@ package de.lifebox.LifeBox;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,8 +30,10 @@ import java.util.Date;
  */
 public class MetaFormActivity extends Activity
 {
+	public final static String TAG = "MetaFormActivity";
 	// instance of my DbHelper class
 	DbHelper mDbHelper;
+
 	// will be inserted into the database
 	// (
 	// user statements
@@ -43,7 +48,6 @@ public class MetaFormActivity extends Activity
 	private String mimeType;
 	private String thumbnailUrl;
 	private String creationDate;
-	private String timeStamp;
 
 	// the extras brought by UploadService
 	private String thumbDriveId;
@@ -84,7 +88,7 @@ public class MetaFormActivity extends Activity
 	private ResponseReceiver mResponseReceiver;
 
 	// the ui elements
-	EditText titleET;
+	private EditText titleET;
 	
 	// the counters
 	private TextView tagsCount;
@@ -100,26 +104,32 @@ public class MetaFormActivity extends Activity
 	private ImageButton tagBtn;
 	private ImageButton hashtagBtn;
 
+	// the button listeners
+	// time listener
 	Button.OnClickListener mTimePickerListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
+			// call a picker
 			DialogFragment newFragment = new TimePickerFragment();
 			newFragment.show(getFragmentManager(), "timePicker");
 		}
 	};
 
+	// date listener
 	Button.OnClickListener mDatePickerListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
+			// call a picker
 			DialogFragment newFragment = new DatePickerFragment();
 			newFragment.show(getFragmentManager(), "datePicker");
 		}
 	};
 
+	// tag listener
 	Button.OnClickListener mTagListener = new Button.OnClickListener()
 	{
 		@Override
@@ -133,6 +143,7 @@ public class MetaFormActivity extends Activity
 		}
 	};
 
+	// hashtag listener
 	Button.OnClickListener mHashtagListener = new Button.OnClickListener()
 	{
 		@Override
@@ -146,37 +157,44 @@ public class MetaFormActivity extends Activity
 		}
 	};
 
+	// save entry listener
 	Button.OnClickListener mSaveListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
+			// try to save the user statements
 			boolean userdataComplete = saveUserStatements();
 
+			// all necessary data collected?
 			if(userdataComplete == true)
 			{
+				// insert a file
 				if( (mediaType.equals(Constants.TYPE_FILE)) && (uploadComplete == true) )
 				{
 					mDbHelper.insertFile(mimeType, mediaType, userTitle, userDescription, userTimestamp, fileUrl,
 						thumbnailUrl, fileDriveId, fileDownloadUrl, thumbDriveId, thumbDownloadUrl, hashtagList, tagList);
-					Log.d("entry inserted", Constants.TYPE_FILE);
+					Log.d(TAG, "entry inserted: " + Constants.TYPE_FILE);
 				}
+				// insert a text
 				else if(mediaType.equals(Constants.TYPE_TEXT))
 				{
 					mDbHelper.insertText(text, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
-					Log.d("entry inserted", Constants.TYPE_TEXT);
+					Log.d(TAG, "entry inserted: " + Constants.TYPE_TEXT);
 				}
+				// insert a movie
 				else if(mediaType.equals(Constants.TYPE_MOVIE))
 				{
 					mDbHelper.insertMovie(movieTitle, movieDirector, movieDescription, movieGenre, movieTimestamp,
 							movieThumbnailUrl, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
-					Log.d("entry inserted", Constants.TYPE_MOVIE);
+					Log.d(TAG, "entry inserted:" + Constants.TYPE_MOVIE);
 				}
+				// insert a song
 				else if(mediaType.equals(Constants.TYPE_MUSIC))
 				{
 					mDbHelper.insertMusic(musicArtist, musicAlbum, musicTimestamp, musicThumbnailUrl, musicTrack,
 							musicGenre, mediaType, userTitle, userDescription, userTimestamp, hashtagList, tagList);
-					Log.d("entry inserted", Constants.TYPE_MUSIC);
+					Log.d(TAG, "entry inserted" + Constants.TYPE_MUSIC);
 				}
 
 				// pass to MainActivity
@@ -197,12 +215,10 @@ public class MetaFormActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.metaform);
 
-		// the filter
+		// setup the filter
 		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_UPLOADRESPONSE);
-		// Adds a data filter for the HTTP scheme
-//		mStatusIntentFilter.addDataScheme("http");
 
-		// Sets the filter's category to DEFAULT
+		// set the filter's category to DEFAULT
 		mStatusIntentFilter.addCategory(Intent.CATEGORY_DEFAULT);
 
 		mDbHelper = new DbHelper(getBaseContext());
@@ -214,6 +230,8 @@ public class MetaFormActivity extends Activity
 
 		// initialize the variables
 		uploadComplete = true; 						// only needed by files
+
+		// Lists for tags and hashtags
 		hashtagList = new ArrayList<String>();
 		tagList = new ArrayList<String>();
 
@@ -230,10 +248,9 @@ public class MetaFormActivity extends Activity
 		imageView = (ImageView) findViewById(R.id.iv_thumbnail);
 
 		// the current system time
-		// TODO init with the creationdate
-		String time = new SimpleDateFormat("HH:mm").format(new Date());
+		String time = new SimpleDateFormat(Constants.TIMEFORMAT).format(new Date());
 		// the current date
-		String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		String date = new SimpleDateFormat(Constants.DATEFORMAT).format(new Date());
 
 		// get the extras
 		Intent intent = getIntent();
@@ -243,11 +260,12 @@ public class MetaFormActivity extends Activity
 		if(intent.hasExtra(Constants.MEDIA_TYPE_EXTRA))
 		{
 			mediaType = intent.getStringExtra(Constants.MEDIA_TYPE_EXTRA);
-			Log.d("type", mediaType);
+			Log.d(TAG, "type: " + mediaType);
 		}
 
 		// determine what to do with the specific media
 		// get the extras, upload the file if neccessary
+		// mediatype file
 		if(mediaType.equals(Constants.TYPE_FILE))
 		{
 			// show the upload process
@@ -267,6 +285,7 @@ public class MetaFormActivity extends Activity
 			uploadComplete = false;
 			upload(thumbnailUrl, Constants.MIME_TYPE_IMAGE, true);
 		}
+		// mediatype text
 		else if(mediaType.equals(Constants.TYPE_TEXT))
 		{
 			text = intent.getStringExtra(Constants.TEXT_EXTRA);
@@ -274,6 +293,7 @@ public class MetaFormActivity extends Activity
 			// show preview
 			imageView.setImageResource(R.drawable.button_text);
 		}
+		// mediatype movie
 		else if(mediaType.equals(Constants.TYPE_MOVIE))
 		{
 			movieTitle = intent.getStringExtra(Constants.MOVIE_TITLE_EXTRA);
@@ -291,13 +311,13 @@ public class MetaFormActivity extends Activity
 			movieView.setVisibility(View.VISIBLE);
 			movieView.loadUrl(movieThumbnailUrl);
 		}
+		// mediatype music
 		else if(mediaType.equals(Constants.TYPE_MUSIC))
 		{
 			musicArtist = intent.getStringExtra(Constants.MUSIC_ARTIST_EXTRA);
 			musicAlbum = intent.getStringExtra(Constants.MUSIC_ALBUM_EXTRA);
 			musicReleaseDate = intent.getStringExtra(Constants.MUSIC_REALEASE_DATE_EXTRA);
 			// generate the timestamp
-			// getTime() returns milliseconds, time is 22:00 so + 2h in seconds = 7200
 			musicTimestamp = stringToTimestamp(musicReleaseDate).getTime();
 			musicThumbnailUrl = intent.getStringExtra(Constants.MUSIC_THUMBNAIL_URL_EXTRA);
 			musicTrack = intent.getStringExtra(Constants.MUSIC_TRACK_EXTRA);
@@ -309,6 +329,7 @@ public class MetaFormActivity extends Activity
 			musicView.loadUrl(musicThumbnailUrl);
 		}
 
+		// unspecific ui elements
 		// the counters
 		tagsCount = (TextView) findViewById(R.id.textview_tagscount);
 		hashtagsCount = (TextView) findViewById(R.id.textview_hashtagscount);
@@ -399,6 +420,7 @@ public class MetaFormActivity extends Activity
 		// decide by request code what to do
 		switch(requestCode)
 		{
+			// returns from collecting tags
 			case Constants.ACTION_GATHER_TAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -412,8 +434,8 @@ public class MetaFormActivity extends Activity
 						tagBtn.setBackgroundResource(R.drawable.button_tag);
 					}
 				}
-				//TODO Fehlerbehandlung
 				break;
+			// returns from collecting hashtags
 			case Constants.ACTION_GATHER_HASHTAGS:
 				if(resultCode == Activity.RESULT_OK)
 				{
@@ -430,7 +452,6 @@ public class MetaFormActivity extends Activity
 						}
 					}
 				}
-				//TODO Fehlerbehandlung
 				break;
 			default:
 				break;
@@ -465,12 +486,13 @@ public class MetaFormActivity extends Activity
 
 	/**
 	 * Saves the user statements.
-	 * @return true if everything is ok. Otherwise false if there was a problem (needed input field empty...)
+	 * @return true if everything is ok. Otherwise false if there was a problem.
 	 */
 	private boolean saveUserStatements()
 	{
 		boolean success = uploadComplete;
 
+		// necessary data
 		userTitle = "";
 		userDescription = "";
 		userTimestamp = 0;
@@ -489,6 +511,7 @@ public class MetaFormActivity extends Activity
 		// title has to be set
 		if(userTitle.equals(""))
 		{
+			// no title is set
 			success = false;
 
 			// inform the user
@@ -496,8 +519,10 @@ public class MetaFormActivity extends Activity
 		}
 		else
 		{
+			// title set but upload still in progress
 			if(uploadComplete == false)
 			{
+
 				// inform the user
 				Toast.makeText(getBaseContext(), "Upload in progress.", Toast.LENGTH_SHORT).show();
 			}
@@ -510,7 +535,7 @@ public class MetaFormActivity extends Activity
 		// date and time string
 		String dts = date + " " + time;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_TIME);
 		Date parsedDate = null;
 		try
 		{
@@ -519,7 +544,7 @@ public class MetaFormActivity extends Activity
 		catch (ParseException e)
 		{
 			success = false;
-			Log.e("parse date error", e.getMessage());
+			Log.e(TAG, "parse date error" + e.getMessage());
 		}
 		Timestamp timestamp = new Timestamp(parsedDate.getTime());
 
@@ -539,7 +564,7 @@ public class MetaFormActivity extends Activity
 		string = string.substring(0, 16);
 		string = string.replace('T', ' ');
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_TIME);
 
 		Date parsedDate = null;
 		try
@@ -574,13 +599,12 @@ public class MetaFormActivity extends Activity
 
 				// show the thumbnail
 				imageView.setImageDrawable(Drawable.createFromPath(thumbnailUrl));
-				//todo show in the beginning
 
 				// get the extras
 				thumbDriveId = intent.getStringExtra(Constants.DRIVE_ID_EXTRA);
 				thumbDownloadUrl = intent.getStringExtra(Constants.DOWNLOAD_URL_EXTRA);
 			}
-			// if the upload was the file itself -> done
+			// if the upload was the file itself (not just the thumbnail) -> done
 			else
 			{
 				// get the extras
@@ -594,13 +618,6 @@ public class MetaFormActivity extends Activity
 				progressBar.setVisibility(View.INVISIBLE);
 				uploadText.setBackgroundResource(R.color.gray);
 			}
-
-			//todo zwischen thumb und file unterscheiden
-			// get the extras
-			String driveMetaData = intent.getStringExtra("driveMetaData");
-
-			TextView mTextView = (TextView) findViewById(R.id.in_description);
-			mTextView.setText(driveMetaData);
 		}
 	}
 

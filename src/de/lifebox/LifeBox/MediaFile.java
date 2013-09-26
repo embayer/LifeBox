@@ -1,7 +1,7 @@
 package de.lifebox.LifeBox;
 
 /**
- * Wrapper class for the media type file
+ * Wrapper class for the mediatype file
  * @version 0.1 06.08.13
  * @autor Markus Bayer
  */
@@ -9,16 +9,19 @@ public class MediaFile
 {
 	private final String filetype;
 
+	// offline content
 	private final String offlinePathFile;
 	private final String offlinePathThumbnail;
 
+	// online content
 	private final String driveIdFile;
 	private final String driveIdThumbnail;
 	private final String urlFile;
 	private final String urlThumbnail;
 
 	/** Constructor. */
-	public MediaFile(String filetype, String offlinePathFile, String offlinePathThumbnail, String driveIdFile, String driveIdThumbnail, String urlFile, String urlThumbnail)
+	public MediaFile(String filetype, String offlinePathFile, String offlinePathThumbnail, String driveIdFile,
+					 String driveIdThumbnail, String urlFile, String urlThumbnail)
 	{
 		this.filetype = filetype;
 		this.offlinePathFile = offlinePathFile;

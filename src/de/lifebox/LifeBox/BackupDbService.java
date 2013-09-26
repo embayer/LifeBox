@@ -1,24 +1,16 @@
 package de.lifebox.LifeBox;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
-import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.*;
 
 import java.io.*;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -47,37 +39,48 @@ public class BackupDbService extends UploadService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
+		// inform the user
 		showToast("Begin database backup");
 
 		// create a timestamp
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+		String timeStamp = new SimpleDateFormat(Constants.FILE_PREFIX_DATEFORMAT).format(new Date());
 
 		// offline backup to sd-card
 		String path = offlineBackup(getBaseContext(), Constants.DATABASE_NAME, timeStamp);
 
-		// online backup to google drive
+		// online backup to Google Drive
 		onlineBackup(path);
 	}
 
+	/**
+	 * Backup the database file onto the sd card of the device
+	 * @param c (Context) the Context
+	 * @param databaseName (String) name of the database
+	 * @param timeStamp (String) current time
+	 * @return String the path
+	 */
 	private String offlineBackup(Context c, String databaseName, String timeStamp)
 	{
 		// the result
 		File db = null;
+		// get the path
 		String databasePath = c.getDatabasePath(databaseName).getPath();
+		// get a file
 		File f = new File(databasePath);
 		OutputStream myOutput = null;
 		InputStream myInput = null;
 		Log.d(TAG, " testing db path " + databasePath);
 		Log.d(TAG, " testing db exist " + f.exists());
 
-		if (f.exists())
+		// store it
+		if(f.exists())
 		{
 			try
 			{
 				AlbumStorageDirFactory mAlbumStorageDirFactory = new AlbumStorageDirFactory();
 				File directory = mAlbumStorageDirFactory.getDbStorageDir();
 
-				if (!directory.exists())
+				if(!directory.exists())
 				{
 					directory.mkdir();
 				}
@@ -89,6 +92,7 @@ public class BackupDbService extends UploadService
 
 				byte[] buffer = new byte[1024];
 				int length;
+
 				while ((length = myInput.read(buffer)) > 0)
 				{
 					myOutput.write(buffer, 0, length);
@@ -125,12 +129,17 @@ public class BackupDbService extends UploadService
 		return db.getAbsolutePath();
 	}
 
+	/**
+	 * Backup the database file on Google Drive
+	 * @param path (String) the path of the database file
+	 */
 	private void onlineBackup(String path)
 	{
 		// retrieve the users accountname from the sharedpreferences
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
 		String accountName = settings.getString("accountName", "");
 
+		// signin with OAuth2.0, full rights
 		credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
 
 		if(null != accountName)
@@ -156,7 +165,6 @@ public class BackupDbService extends UploadService
 
 				body.setTitle(fileContent.getName());
 				body.setDescription("LifeBoxFile");
-//				body.setParents(Arrays.asList(new ParentReference().setId("appdata")));
 
 				// upload
 				com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
@@ -165,24 +173,27 @@ public class BackupDbService extends UploadService
 				// succeeded?
 				if (null != file)
 				{
-					// notify the user via a toast
+					// notify the user via a toast and try again
+					onlineBackup(path);
 					showToast("Database backup complete.");
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
 			{
-				showToast("Authentication-Error. Please try again.");
+				// notify the user via a toast
+				showToast("Authentication-Error. Please login again.");
 			}
 			catch(IOException e)
 			{
+				// notify the user via a toast and try again
+				onlineBackup(path);
 				Log.e("IO Error", e.getMessage());
-				showToast("IO-Error. Please try again.");
+				showToast("IO-Error. Trying again.");
 			}
 		}
 		else
 		{
-			//TODO Fehlerbehandlung
-			showToast("Log in Error. Please try again.");
+			showToast("Login Error. Please login again.");
 //			startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 		}
 	}

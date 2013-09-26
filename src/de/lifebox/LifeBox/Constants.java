@@ -1,7 +1,5 @@
 package de.lifebox.LifeBox;
 
-import java.util.ArrayList;
-
 /**
  * Holds system-wide constants
  * @version 0.1 24.06.13
@@ -9,8 +7,6 @@ import java.util.ArrayList;
  */
 public final class Constants
 {
-	//TODO set the package name prefix for all extras
-	//TODO split in extra name, extra
 	// the name of the package
 	public static final String PACKAGE_NAME_PREFIX = "de.lifebox.LifeBox.";
 	// the app name
@@ -31,8 +27,6 @@ public final class Constants
 	public static final int CALLER_META_FORM_ACTIVITY = 102;
 	public static final int CALLER_TIMELINE_DETAIL_ACTIVITY = 103;
 	public static final int CALLER_FILTER_ACTIVITY = 104;
-	public static final int CALLER_TIMELINE_RELOAD_SERVICE = 105;
-	public static final int CALLER_TIMELINE_FILTERED_RELOAD_SERVICE = 106;
 
 	// codes for the different MIME-Types
 	public static final String MIME_TYPE_IMAGE = "image/jpeg";
@@ -51,10 +45,18 @@ public final class Constants
 	public static final String TYPE_IMAGE_FILE = MIME_TYPE_IMAGE;
 	public static final String TYPE_VIDEO_FILE = MIME_TYPE_VIDEO;
 
-	// the date format
+	// date formats
 	public static final String SQL_DATEFORMAT = "yyyy-MM-dd";
 	public static final String GERMAN_DATEFORMAT = "dd.MM.yyyy";
 	public static final String DATEFORMAT = SQL_DATEFORMAT;
+
+	public static final String FILE_PREFIX_DATEFORMAT = "yyyyMMdd_HHmmss";
+	public static final String DATE_TIME = "yyyy-MM-dd HH:mm";
+	// time format
+	public static final String TIMEFORMAT = "HH:mm";
+
+	// amount of entries a TimelineReloadService fetch at a time
+	public static final int LIMIT = 10;
 
 	// codes for the extras
 	// caller identification
@@ -150,6 +152,6 @@ public final class Constants
 	public static final String TIMELINE_ENTRIES_ARRAY_EXTRA = PACKAGE_NAME_PREFIX + "timelineEntriesArrayExtra";
 	public static final String TIMELINE_ENTRIES_BUNDLE_EXTRA = PACKAGE_NAME_PREFIX + "timelineEntriesBundleExtra";
 
-	/** Constructor is empty to prevent instantiating the Constants class. */
+	/** Constructor is private and empty to prevent instantiating the Constants class. */
 	private Constants() {}
 }

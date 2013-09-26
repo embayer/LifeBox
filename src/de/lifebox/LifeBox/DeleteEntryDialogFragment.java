@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 /**
  * Dialog fragment to let the user confirm the deletion of a entry
@@ -30,7 +28,8 @@ public class DeleteEntryDialogFragment extends DialogFragment
 
 	// Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
 	@Override
-	public void onAttach(Activity activity) {
+	public void onAttach(Activity activity)
+	{
 		super.onAttach(activity);
 		// verify that the host activity implements the callback interface
 		try
@@ -66,6 +65,7 @@ public class DeleteEntryDialogFragment extends DialogFragment
 						mListener.onDialogNegativeClick(DeleteEntryDialogFragment.this);
 					}
 				});
+
 		// Create the AlertDialog object and return it
 		return builder.create();
 	}

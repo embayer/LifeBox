@@ -1,6 +1,5 @@
 package de.lifebox.LifeBox;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,7 @@ public class TimelineDetailMusicActivity extends TimelineDetailActivity
 {
 	private final static String TAG = "TimelineDetailMusicActivity";
 
+	// databasehelper
 	private DbHelper mDbHelper;
 
 	// the music

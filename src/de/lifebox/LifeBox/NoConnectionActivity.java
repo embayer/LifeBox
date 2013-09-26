@@ -1,7 +1,6 @@
 package de.lifebox.LifeBox;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -18,17 +17,21 @@ import android.widget.Toast;
  */
 public class NoConnectionActivity extends Activity
 {
+	// button listener retry
 	Button.OnClickListener mRetryListener = new Button.OnClickListener()
 	{
 		@Override
 		public void onClick(View v)
 		{
+			// check connectivity
 			if(isOnline())
 			{
+				// signin per Google+ Sign-In
 				startSignIn();
 			}
 			else
 			{
+				// inform the user about the missing connection
 				Toast.makeText(getBaseContext(), "Check your internet connection.", Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -40,21 +43,19 @@ public class NoConnectionActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.noconnection);
 
+		// init the retry button, set the listener
 		Button retryBtn = (Button) findViewById(R.id.retry);
 		retryBtn.setOnClickListener(mRetryListener);
-
-//		if(isOnline())
-//		{
-//			startSignIn();
-//		}
 	}
 
 	/**
-	 * Start an intent to signin to g+
+	 * Start an intent to signin to Google+ Sign-In
 	 */
 	public void startSignIn()
 	{
 		Intent intent = new Intent(this, SignInActivity.class);
+
+		// clear backstack navigation
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
@@ -70,7 +71,7 @@ public class NoConnectionActivity extends Activity
 				getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-		if(networkInfo != null && networkInfo.isConnected())
+		if(null != networkInfo && networkInfo.isConnected())
 		{
 			return true;
 		}

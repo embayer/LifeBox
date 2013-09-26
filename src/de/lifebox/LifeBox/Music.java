@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class Music
 {
+	// members of the mediatype movie
 	private final String artist;
 	private final String album;
 	private final String releaseDate;

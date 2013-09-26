@@ -1,13 +1,10 @@
 package de.lifebox.LifeBox;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -19,6 +16,7 @@ public class TimelineDetailMovieActivity extends TimelineDetailActivity
 {
 	private final static String TAG = "TimelineDetailMovieActivity";
 
+	// databasehelper
 	private DbHelper mDbHelper;
 
 	// the movie
@@ -32,6 +30,7 @@ public class TimelineDetailMovieActivity extends TimelineDetailActivity
 	private TextView genreTV;
 	private TextView descriptionTV;
 
+	/** Called when the Activity is first created. */
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);

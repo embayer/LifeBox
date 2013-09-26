@@ -17,7 +17,10 @@ import java.util.List;
 
 
 /**
- * Main activity, holding the view fragments.
+ * Main activity, holding the view fragments:
+ * 	-ReportingFragment
+ * 	-InputFragment
+ * 	-TimelineFragment
  * @author Markus Bayer
  * @version 0.1 12.06.2013
  */
@@ -27,12 +30,6 @@ public class MainActivity extends FragmentActivity
 
 	MainPageAdapter mPageAdapter;		// managing the different views
 	ViewPager mViewPager;               // switch between views through swiping
-
-	static final int CAPTURE_IMAGE = 1;
-
-	private static final int ACTION_TAKE_PHOTO = 1;
-
-	private static Uri fileUri;
 
 	/** Executed when the activity is first created. */
 	@Override
@@ -57,6 +54,7 @@ public class MainActivity extends FragmentActivity
 					}
 				});
 
+		// ActionBar object
 		final ActionBar actionBar = getActionBar();
 		// put tabs into actionbar
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -92,17 +90,21 @@ public class MainActivity extends FragmentActivity
 		Intent intent = getIntent();
 		int callerId = intent.getIntExtra(Constants.CALLER_EXTRA, 100);
 
+		// show the correct fragment by caller
+		// fresh start
 		if(callerId == Constants.CALLER_SIGN_IN_ACTIVITY)
 		{
 			// display the inputmethod on startup
 			mViewPager.setCurrentItem(1, true);
 		}
+		// new entry was added or a entry detail was viewed
 		else if(callerId == Constants.CALLER_META_FORM_ACTIVITY
 				|| callerId == Constants.CALLER_TIMELINE_DETAIL_ACTIVITY)
 		{
 			// display the timeline
 			mViewPager.setCurrentItem(2, true);
 		}
+		//
 		else if(callerId == Constants.CALLER_FILTER_ACTIVITY)
 		{
 			// get the extras and put them as bundle
@@ -121,6 +123,7 @@ public class MainActivity extends FragmentActivity
 			// display the timeline
 			mViewPager.setCurrentItem(2, true);
 		}
+		// default case
 		else if(callerId == 100)
 		{
 			mViewPager.setCurrentItem(1, true);

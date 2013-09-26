@@ -31,6 +31,8 @@ import java.util.ArrayList;
  */
 public class SearchMovieActivity extends Activity
 {
+	public final static String TAG = "SearchMovieActivity";
+
 	private ResponseReceiver mResponseReceiver;
 
 	// ArrayList to store the searchresults
@@ -46,6 +48,7 @@ public class SearchMovieActivity extends Activity
 	// the type of media to search for
 	private String mediaType;
 
+	// ui elements
 	// the EditText search query
 	private EditText queryEditText;
 	// the listviews to display the searchresult
@@ -76,6 +79,7 @@ public class SearchMovieActivity extends Activity
 				{
 					searchMedia();
 				}
+
 				eventConsumed = true;
 
 			}
@@ -125,6 +129,7 @@ public class SearchMovieActivity extends Activity
 					}
 				}
 
+				// pass to MetaFormActivity
 				startActivity(intent);
 			}
 		}
@@ -152,6 +157,7 @@ public class SearchMovieActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.searchmedia);
 
+		// initialize the ui elements
 		searchResultListView = (ListView) findViewById(R.id.listview_searchresults);
 
 		// the progress bar
@@ -165,7 +171,7 @@ public class SearchMovieActivity extends Activity
 		Button saveBtn = (Button) findViewById(R.id.button_save_media);
 		saveBtn.setOnClickListener(mSaveListener);
 
-		// the filter
+		// setup the filter
 		IntentFilter mStatusIntentFilter = new IntentFilter(Constants.BROADCAST_ACTION_SEARCHRESPONSE);
 
 		// Sets the filter's category to DEFAULT
@@ -273,6 +279,7 @@ public class SearchMovieActivity extends Activity
 		}
 		else
 		{
+			// inform the user
 			Toast toast = Toast.makeText(getBaseContext(), "Please enter a movie.", Toast.LENGTH_SHORT);
 			toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 120);
 			toast.show();
@@ -424,7 +431,6 @@ public class SearchMovieActivity extends Activity
 			Movie currentMovie = movieList.get(position);
 
 			// set the thumbnail image
-			// TODO remove network operation from the main thread
 			thumbnailWebView = (WebView)itemView.findViewById(R.id.searchresult_thumbnail);
 			thumbnailWebView.loadUrl(currentMovie.getThumbnailUrl());
 
@@ -457,6 +463,7 @@ public class SearchMovieActivity extends Activity
 			if(intent.hasExtra(Constants.MEDIA_RESULT_EXTRA))
 			{
 				String result = intent.getStringExtra(Constants.MEDIA_RESULT_EXTRA);
+				Log.d(TAG, "JSON: " + result);
 
 				try
 				{
@@ -478,7 +485,7 @@ public class SearchMovieActivity extends Activity
 				}
 				catch (IOException e)
 				{
-					Log.e("parseMusicJsonString: IOException", e.getMessage());
+					Log.e(TAG, "parseMusicJsonString: IOException" + e.getMessage());
 				}
 			}
 		}

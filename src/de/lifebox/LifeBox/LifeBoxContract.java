@@ -13,7 +13,7 @@ public final class LifeBoxContract
 	public LifeBoxContract() {}
 
 	// inner classes that defines the table contents
-	// the entities
+	// entries
 	/** The entries on the timeline. */
 	public static abstract class Entries implements BaseColumns
 	{
@@ -39,7 +39,7 @@ public final class LifeBoxContract
 	}
 
 	// the possible types
-	/** The media files. (Images, Videos are of the type file). */
+	/** The mediatype files. (Images, Videos are of the type file). */
 	public static abstract class Files implements BaseColumns
 	{
 		public static final String TABLE_NAME = "files";
@@ -48,7 +48,7 @@ public final class LifeBoxContract
 		public static final String COLUMN_NAME_FILETYPES_ID = "filetypes_id";
 	}
 
-	/** The media text. */
+	/** The mediatype text. */
 	public static abstract class Text implements BaseColumns
 	{
 		public static final String TABLE_NAME = "text";
@@ -57,7 +57,7 @@ public final class LifeBoxContract
 		public static final String COLUMN_NAME_TEXT = "text";
 	}
 
-	/** The media music. */
+	/** The mediatype music. */
 	public static abstract class Music implements BaseColumns
 	{
 		public static final String TABLE_NAME = "music";
@@ -68,7 +68,7 @@ public final class LifeBoxContract
 		public static final String COLUMN_NAME_ALBUMS_ID = "albums_id";
 	}
 
-	/** The type movie. */
+	/** The mediatype movie. */
 	public static abstract class Movies implements BaseColumns
 	{
 		public static final String TABLE_NAME = "movies";

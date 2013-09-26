@@ -5,7 +5,10 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.*;
 
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 {
 	public static final String TAG = "TimelineDetailActivity";
 
+	// databasehelper
 	private DbHelper mDbHelper;
 
 	// the extra (_id of the entry)
@@ -46,6 +50,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 
 	private TableLayout tagsTL;
 
+	// table rows to store tags
 	TableRow tableRow1;
 	TableRow tableRow2;
 	TableRow tableRow3;
@@ -109,6 +114,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 		{
 			// 0 is not valid and will be ignored
 			int imgId = 0;
+
 			try
 			{
 				// get the entriesId to the string representation of the drawable
@@ -126,6 +132,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 			ImageView iv = new ImageView(TimelineDetailActivity.this);
 			iv.setBackgroundResource(imgId);
 
+			// break the rows
 			if(cnt < 10)
 			{
 				tableRow1.addView(iv);
@@ -141,8 +148,6 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 
 			cnt++;
 		}
-
-//		setContentView(tagsTL);
 
 		//get the hashtag List
 		hashtagList = mDbHelper.selectHashtags(entriesId);
@@ -179,13 +184,13 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.entrydetail, menu);
 
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	/** Called when the a item on the action bar is pressed. */
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
 		// handle presses on the action bar items
 		switch (item.getItemId())
 		{
@@ -215,7 +220,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 		return specificLL;
 	}
 
-	// the dialog fragment receives a reference to this Activity through the
+	// the dialog fragment receives a reference to this Activity by the
 	// Fragment.onAttach() callback, which it uses to call the following methods
 	// defined by the NoticeDialogFragment.NoticeDialogListener interface
 
@@ -231,6 +236,7 @@ public class TimelineDetailActivity extends Activity implements DeleteEntryDialo
 
 		boolean success = false;
 
+		// decide by mediatype
 		if(type.equals(Constants.TYPE_FILE))
 		{
 			success = mDbHelper.deleteFile(entriesId, mediaId);

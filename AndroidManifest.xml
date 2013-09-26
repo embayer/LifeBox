@@ -33,10 +33,6 @@
 
         <activity android:name=".MainActivity" />
 
-        <activity android:name=".SelectFileTypeActivity"
-                  android:theme="@android:style/Theme.Holo.Wallpaper"
-                  android:parentActivityName="SelectTypeActivity" />
-
         <activity
                 android:name=".NoConnectionActivity"
                 android:noHistory="true" />
@@ -47,7 +43,6 @@
 
         <activity android:name=".HashtagsActivity"
                   android:windowSoftInputMode="stateVisible|adjustPan"/>
-        <activity android:name=".SearchMediaActivity"/>
         <activity android:name=".SearchMovieActivity"/>
         <activity android:name=".SearchMusicActivity"/>
         <activity android:name=".TextFormActivity"

@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import com.google.api.services.drive.model.File;
 
 /**
  * Detailed view for entries of the type mediafile (image).
@@ -22,6 +20,7 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 {
 	private final static String TAG = "TimelineDetailFileImageActivity";
 
+	// databasehelper
 	private DbHelper mDbHelper;
 
 	// the mediafile
@@ -31,7 +30,7 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 	private ImageButton portraitImageIB;
 	private ImageButton landscapeImageIB;
 
-	// ImageButtons
+	// ImageButton Listener
 	Button.OnClickListener mImageButtonListener = new Button.OnClickListener()
 	{
 		@Override
@@ -45,6 +44,7 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 		}
 	};
 
+	/** Called when the Activity is first created. */
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -77,6 +77,7 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 
 		if(width < height)
 		{
+			// portrait mode -> disable landscape, show portrait
 			landscapeLayout.setVisibility(View.INVISIBLE);
 			landscapeImageIB.setVisibility(View.INVISIBLE);
 			landscapeLayout.removeAllViews();
@@ -85,6 +86,7 @@ public class TimelineDetailFileImageActivity extends TimelineDetailActivity
 		}
 		else
 		{
+			// landscape mode -> disable portrait, show landscape
 			portraitLayout.setVisibility(View.INVISIBLE);
 			portraitImageIB.setVisibility(View.INVISIBLE);
 			portraitLayout.removeAllViews();
