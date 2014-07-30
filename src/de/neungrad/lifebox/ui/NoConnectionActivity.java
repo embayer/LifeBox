@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 
 /**
  * Activity for handling connection problems.

@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.widget.Button;
 import android.widget.TimePicker;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.helper.Constants;
 
 import java.util.ArrayList;

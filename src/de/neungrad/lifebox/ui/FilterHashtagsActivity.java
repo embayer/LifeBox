@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 
 /**
  * Activity which lets the user select the hashtags for the filter.

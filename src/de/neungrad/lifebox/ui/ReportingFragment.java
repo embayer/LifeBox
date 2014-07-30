@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.db.DbHelper;
 import de.neungrad.lifebox.db.LifeBoxContract;
 import de.neungrad.lifebox.helper.Constants;
@@ -93,21 +93,33 @@ public class ReportingFragment extends Fragment
 
 		// most often used tag
 		TextView tagMostPopular = (TextView) view.findViewById(R.id.reporting_tag_mostpopular_value);
-		tagMostPopular.setText(tagList.get(0).get("tag").toString());
+		if(!tagList.isEmpty())
+		{
+			tagMostPopular.setText(tagList.get(0).get("tag").toString());
+		}
 
 		// amount of appearance
 		TextView tagMostPopularCount = (TextView) view.findViewById(R.id.reporting_tag_mostpopular_count_value);
-		tagMostPopularCount.setText(tagList.get(0).get("count").toString());
+		if(!tagList.isEmpty())
+		{
+			tagMostPopularCount.setText(tagList.get(0).get("count").toString());
+		}
 
 		ArrayList<HashMap<String, String>> hashtagList = mDbHelper.selectHashtagUsage(1);
 
 		// most often used hashtag
 		TextView hashtagMostPopular = (TextView) view.findViewById(R.id.reporting_hashtag_mostpopular_value);
-		hashtagMostPopular.setText(hashtagList.get(0).get("hashtag").toString());
+		if(!hashtagList.isEmpty())
+		{
+			hashtagMostPopular.setText(hashtagList.get(0).get("hashtag").toString());
+		}
 
 		// amount of appearance
 		TextView hashtagMostPopularCount = (TextView) view.findViewById(R.id.reporting_hashtag_mostpopular_count_value);
-		hashtagMostPopularCount.setText(hashtagList.get(0).get("count").toString());
+		if(!hashtagList.isEmpty())
+		{
+			hashtagMostPopularCount.setText(hashtagList.get(0).get("count").toString());
+		}
 
 		// different music genres
 		TextView differentMusicGenres = (TextView) view.findViewById(R.id.reporting_musicgenres_total_value);
@@ -126,11 +138,17 @@ public class ReportingFragment extends Fragment
 
 		// most often used music genre
 		TextView musicGenreMostPopular = (TextView) view.findViewById(R.id.reporting_musicgenres_mostpopular_value);
-		musicGenreMostPopular.setText(musicGenreList.get(0).get("genre").toString());
+		if(!musicGenreList.isEmpty())
+		{
+			musicGenreMostPopular.setText(musicGenreList.get(0).get("genre").toString());
+		}
 
 		// amount of appearance
 		TextView musicGenreMostPopularCount = (TextView) view.findViewById(R.id.reporting_musicgenres_mostpopular_count_value);
-		musicGenreMostPopularCount.setText(musicGenreList.get(0).get("count").toString());
+		if(!musicGenreList.isEmpty())
+		{
+			musicGenreMostPopularCount.setText(musicGenreList.get(0).get("count").toString());
+		}
 
 		ArrayList<HashMap<String, String>> movieGenreList = mDbHelper.selectGenreUsage
 				(
@@ -139,11 +157,17 @@ public class ReportingFragment extends Fragment
 
 		// most often used movie genre
 		TextView movieGenreMostPopular = (TextView) view.findViewById(R.id.reporting_moviegenres_mostpopular_value);
-		movieGenreMostPopular.setText(movieGenreList.get(0).get("genre").toString());
+		if(!movieGenreList.isEmpty())
+		{
+			movieGenreMostPopular.setText(movieGenreList.get(0).get("genre").toString());
+		}
 
 		// amount of appearance
 		TextView movieGenreMostPopularCount = (TextView) view.findViewById(R.id.reporting_moviegenres_mostpopular_count_value);
-		movieGenreMostPopularCount.setText(movieGenreList.get(0).get("count").toString());
+		if(!movieGenreList.isEmpty())
+		{
+			movieGenreMostPopularCount.setText(movieGenreList.get(0).get("count").toString());
+		}
 
 		HashMap<String, String> firstList = mDbHelper.selectExtremeTitle("MIN");
 

@@ -24,7 +24,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.helper.AlbumStorageDirFactory;
 import de.neungrad.lifebox.helper.Constants;
 import de.neungrad.lifebox.service.BackupDbService;

@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.TextView;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.db.DbHelper;
 import de.neungrad.lifebox.helper.Music;
 

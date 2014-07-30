@@ -22,6 +22,7 @@ import de.neungrad.lifebox.helper.Constants;
 
 import java.io.IOException;
 
+
 /**
  * IntentService for uploading media onto Google Drive as asynchronous requests.
  * @author Markus Bayer
@@ -43,6 +44,9 @@ public class UploadService extends IntentService
 	// thumbnail flag (extra from MetaFormActivity)
 	private boolean isThumbnail;
 
+	// tries to upload the
+	private int tries = 0;
+
 	/** Constructor */
 	public UploadService()
 	{
@@ -61,6 +65,7 @@ public class UploadService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
+		// try to upload
 		upload(intent);
 	}
 
@@ -84,6 +89,7 @@ public class UploadService extends IntentService
 		// retrieve the user accountname from the sharedpreferences
 		SharedPreferences settings = getSharedPreferences("preferences", 0);
 		String accountName = settings.getString("accountName", "");
+		Log.e("acn", accountName);
 
 		// login with OAuth2.0, full rights on Google Drive
 		credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
@@ -144,20 +150,25 @@ public class UploadService extends IntentService
 					sendMeta(file);
 				}
 			}
-			// inform the user about the error and try it again
+			// inform the user about the error
 			catch(UserRecoverableAuthIOException e)
 			{
-				// inform user and try again
+				// inform user
 				Log.e(TAG, "Authentication-Error: " + e.getMessage());
-				showToast("Authentication-Error. Trying to restart.");
-				upload(intent);
+				showToast("Authentication-Error. Please login again.");
 			}
 			catch(IOException e)
 			{
 				// inform user and try again
 				Log.e(TAG, "IO Error: " + e.getMessage());
 				showToast("IO-Error. Trying to restart.");
-				upload(intent);
+
+				if(tries < 3)
+				{
+					tries += 1;
+					upload(intent);
+				}
+
 			}
 		}
 		else

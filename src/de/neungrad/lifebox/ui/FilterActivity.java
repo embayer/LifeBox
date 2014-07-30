@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.db.DbHelper;
 import de.neungrad.lifebox.helper.Constants;
 

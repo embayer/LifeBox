@@ -16,7 +16,7 @@ import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.*;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.helper.Constants;
 import de.neungrad.lifebox.helper.Movie;
 import de.neungrad.lifebox.service.SearchService;

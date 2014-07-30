@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import de.neungrad.lifebox.helper.Constants;
 import de.neungrad.lifebox.db.LifeBoxContract;
+import de.neungrad.lifebox.helper.Constants;
 
 import java.util.ArrayList;
 

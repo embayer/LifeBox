@@ -6,7 +6,7 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.DatePicker;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.helper.Constants;
 
 import java.text.SimpleDateFormat;

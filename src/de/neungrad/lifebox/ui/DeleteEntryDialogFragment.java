@@ -6,8 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import de.lifebox.LifeBox.R;
-
+import de.neungrad.lifebox.R;
 /**
  * Dialog fragment to let the user confirm the deletion of a entry
  * @version 0.1 08.08.13

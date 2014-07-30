@@ -16,7 +16,7 @@ import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.*;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.helper.Constants;
 import de.neungrad.lifebox.helper.Music;
 import de.neungrad.lifebox.service.SearchService;
@@ -440,7 +440,6 @@ public class SearchMusicActivity extends Activity
 			Music currentMusic = musicList.get(position);
 
 			// set the thumbnail image
-			// TODO remove network operation from the main thread
 			thumbnailWebView = (WebView) itemView.findViewById(R.id.musiclist_thumbnail);
 			thumbnailWebView.loadUrl(currentMusic.getThumbnailUrl());
 

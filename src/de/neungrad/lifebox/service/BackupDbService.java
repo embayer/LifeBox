@@ -31,6 +31,9 @@ public class BackupDbService extends UploadService
 	/** Google account authentification object */
 	private GoogleAccountCredential credential;
 
+	// tries to upload the
+	private int tries = 0;
+
 	/** Creates an IntentService.  Invoked the subclass's constructor. */
 	public BackupDbService()
 	{
@@ -175,8 +178,12 @@ public class BackupDbService extends UploadService
 				if (null != file)
 				{
 					// notify the user via a toast and try again
-					onlineBackup(path);
 					showToast("Database backup complete.");
+					if(tries < 3)
+					{
+						tries += 1;
+						onlineBackup(path);
+					}
 				}
 			}
 			catch(UserRecoverableAuthIOException e)
@@ -187,7 +194,11 @@ public class BackupDbService extends UploadService
 			catch(IOException e)
 			{
 				// notify the user via a toast and try again
-				onlineBackup(path);
+				if(tries < 3)
+				{
+					tries += 1;
+					onlineBackup(path);
+				}
 				Log.e("IO Error", e.getMessage());
 				showToast("IO-Error. Trying again.");
 			}

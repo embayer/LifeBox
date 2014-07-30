@@ -10,7 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import de.lifebox.LifeBox.R;
+import de.neungrad.lifebox.R;
 import de.neungrad.lifebox.db.DbHelper;
 import de.neungrad.lifebox.helper.Constants;
 import de.neungrad.lifebox.helper.Entry;
